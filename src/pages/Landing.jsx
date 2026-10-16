@@ -855,6 +855,7 @@ const PERSON = JSON.stringify({
   "@type": "Person",
   name: PROFILE.name,
   alternateName: PROFILE.shortName,
+  url: import.meta.env.VITE_SITE_URL || undefined,
   jobTitle: PROFILE.role,
   email: `mailto:${PROFILE.email}`,
   sameAs: [PROFILE.github, PROFILE.linkedin],
