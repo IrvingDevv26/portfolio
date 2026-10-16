@@ -140,23 +140,6 @@ export const SHOWCASE = {
 
 export const PROJECTS = [
   {
-    name: "AgendaFlow",
-    kind: "Agente de IA · Citas",
-    summary:
-      "Un agente que atiende como por WhatsApp: consulta horarios, agenda, cambia y cancela citas de una clínica. La IA conversa y el backend valida cada acción, así que nunca hay choques ni horarios inventados.",
-    highlights: [
-      "Cinco herramientas (consultar, agendar, buscar, cambiar y cancelar) validadas en el backend",
-      "Entiende fechas como \"el jueves en la tarde\" y explica las reglas al paciente",
-      "IA gratuita con respaldo (Gemini Flash-Lite y Groq) y límites por visitante",
-    ],
-    tags: ["FastAPI", "Python", "Gemini", "Tool calling", "React"],
-    image: "/project-agendaflow.jpg",
-    imageAlt: "Demo de AgendaFlow: chat con el agente y agenda de la clínica actualizándose",
-    demo: "/demo/agenda",
-    note: "Repositorio privado: te muestro el código en una llamada.",
-    video: "", // enlace de Loom (https://www.loom.com/share/...)
-  },
-  {
     name: "VillaNet",
     kind: "Plataforma SaaS · Redes",
     summary:
@@ -178,10 +161,37 @@ export const PROJECTS = [
   },
 ];
 
-/* ── Demo de AgendaFlow (/demo/agenda) ─────────────────────── */
+/* ── Caso de estudio y demo de AgendaFlow (/demo/agenda) ────── */
 
 export const AGENDA_PROJECT = {
+  name: "AgendaFlow",
   video: "", // enlace de Loom del recorrido de la demo
+  tagline:
+    "Un agente de IA que agenda, cambia y cancela citas como por WhatsApp, sin choques ni horarios inventados.",
+  challenge:
+    "Consultorios, salones y talleres pierden horas contestando mensajes para agendar, y un error al anotar una cita termina en choques de horario o pacientes que no llegan.",
+  solution:
+    "Un agente que conversa con el paciente y opera la agenda con herramientas que valida el backend: entiende fechas en lenguaje natural, ofrece solo horarios reales y confirma cada cita con un código.",
+  tags: ["FastAPI", "Python", "Tool calling", "Gemini", "React"],
+  metrics: [
+    { value: 5, label: "herramientas validadas", detail: "consultar, agendar, buscar, cambiar y cancelar" },
+    { value: 3, unit: "s", label: "por respuesta", detail: "en promedio, con IA gratuita" },
+    { value: 49, label: "pruebas automáticas", detail: "reglas, agente y API" },
+  ],
+  steps: [
+    {
+      title: "Escribes como en WhatsApp",
+      text: "El paciente pide su cita con sus palabras: «el jueves en la tarde», «la de las 4».",
+    },
+    {
+      title: "La IA elige una herramienta",
+      text: "Consulta horarios, agenda, cambia o cancela; si algo no se puede, lo explica y propone otra opción.",
+    },
+    {
+      title: "El backend valida todo",
+      text: "Horarios, choques y anticipación se revisan en código: la IA nunca escribe directo en la agenda.",
+    },
+  ],
   highlights: [
     "La IA conversa; el backend decide: horarios, choques y anticipación se validan en código",
     "Cada acción del agente queda registrada y visible, igual que en un sistema real",

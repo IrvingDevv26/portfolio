@@ -46,7 +46,12 @@ const MSG = {
   network:
     "No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
   generic: "Algo salió mal. Inténtalo de nuevo.",
+  asleep:
+    "El servidor de la demo no despertó a tiempo. Inténtalo de nuevo en un momento.",
 };
+
+const WAKE_TIMEOUT = 120_000; // un servidor gratuito tarda hasta ~1 minuto en despertar
+const WAKE_RETRY = 3_000;
 
 // Fechas como texto "AAAA-MM-DD" sin depender de la zona horaria del visitante
 const addDays = (iso, days) => {
@@ -96,12 +101,31 @@ async function request(path, options = {}) {
   } catch {
     throw Object.assign(new Error(MSG.network), { status: 0 });
   }
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
+  // Mientras el servidor gratuito despierta, su proxy puede responder con una
+  // página HTML en vez de JSON: se trata como "todavía no está listo"
+  const json = (response.headers.get("content-type") || "").includes("json");
+  const data = json ? await response.json().catch(() => ({})) : {};
+  if (!response.ok || !json) {
     const detail = typeof data.detail === "string" ? data.detail : MSG.generic;
-    throw Object.assign(new Error(detail), { status: response.status });
+    throw Object.assign(new Error(detail), { status: response.status, json });
   }
   return data;
+}
+
+// Espera a que el backend responda /api/health (lo despierta si dormía)
+async function wakeUp(onWaiting) {
+  const started = Date.now();
+  for (;;) {
+    try {
+      return await request("/api/health");
+    } catch {
+      if (Date.now() - started > WAKE_TIMEOUT) {
+        throw Object.assign(new Error(MSG.asleep), { status: 503 });
+      }
+      onWaiting();
+      await new Promise((resolve) => setTimeout(resolve, WAKE_RETRY));
+    }
+  }
 }
 
 /* ── Chat ─────────────────────────────────────────────────── */
@@ -533,7 +557,8 @@ const AgendaLab = () => {
       setConnectError(error.message);
       setStatus("error");
     };
-    return request("/api/agenda/sessions", { method: "POST" })
+    return wakeUp(() => setSlow(true))
+      .then(() => request("/api/agenda/sessions", { method: "POST" }))
       .then(opened, failed)
       .finally(() => {
         clearTimeout(timer);
