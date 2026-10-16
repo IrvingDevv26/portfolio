@@ -151,6 +151,21 @@ Static site, deployed on [Cloudflare Pages](https://pages.cloudflare.com):
 Client-side routes such as `/demo/datarefine` work out of the box: without a
 top-level `404.html`, Pages serves the app for every path.
 
+**Link previews per demo.** Chat apps and social networks read the HTML
+without running JavaScript, so a small Vite plugin (`vite.config.js`) writes
+`dist/demo/agenda.html` and `dist/demo/datarefine.html`: copies of
+`index.html` with each demo's title, description and preview image
+(`public/og-*.jpg`). Pages serves them at `/demo/agenda` and
+`/demo/datarefine`.
+
+**Demo APIs awake in business hours.** Both APIs run on Render's free plan,
+which sleeps after 15 minutes without traffic. The
+[Keep demos awake](.github/workflows/keep-demos-awake.yml) workflow pings
+them every 10 minutes, Monday to Friday from 8:00 to 20:00 (Mexico City),
+using at most ~560 of the 750 free hours per month that Render shares across
+the workspace. GitHub disables scheduled workflows after 60 days without
+repository activity; re-enable it from the Actions tab if that happens.
+
 ## Related
 
 - **DataRefine API** (private): FastAPI + pandas backend behind the
@@ -168,6 +183,9 @@ top-level `404.html`, Pages serves the app for every path.
   (`/demo/datarefine`) diagnostica tu archivo en el navegador y luego lo limpia
   con el backend; AgendaFlow (`/demo/agenda`) es un agente de IA que agenda
   citas mientras ves la agenda actualizarse.
+- **Siempre listas:** en horario laboral (lun–vie, 8:00–20:00 de CDMX) un
+  workflow de GitHub Actions mantiene despiertas las APIs de las demos, y cada
+  demo tiene su propia vista previa al compartir el enlace.
 - **Cómo correrlo:** `npm install`, copia `.env.example` como `.env` y ejecuta
   `npm run dev`.
 - **Dónde editar:** todos los textos, enlaces y proyectos están en

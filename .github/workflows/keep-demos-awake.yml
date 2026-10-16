@@ -1,0 +1,39 @@
+name: Keep demos awake
+
+# Render's free web services sleep after 15 minutes without traffic, and the
+# next visitor waits up to a minute while they wake up. During Mexico City
+# business hours (Mon–Fri 8:00–20:00, UTC-6 all year) this pings both demo
+# APIs every 10 minutes so clients find them ready.
+#
+# Outside those hours they sleep on purpose: Render shares 750 free instance
+# hours per month across the whole workspace and suspends every free service
+# when they run out. This schedule uses at most ~560 hours a month for both APIs.
+
+on:
+  schedule:
+    # GitHub runs cron in UTC; minute 4 avoids the busy top of the hour
+    - cron: "4-59/10 14-23 * * 1-5" # 8:04–17:54 in Mexico City
+    - cron: "4-59/10 0-1 * * 2-6" # 18:04–19:54 (already the next day in UTC)
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping the demo APIs
+        run: |
+          for url in \
+            https://api.irvingdevv.dev/api/health \
+            https://agenda-api.irvingdevv.dev/api/health; do
+            # A sleeping service can take up to a minute to answer. A failed
+            # ping only leaves a warning: the job does not fail (no emails)
+            if curl --silent --show-error --fail --max-time 90 \
+                --retry 2 --retry-delay 5 "$url" > /dev/null; then
+              echo "awake: $url"
+            else
+              echo "::warning::$url did not answer"
+            fi
+          done
