@@ -1,46 +1,29 @@
-import {
-  AnimatePresence,
-  LayoutGroup,
-  motion,
-  MotionConfig,
-} from "framer-motion";
+import { motion, MotionConfig } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  ArrowUpIcon,
-  CheckIcon,
-  XIcon,
-} from "../components/icons";
+import ActionLog from "../components/agenda/ActionLog";
+import Chat from "../components/agenda/Chat";
+import { ClinicCard, ClinicDetails } from "../components/agenda/ClinicCard";
+import { daysBetween, minutesOf, timeNow } from "../components/agenda/dates";
+import WeekCalendar, { LAST_WEEK } from "../components/agenda/WeekCalendar";
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon } from "../components/icons";
 import BlurText from "../components/reactbits/BlurText";
-import LatticeLoader from "../components/reactbits/LatticeLoader";
 import ShinyText from "../components/reactbits/ShinyText";
 import SpotlightCard from "../components/reactbits/SpotlightCard";
 import Squares from "../components/reactbits/Squares";
 import { Eyebrow } from "../components/shared";
 import VideoButton from "../components/VideoButton";
 import { AGENDA_PROJECT } from "../content";
-import { useDocumentTitle } from "../lib/hooks";
-import { btn, card, focusRing, iconBtn } from "../lib/ui";
+import { useDocumentTitle, useMediaQuery } from "../lib/hooks";
+import { btn, card, focusRing } from "../lib/ui";
 
 /* Demo en vivo de AgendaFlow: un agente de IA que agenda, cambia y cancela
-   citas de una clínica de ejemplo. A la izquierda el chat (estilo WhatsApp),
-   a la derecha la agenda del negocio y las acciones que ejecutó el agente.
-   El backend vive en otro repositorio (AgendaFlow, FastAPI). */
+   citas de una clínica de ejemplo. El chat (estilo WhatsApp) va junto a la
+   agenda del negocio y la bitácora de acciones del agente; en móvil se cambia
+   entre los tres con pestañas. El backend vive en otro repositorio
+   (AgendaFlow, FastAPI). */
 
 const API_URL = import.meta.env.VITE_AGENDA_API_URL ?? "";
-
-const SUGGESTIONS = [
-  "¿Qué servicios tienen y cuánto cuestan?",
-  "Quiero una limpieza el jueves en la tarde",
-  "¿Tienen estacionamiento?",
-  "Quiero cambiar mi cita",
-];
-
-// Color de cada profesional en la agenda
-const PRO_COLORS = ["#D4B27A", "#C9B6F2"];
-const WEEKDAYS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
 
 const MSG = {
   network:
@@ -53,43 +36,10 @@ const MSG = {
 const WAKE_TIMEOUT = 120_000; // un servidor gratuito tarda hasta ~1 minuto en despertar
 const WAKE_RETRY = 3_000;
 
-// Fechas como texto "AAAA-MM-DD" sin depender de la zona horaria del visitante
-const addDays = (iso, days) => {
-  const date = new Date(`${iso}T12:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
-};
-const weekdayOf = (iso) => new Date(`${iso}T12:00:00Z`).getUTCDay();
-const daysBetween = (from, to) =>
-  Math.round(
-    (new Date(`${to}T12:00:00Z`) - new Date(`${from}T12:00:00Z`)) / 864e5,
-  );
-const MONTHS = [
-  "ene",
-  "feb",
-  "mar",
-  "abr",
-  "may",
-  "jun",
-  "jul",
-  "ago",
-  "sep",
-  "oct",
-  "nov",
-  "dic",
-];
-const shortDate = (iso) =>
-  `${Number(iso.slice(8, 10))} ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
-const LAST_WEEK = 4; // se puede agendar hasta 30 días a futuro
-
-// Las respuestas son texto plano; si el modelo usa **negritas** o viñetas, se limpian
-const tidy = (text) =>
-  text.replace(/\*\*(.+?)\*\*/g, "$1").replace(/^\s*[-*]\s+/gm, "• ");
-
 // Ids de mensajes y acciones (sólo para las keys de React)
 let lastId = 0;
 const newId = () => ++lastId;
-const message = (role, text) => ({ id: newId(), role, text });
+const message = (role, text) => ({ id: newId(), role, text, time: timeNow() });
 
 async function request(path, options = {}) {
   let response;
@@ -128,391 +78,6 @@ async function wakeUp(onWaiting) {
   }
 }
 
-/* ── Chat ─────────────────────────────────────────────────── */
-
-const Bubble = ({ message }) => {
-  if (message.role === "system") {
-    return (
-      <p className="mx-auto max-w-[90%] rounded-full border border-[color:var(--line)] bg-[color:var(--ink)] px-3 py-1.5 text-center text-xs text-[color:var(--muted)]">
-        {message.text}
-      </p>
-    );
-  }
-  const mine = message.role === "user";
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25 }}
-      className={`max-w-[85%] whitespace-pre-line rounded-2xl px-3.5 py-2 text-[15px] leading-relaxed ${
-        mine
-          ? "ml-auto rounded-br-md border border-[color:var(--accent-line)] bg-[rgba(212,178,122,0.16)] text-[color:var(--text)]"
-          : "mr-auto rounded-bl-md border border-[color:var(--line)] bg-[color:var(--raised)] text-[color:var(--soft)]"
-      }`}
-    >
-      {mine ? message.text : tidy(message.text)}
-    </motion.div>
-  );
-};
-
-const Chat = ({
-  business,
-  messages,
-  sending,
-  remaining,
-  onSend,
-  onRestart,
-  disabled,
-}) => {
-  const [text, setText] = useState("");
-  const logRef = useRef(null);
-  const inputRef = useRef(null);
-
-  // Siempre muestra el último mensaje
-  useEffect(() => {
-    const log = logRef.current;
-    if (log) log.scrollTop = log.scrollHeight;
-  }, [messages, sending]);
-
-  const submit = (value) => {
-    const message = value.trim();
-    if (!message || sending || disabled) return;
-    onSend(message);
-    setText("");
-    inputRef.current?.focus();
-  };
-
-  const onlyGreeting = messages.filter((m) => m.role === "user").length === 0;
-
-  return (
-    <section
-      aria-label="Chat con el asistente de la clínica"
-      className={`${card} flex h-[36rem] flex-col overflow-hidden lg:h-[42rem]`}
-    >
-      <header className="flex items-center gap-3 border-b border-[color:var(--line)] px-4 py-3">
-        <span
-          aria-hidden="true"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[color:var(--accent)] font-display text-sm font-semibold text-[color:var(--btn-ink)]"
-        >
-          DS
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-medium text-[color:var(--text)]">
-            {business?.nombre ?? "Clínica Dental Sonrisa"}
-          </p>
-          <p className="flex items-center gap-1.5 text-xs text-[color:var(--muted)]">
-            <span
-              aria-hidden="true"
-              className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]"
-            />
-            {sending ? "escribiendo…" : "en línea · asistente con IA"}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={onRestart}
-          className={`${iconBtn} w-auto px-2.5 text-xs`}
-        >
-          Reiniciar
-        </button>
-      </header>
-
-      <div
-        ref={logRef}
-        role="log"
-        aria-live="polite"
-        aria-label="Mensajes"
-        className="flex-1 space-y-2.5 overflow-y-auto px-4 py-4"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px)",
-          backgroundSize: "18px 18px",
-        }}
-      >
-        {messages.map((message) => (
-          <Bubble key={message.id} message={message} />
-        ))}
-        {sending && (
-          <div className="mr-auto w-fit rounded-2xl rounded-bl-md border border-[color:var(--line)] bg-[color:var(--raised)] px-3.5 py-2.5 text-[color:var(--soft)]">
-            <LatticeLoader
-              label="Escribiendo"
-              pattern="snake"
-              color="#D4B27A"
-              showTimer={false}
-              fontSize={13}
-              cellSize={5}
-            />
-          </div>
-        )}
-      </div>
-
-      {onlyGreeting && !disabled && (
-        <div className="flex gap-2 overflow-x-auto border-t border-[color:var(--line)] px-4 py-3">
-          {SUGGESTIONS.map((suggestion) => (
-            <button
-              key={suggestion}
-              type="button"
-              onClick={() => submit(suggestion)}
-              disabled={sending}
-              className={`shrink-0 rounded-full border border-[color:var(--line-strong)] px-3 py-1.5 text-xs text-[color:var(--soft)] transition-colors hover:border-[color:var(--accent-line)] hover:text-[color:var(--text)] ${focusRing}`}
-            >
-              {suggestion}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          submit(text);
-        }}
-        className="flex items-center gap-2 border-t border-[color:var(--line)] p-3"
-      >
-        <label htmlFor="agenda-message" className="sr-only">
-          Escribe un mensaje
-        </label>
-        <input
-          id="agenda-message"
-          ref={inputRef}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          maxLength={500}
-          autoComplete="off"
-          disabled={disabled}
-          placeholder={disabled ? "Conectando…" : "Escribe como en WhatsApp…"}
-          className={`min-w-0 flex-1 rounded-full border border-[color:var(--line-strong)] bg-[color:var(--ink)] px-4 py-2.5 text-[15px] text-[color:var(--text)] placeholder:text-[color:var(--muted)] focus:border-[color:var(--accent-line)] focus:outline-none disabled:opacity-60`}
-        />
-        <button
-          type="submit"
-          aria-label="Enviar"
-          disabled={sending || disabled || !text.trim()}
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[color:var(--btn)] text-[color:var(--btn-ink)] transition hover:bg-[color:var(--btn-hover)] disabled:opacity-40 ${focusRing}`}
-        >
-          <ArrowUpIcon className="h-5 w-5" />
-        </button>
-      </form>
-      {remaining !== null && (
-        <p className="px-4 pb-2 text-right text-[11px] text-[color:var(--muted)]">
-          {remaining} mensajes restantes en esta demo
-        </p>
-      )}
-    </section>
-  );
-};
-
-/* ── Agenda del negocio ───────────────────────────────────── */
-
-const Calendar = ({ today, agenda, business, highlighted, week, onWeek }) => {
-  const first = addDays(today, week * 7);
-  const range = Array.from({ length: 7 }, (_, i) => addDays(first, i));
-  // Los domingos la clínica cierra: 6 columnas caben sin scroll
-  const days = range.filter((day) => weekdayOf(day) !== 0);
-  const colorOf = (name) => {
-    const index = (business?.profesionales ?? []).findIndex(
-      (p) => p.nombre === name,
-    );
-    return PRO_COLORS[index] ?? "#BCC1CB";
-  };
-
-  return (
-    <section aria-label="Agenda de la clínica" className={`${card} p-5`}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-display text-lg font-semibold">
-          Agenda de la clínica
-        </h2>
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => onWeek(week - 1)}
-            disabled={week === 0}
-            aria-label="Semana anterior"
-            className={`${iconBtn} disabled:opacity-30`}
-          >
-            <ArrowLeftIcon className="h-4 w-4" />
-          </button>
-          <span className="min-w-[8.5rem] text-center text-sm text-[color:var(--soft)]">
-            {week === 0
-              ? "Esta semana"
-              : `${shortDate(range[0])} – ${shortDate(range[6])}`}
-          </span>
-          <button
-            type="button"
-            onClick={() => onWeek(week + 1)}
-            disabled={week === LAST_WEEK}
-            aria-label="Semana siguiente"
-            className={`${iconBtn} disabled:opacity-30`}
-          >
-            <ArrowRightIcon className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[color:var(--muted)]">
-          {(business?.profesionales ?? []).map((p) => (
-            <li key={p.id} className="flex items-center gap-1.5">
-              <span
-                aria-hidden="true"
-                className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: colorOf(p.nombre) }}
-              />
-              {p.nombre}
-            </li>
-          ))}
-          <li className="flex items-center gap-1.5">
-            <span
-              aria-hidden="true"
-              className="h-2 w-2 rounded-sm border border-[color:var(--accent)] bg-[color:var(--accent-bg)]"
-            />
-            Tus citas
-          </li>
-        </ul>
-      </div>
-
-      <div className="mt-4 overflow-x-auto">
-        <LayoutGroup>
-          <div className="grid min-w-[34rem] grid-cols-6 gap-2">
-            {days.map((day) => {
-              const weekday = weekdayOf(day);
-              const items = agenda.filter((a) => a.inicio.slice(0, 10) === day);
-              return (
-                <div key={day} className="min-w-0">
-                  <p className="mb-2 border-b border-[color:var(--line)] pb-1.5 text-center text-xs">
-                    <span className="block font-mono uppercase tracking-wider text-[color:var(--muted)]">
-                      {day === today ? "hoy" : WEEKDAYS[weekday]}
-                    </span>
-                    <span className="font-display text-base font-semibold text-[color:var(--text)]">
-                      {Number(day.slice(8, 10))}
-                    </span>
-                  </p>
-                  <ul className="space-y-1">
-                    <AnimatePresence initial={false}>
-                      {items.map((a) => {
-                        const mine = a.origen === "agent";
-                        const flash = highlighted.includes(a.codigo);
-                        return (
-                          <motion.li
-                            key={a.codigo}
-                            layout
-                            layoutId={a.codigo}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{
-                              opacity: 1,
-                              scale: 1,
-                              boxShadow: flash
-                                ? [
-                                    "0 0 0 0 rgba(212,178,122,0.7)",
-                                    "0 0 0 6px rgba(212,178,122,0)",
-                                  ]
-                                : "0 0 0 0 rgba(212,178,122,0)",
-                            }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{
-                              duration: 0.35,
-                              boxShadow: {
-                                duration: 1.2,
-                                repeat: flash ? 2 : 0,
-                              },
-                            }}
-                            title={`${a.servicio} · ${a.profesional} · ${a.paciente}`}
-                            className={`rounded-md border-l-2 px-1.5 py-1 text-[11px] leading-tight ${
-                              mine
-                                ? "border border-[color:var(--accent)] bg-[color:var(--accent-bg)] text-[color:var(--text)]"
-                                : "bg-[color:var(--glass)] text-[color:var(--soft)]"
-                            }`}
-                            style={{
-                              borderLeftColor: colorOf(a.profesional),
-                            }}
-                          >
-                            <span className="font-mono">
-                              {a.inicio.slice(11, 16)}
-                            </span>{" "}
-                            <span className="block truncate">
-                              {mine
-                                ? `${a.paciente} · ${a.servicio}`
-                                : a.servicio}
-                            </span>
-                          </motion.li>
-                        );
-                      })}
-                    </AnimatePresence>
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
-        </LayoutGroup>
-      </div>
-      <p className="mt-3 text-xs text-[color:var(--muted)]">
-        Las citas grises son de otros pacientes (ficticios). Cada visitante
-        tiene su propia copia de la agenda. Domingos cerrado.
-      </p>
-    </section>
-  );
-};
-
-const Actions = ({ actions }) => (
-  <section aria-label="Acciones del agente" className={`${card} p-5`}>
-    <h2 className="font-display text-lg font-semibold">
-      Lo que hizo el agente
-    </h2>
-    {actions.length === 0 ? (
-      <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted)]">
-        Aquí verás cada acción que ejecuta el agente detrás del chat: consultar
-        horarios, agendar, cambiar o cancelar. Todas pasan por reglas del
-        backend; la IA no puede saltárselas.
-      </p>
-    ) : (
-      <ul className="mt-3 space-y-2">
-        <AnimatePresence initial={false}>
-          {actions.map((action) => (
-            <motion.li
-              key={action.id}
-              layout
-              initial={{ opacity: 0, x: -12 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex gap-3 rounded-xl border border-[color:var(--line)] bg-[color:var(--ink)] px-3 py-2.5"
-            >
-              <span
-                aria-hidden="true"
-                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                  action.ok
-                    ? "bg-[color:var(--clean-bg)] text-[color:var(--clean)]"
-                    : "bg-[color:var(--danger-bg)] text-[color:var(--danger)]"
-                }`}
-              >
-                {action.ok ? (
-                  <CheckIcon className="h-3.5 w-3.5" />
-                ) : (
-                  <XIcon className="h-3.5 w-3.5" />
-                )}
-              </span>
-              <div className="min-w-0 text-sm">
-                <p className="font-medium text-[color:var(--text)]">
-                  {action.etiqueta}
-                  <span className="ml-2 font-mono text-[11px] font-normal text-[color:var(--muted)]">
-                    {action.herramienta}()
-                  </span>
-                </p>
-                {action.detalle && (
-                  <p className="text-[color:var(--soft)]">{action.detalle}</p>
-                )}
-                {!action.ok && action.error && (
-                  <p className="text-[color:var(--danger)]">
-                    Regla del backend: {action.error}
-                  </p>
-                )}
-              </div>
-            </motion.li>
-          ))}
-        </AnimatePresence>
-      </ul>
-    )}
-  </section>
-);
-
-/* ── Página ───────────────────────────────────────────────── */
-
 const FACTS = [
   "Clínica de ejemplo",
   "Usa datos inventados",
@@ -520,8 +85,16 @@ const FACTS = [
   "Reglas validadas en el backend",
 ];
 
+// Pestañas del área de trabajo en pantallas angostas
+const TABS = [
+  ["chat", "Chat"],
+  ["agenda", "Agenda"],
+  ["acciones", "Acciones"],
+];
+
 const AgendaLab = () => {
   useDocumentTitle("AgendaFlow — Demo en vivo · Irving Dávila");
+  const desktop = useMediaQuery("(min-width: 1024px)");
 
   const [status, setStatus] = useState("connecting"); // connecting | ready | error
   const [slow, setSlow] = useState(false); // el servidor gratuito está despertando
@@ -534,6 +107,12 @@ const AgendaLab = () => {
   const [remaining, setRemaining] = useState(null);
   const [sending, setSending] = useState(false);
   const [week, setWeek] = useState(0); // semana visible en la agenda (0 = esta)
+  const [day, setDay] = useState(null); // día visible en móvil
+  const [now, setNow] = useState(null); // minutos desde medianoche, hora de la clínica
+  const [tab, setTab] = useState("chat");
+  const [unseen, setUnseen] = useState({ agenda: 0, acciones: 0 });
+  const tabRef = useRef("chat");
+  const workspaceRef = useRef(null);
 
   // Crea una conversación nueva. El estado sólo cambia en callbacks (cuando el
   // servidor responde o cuando tarda), así se puede llamar desde el efecto inicial
@@ -551,6 +130,9 @@ const AgendaLab = () => {
       setHighlighted([]);
       setRemaining(data.mensajes_restantes);
       setWeek(0);
+      setDay(null);
+      setNow(minutesOf(data.ahora));
+      setUnseen({ agenda: 0, acciones: 0 });
       setStatus("ready");
     };
     const failed = (error) => {
@@ -570,11 +152,37 @@ const AgendaLab = () => {
     connect();
   }, [connect]);
 
+  // El reloj de la clínica avanza para mover la línea de "ahora" en la agenda
+  useEffect(() => {
+    const id = setInterval(
+      () => setNow((minutes) => (minutes === null ? minutes : minutes + 1)),
+      60_000,
+    );
+    return () => clearInterval(id);
+  }, []);
+
   // "Reiniciar" y "Reintentar": vuelve al estado de conexión y empieza otra
   const restart = () => {
     setStatus("connecting");
     setConnectError("");
+    setMessages([]);
     connect();
+  };
+
+  const selectTab = (next) => {
+    tabRef.current = next;
+    setTab(next);
+    setUnseen((counts) => ({ ...counts, [next]: 0 }));
+    // Si ya se bajó por la página, vuelve al inicio del área de trabajo
+    const area = workspaceRef.current;
+    if (!area) return;
+    const top = area.getBoundingClientRect().top + window.scrollY;
+    if (window.scrollY > top) window.scrollTo({ top, behavior: "smooth" });
+  };
+
+  const changeWeek = (next) => {
+    setWeek(next);
+    setDay(null);
   };
 
   const send = async (text) => {
@@ -589,21 +197,39 @@ const AgendaLab = () => {
           body: JSON.stringify({ message: text }),
         },
       );
-      setMessages((list) => [...list, message("agent", data.respuesta)]);
+      const time = timeNow();
+      const fresh = data.acciones.map((a) => ({ ...a, id: newId(), time }));
+      // Las herramientas se ven en el chat antes de la respuesta del agente
+      setMessages((list) => [
+        ...list,
+        ...fresh.map((action) => ({ id: newId(), role: "tool", action })),
+        message("agent", data.respuesta),
+      ]);
       setAgenda(data.agenda);
       setRemaining(data.mensajes_restantes);
-      const fresh = data.acciones.map((a) => ({ ...a, id: newId() }));
-      setActions((list) => [...fresh.reverse(), ...list].slice(0, 12));
-      const codes = fresh.map((a) => a.codigo).filter(Boolean);
+      setActions((list) => [...[...fresh].reverse(), ...list].slice(0, 12));
+      const codes = fresh
+        .filter((a) => a.ok)
+        .map((a) => a.codigo)
+        .filter(Boolean);
       setHighlighted(codes);
-      // Muestra la semana de la cita que el agente acaba de crear o mover
+      setUnseen((counts) => ({
+        agenda:
+          codes.length && tabRef.current !== "agenda"
+            ? counts.agenda + 1
+            : counts.agenda,
+        acciones:
+          tabRef.current !== "acciones"
+            ? counts.acciones + fresh.length
+            : counts.acciones,
+      }));
+      // Lleva la agenda al día de la cita que el agente acaba de crear o mover
       const touched = data.agenda.find((a) => codes.includes(a.codigo));
       if (touched && session.ahora) {
-        const offset = daysBetween(
-          session.ahora.slice(0, 10),
-          touched.inicio.slice(0, 10),
-        );
+        const date = touched.inicio.slice(0, 10);
+        const offset = daysBetween(session.ahora.slice(0, 10), date);
         setWeek(Math.min(LAST_WEEK, Math.max(0, Math.floor(offset / 7))));
+        setDay(date);
       }
     } catch (error) {
       const text =
@@ -616,6 +242,7 @@ const AgendaLab = () => {
     }
   };
 
+  const business = session?.negocio;
   const today = session?.ahora?.slice(0, 10);
 
   return (
@@ -636,7 +263,8 @@ const AgendaLab = () => {
           </div>
         </header>
 
-        <main className="relative isolate overflow-hidden">
+        {/* overflow-x-clip (y no hidden) para que las pestañas puedan quedarse fijas */}
+        <main className="relative isolate overflow-x-clip">
           <div className="relative isolate">
             <Squares className="-z-10" squareSize={48} speed={0.25} />
             <div
@@ -647,92 +275,123 @@ const AgendaLab = () => {
                   "radial-gradient(45% 60% at 85% 0%, rgba(212,178,122,0.12) 0%, rgba(212,178,122,0) 70%), linear-gradient(to bottom, rgba(8,9,12,0) 55%, #08090C 100%)",
               }}
             />
-            <div className="mx-auto max-w-6xl px-6 pb-6 pt-12 md:px-10 md:pt-16">
-              <Eyebrow>AgendaFlow</Eyebrow>
-              <BlurText
-                as="h1"
-                text="Un agente de IA que agenda citas por ti."
-                className="balance mt-4 max-w-3xl font-display text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl"
-              />
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[color:var(--soft)]">
-                Escríbele como a WhatsApp: consulta horarios, agenda, cambia o
-                cancela. A la derecha ves la agenda de la clínica actualizarse y
-                cada acción que ejecuta el agente.
-              </p>
-              <ul className="mt-6 flex flex-wrap gap-2" aria-label="Detalles">
-                {FACTS.map((fact) => (
-                  <li
-                    key={fact}
-                    className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--ink)]/70 px-3 py-1 text-xs text-[color:var(--soft)] backdrop-blur"
-                  >
-                    <CheckIcon className="h-3.5 w-3.5 text-[color:var(--accent)]" />
-                    {fact}
-                  </li>
-                ))}
-              </ul>
+            <div className="mx-auto max-w-6xl px-6 pb-6 pt-12 md:px-10 md:pt-16 lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-end lg:gap-12">
+              <div>
+                <Eyebrow>AgendaFlow</Eyebrow>
+                <BlurText
+                  as="h1"
+                  text="Un agente de IA que agenda citas por ti."
+                  className="balance mt-4 max-w-3xl font-display text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl"
+                />
+                <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[color:var(--soft)]">
+                  Escríbele como a WhatsApp: consulta horarios, agenda, cambia o
+                  cancela. Mientras conversan, la agenda de la clínica se
+                  actualiza y ves cada acción que ejecuta el agente.
+                </p>
+                <ul className="mt-6 flex flex-wrap gap-2" aria-label="Detalles">
+                  {FACTS.map((fact) => (
+                    <li
+                      key={fact}
+                      className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--ink)]/70 px-3 py-1 text-xs text-[color:var(--soft)] backdrop-blur"
+                    >
+                      <CheckIcon className="h-3.5 w-3.5 text-[color:var(--accent)]" />
+                      {fact}
+                    </li>
+                  ))}
+                </ul>
+                <ClinicDetails business={business} className="mt-6 lg:hidden" />
+              </div>
+              <ClinicCard business={business} className="hidden lg:block" />
             </div>
           </div>
 
-          <div className="mx-auto max-w-6xl px-6 pb-16 pt-6 md:px-10 md:pb-24">
-            {status !== "ready" ? (
-              <div
-                className={`${card} flex flex-col items-center gap-4 px-6 py-16 text-center`}
-              >
-                {status === "connecting" ? (
-                  <>
-                    <div className="text-[color:var(--soft)]">
-                      <LatticeLoader
-                        label={slow ? "Despertando el servidor" : "Conectando"}
-                        pattern="orbit"
-                        color="#D4B27A"
-                      />
-                    </div>
-                    {slow && (
-                      <p className="max-w-md text-sm text-[color:var(--muted)]">
-                        El servidor gratuito se duerme cuando nadie lo usa; la
-                        primera vez puede tardar hasta un minuto.
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <p className="max-w-md text-[color:var(--danger)]">
-                      {connectError}
-                    </p>
+          <div
+            ref={workspaceRef}
+            className="mx-auto max-w-6xl scroll-mt-2 px-6 pb-16 pt-4 md:px-10 md:pb-24 lg:pt-6"
+          >
+            {/* Pestañas (sólo en pantallas angostas) */}
+            {!desktop && (
+              <div className="sticky top-0 z-20 -mx-6 mb-4 bg-[color:var(--ink)]/85 px-6 py-2 backdrop-blur md:-mx-10 md:px-10">
+                <div
+                  role="group"
+                  aria-label="Vista de la demo"
+                  className="grid grid-cols-3 gap-1 rounded-xl border border-[color:var(--line)] bg-[color:var(--raised)] p-1"
+                >
+                  {TABS.map(([key, label]) => (
                     <button
+                      key={key}
                       type="button"
-                      onClick={restart}
-                      className={btn("primary")}
+                      aria-pressed={tab === key}
+                      onClick={() => selectTab(key)}
+                      className={`relative flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium transition-colors ${focusRing} ${
+                        tab === key
+                          ? "text-[color:var(--btn-ink)]"
+                          : "text-[color:var(--soft)]"
+                      }`}
                     >
-                      Reintentar
+                      {tab === key && (
+                        <motion.span
+                          layoutId="agenda-tab"
+                          className="absolute inset-0 rounded-lg bg-[color:var(--btn)]"
+                          transition={{
+                            type: "spring",
+                            bounce: 0.2,
+                            duration: 0.4,
+                          }}
+                        />
+                      )}
+                      <span className="relative">{label}</span>
+                      {tab !== key && unseen[key] > 0 && (
+                        <span className="relative inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[color:var(--accent)] px-1 text-[10px] font-semibold text-[color:var(--btn-ink)]">
+                          {unseen[key]}
+                        </span>
+                      )}
                     </button>
-                  </>
-                )}
+                  ))}
+                </div>
               </div>
-            ) : (
-              <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,25rem)_minmax(0,1fr)]">
+            )}
+
+            <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
+              <div
+                className={`lg:sticky lg:top-6 ${tab === "chat" ? "" : "hidden lg:block"}`}
+              >
                 <Chat
-                  business={session.negocio}
+                  business={business}
+                  status={status}
+                  slow={slow}
+                  error={connectError}
                   messages={messages}
                   sending={sending}
                   remaining={remaining}
                   onSend={send}
                   onRestart={restart}
-                  disabled={status !== "ready"}
+                  onShowAgenda={() => selectTab("agenda")}
                 />
-                <div className="min-w-0 space-y-6">
-                  <Calendar
-                    today={today}
-                    agenda={agenda}
-                    business={session.negocio}
-                    highlighted={highlighted}
-                    week={week}
-                    onWeek={setWeek}
-                  />
-                  <Actions actions={actions} />
-                </div>
               </div>
-            )}
+              {/* En móvil sólo se monta la pestaña visible: las animaciones de
+                  la agenda no pueden medir elementos ocultos */}
+              {(desktop || tab !== "chat") && (
+                <div className="min-w-0 space-y-6">
+                  {(desktop || tab === "agenda") && (
+                    <WeekCalendar
+                      today={today}
+                      now={now}
+                      agenda={agenda}
+                      business={business}
+                      highlighted={highlighted}
+                      week={week}
+                      onWeek={changeWeek}
+                      day={day}
+                      onDay={setDay}
+                    />
+                  )}
+                  {(desktop || tab === "acciones") && (
+                    <ActionLog actions={actions} />
+                  )}
+                </div>
+              )}
+            </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-3">
               <SpotlightCard className={`${card} p-6`}>

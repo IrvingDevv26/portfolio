@@ -193,10 +193,10 @@ const CleaningDemo = () => {
                 <div
                   key={r}
                   role="presentation"
-                  className={`grid transition-[grid-template-rows,opacity] duration-500 motion-reduce:transition-none ${
-                    collapsed
-                      ? "grid-rows-[0fr] opacity-0"
-                      : "grid-rows-[1fr] opacity-100"
+                  // El duplicado se atenúa en su lugar (si se plegara, el
+                  // contenido de abajo subiría de golpe)
+                  className={`transition-opacity duration-500 motion-reduce:transition-none ${
+                    collapsed ? "opacity-35" : "opacity-100"
                   }`}
                 >
                   <div className="overflow-hidden">
@@ -228,9 +228,10 @@ const CleaningDemo = () => {
           </div>
         </div>
 
-        {/* La IA trabajando: se asienta en "Limpieza lista en …" */}
-        {mode === "after" && (
-          <div className="mt-5 border-t border-[color:var(--line)] pt-4">
+        {/* La IA trabajando: se asienta en "Limpieza lista en …". El espacio
+            está reservado desde el inicio para que nada se recorra */}
+        <div className="mt-5 min-h-[8.5rem] border-t border-[color:var(--line)] pt-4">
+          {mode === "after" && (
             <ThoughtLine
               key={run}
               working={!done}
@@ -240,14 +241,15 @@ const CleaningDemo = () => {
               color="#BCC1CB"
               glyphColor="#D4B27A"
               fontSize={13}
+              collapseOnSettle={false}
             />
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Resumen */}
         <div
           aria-live="polite"
-          className="mt-5 flex min-h-[28px] flex-wrap items-center gap-2"
+          className="mt-5 flex min-h-[64px] flex-wrap content-start items-center gap-2 sm:min-h-[28px]"
         >
           {done ? (
             <>

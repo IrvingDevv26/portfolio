@@ -96,7 +96,27 @@ const GlobalStyles = () => (
 
     /* Secciones fuera de pantalla: el navegador no las maqueta ni pinta
        hasta que se acercan (auto recuerda su alto real tras verlas) */
-    .cv { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+    /* Las secciones fuera de pantalla no se dibujan hasta acercarse. Mientras,
+       ocupan una altura estimada: si se aleja mucho de la real, la página
+       "brinca" al hacer scroll. Por eso cada sección declara su tamaño
+       aproximado en móvil, tablet y escritorio (medido). */
+    .cv { content-visibility: auto; contain-intrinsic-size: auto var(--cv-h, 900px); }
+    .cv-s { --cv-h: 450px; }
+    .cv-m { --cv-h: 1250px; }
+    .cv-l { --cv-h: 1750px; }
+    .cv-xl { --cv-h: 3300px; }
+    @media (min-width: 768px) {
+      .cv-s { --cv-h: 550px; }
+      .cv-m { --cv-h: 1150px; }
+      .cv-l { --cv-h: 1000px; }
+      .cv-xl { --cv-h: 2500px; }
+    }
+    @media (min-width: 1024px) {
+      .cv-s { --cv-h: 450px; }
+      .cv-m { --cv-h: 850px; }
+      .cv-l { --cv-h: 1000px; }
+      .cv-xl { --cv-h: 1950px; }
+    }
 
     /* Grano sutil sobre toda la página: quita lo "plano" del negro */
     .grain::after {

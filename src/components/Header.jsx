@@ -46,9 +46,9 @@ const Header = () => {
 
   // Sección activa: la que cruza la línea central de la pantalla
   useEffect(() => {
-    const elements = SECTION_IDS.map((id) => document.getElementById(id)).filter(
-      Boolean,
-    );
+    const elements = SECTION_IDS.map((id) =>
+      document.getElementById(id),
+    ).filter(Boolean);
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -83,7 +83,10 @@ const Header = () => {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-3.5 md:px-10">
         <Logo />
 
-        <nav aria-label="Principal" className="pointer-events-auto hidden md:block">
+        <nav
+          aria-label="Principal"
+          className="pointer-events-auto hidden lg:block"
+        >
           <ul
             onMouseLeave={() => setHovered(null)}
             className="flex items-center gap-0.5 rounded-full border border-[color:var(--line)] bg-[rgba(16,18,23,0.6)] p-1 text-sm backdrop-blur-md"
@@ -98,7 +101,11 @@ const Header = () => {
                       layoutId="nav-pill"
                       aria-hidden="true"
                       className="absolute inset-0 rounded-full bg-[rgba(255,255,255,0.08)]"
-                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 380,
+                        damping: 32,
+                      }}
                     />
                   )}
                   <a

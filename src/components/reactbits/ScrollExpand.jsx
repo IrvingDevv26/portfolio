@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/refs -- código original de React Bits */
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 
 import './ScrollExpand.css';
 
@@ -100,7 +100,9 @@ const ScrollExpand = ({
     }
   }, []);
 
-  useEffect(() => {
+  // Layout effect: el tamaño se mide antes del primer dibujado, así la página
+  // nunca muestra un cuadro con la altura equivocada
+  useLayoutEffect(() => {
     const root = rootRef.current;
     const track = trackRef.current;
     const stage = stageRef.current;
@@ -112,11 +114,19 @@ const ScrollExpand = ({
     let current = 0;
     let target = 0;
     let stageH = 0;
+    let lastWidth = 0;
     let running = false;
 
     const measure = () => {
       const c = propsRef.current;
-      stageH = c.useWindowScroll ? window.innerHeight : root.clientHeight;
+      const height = c.useWindowScroll ? window.innerHeight : root.clientHeight;
+      const width = root.clientWidth;
+      // En el celular, la barra del navegador aparece y se esconde al hacer
+      // scroll y cambia innerHeight ~60–120px. Si sólo cambió eso, no se
+      // redimensiona: si no, la vitrina y todo lo de abajo "brincarían"
+      if (stageH > 0 && width === lastWidth && Math.abs(height - stageH) < 160) return;
+      stageH = height;
+      lastWidth = width;
       if (stageH <= 0) return;
       stage.style.height = `${stageH}px`;
       track.style.height = `${stageH * (1 + Math.max(0, c.scrollDistance) + Math.max(0, c.holdDistance))}px`;

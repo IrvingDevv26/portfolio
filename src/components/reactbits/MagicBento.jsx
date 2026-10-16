@@ -472,6 +472,7 @@ const nameOf = animation => animation.animationName || '';
 const MagicBento = ({
   items = DEFAULT_ITEMS,
   columns = 4,
+  minCellWidth = MIN_CELL,
   rowHeight = 200,
   gap = 12,
   radius = 20,
@@ -504,6 +505,7 @@ const MagicBento = ({
   const settings = {
     items,
     columns: Math.max(1, Math.round(columns)),
+    minCellWidth: Math.max(1, minCellWidth),
     gap: Math.max(0, gap),
     enableBorderGlow,
     enableSpotlight,
@@ -894,7 +896,7 @@ const MagicBento = ({
       const s = settingsRef.current;
       const width = root.clientWidth;
       const cell = count => (width - s.gap * (count - 1)) / count;
-      const next = cell(s.columns) >= MIN_CELL ? s.columns : s.columns >= 2 && cell(2) >= MIN_PAIR ? 2 : 1;
+      const next = cell(s.columns) >= s.minCellWidth ? s.columns : s.columns >= 2 && cell(2) >= MIN_PAIR ? 2 : 1;
       setCols(next);
       dirty = true;
       wake();
