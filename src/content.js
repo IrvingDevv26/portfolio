@@ -140,6 +140,23 @@ export const SHOWCASE = {
 
 export const PROJECTS = [
   {
+    name: "AgendaFlow",
+    kind: "Agente de IA · Citas",
+    summary:
+      "Un agente que atiende como por WhatsApp: consulta horarios, agenda, cambia y cancela citas de una clínica. La IA conversa y el backend valida cada acción, así que nunca hay choques ni horarios inventados.",
+    highlights: [
+      "Cinco herramientas (consultar, agendar, buscar, cambiar y cancelar) validadas en el backend",
+      "Entiende fechas como \"el jueves en la tarde\" y explica las reglas al paciente",
+      "IA gratuita con respaldo (Gemini Flash-Lite y Groq) y límites por visitante",
+    ],
+    tags: ["FastAPI", "Python", "Gemini", "Tool calling", "React"],
+    image: "/project-agendaflow.jpg",
+    imageAlt: "Demo de AgendaFlow: chat con el agente y agenda de la clínica actualizándose",
+    demo: "/demo/agenda",
+    note: "Repositorio privado: te muestro el código en una llamada.",
+    video: "", // enlace de Loom (https://www.loom.com/share/...)
+  },
+  {
     name: "VillaNet",
     kind: "Plataforma SaaS · Redes",
     summary:
@@ -160,6 +177,22 @@ export const PROJECTS = [
     video: "", // enlace de Loom (https://www.loom.com/share/...)
   },
 ];
+
+/* ── Demo de AgendaFlow (/demo/agenda) ─────────────────────── */
+
+export const AGENDA_PROJECT = {
+  video: "", // enlace de Loom del recorrido de la demo
+  highlights: [
+    "La IA conversa; el backend decide: horarios, choques y anticipación se validan en código",
+    "Cada acción del agente queda registrada y visible, igual que en un sistema real",
+    "Cada visitante tiene su propia agenda de prueba; nada se comparte ni se guarda",
+  ],
+  forBusiness: [
+    "Puede atender tu WhatsApp Business las 24 horas",
+    "Se sincroniza con Google Calendar o con tu sistema de citas",
+    "Envía recordatorios y confirma asistencia un día antes",
+  ],
+};
 
 /* ── Calculadora de costo del trabajo manual ───────────────── */
 
