@@ -1,7 +1,9 @@
 {
-  "name": "agencia-portfolio",
+  "name": "portfolio",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Portfolio of Irving Dávila: full-stack developer focused on AI automation, with a live DataRefine demo.",
+  "author": "Irving de Jesús Dávila Torres <irvingdevv26@hotmail.com>",
   "type": "module",
   "scripts": {
     "dev": "vite",
