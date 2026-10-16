@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1440" viewBox="0 0 1024 1440">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#12151B"/>
+      <stop offset="1" stop-color="#07080B"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F3E3C3"/>
+      <stop offset="0.45" stop-color="#D4B27A"/>
+      <stop offset="1" stop-color="#8F6F3E"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.8" cy="0.15" r="0.7">
+      <stop offset="0" stop-color="#D4B27A" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#D4B27A" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="16" cy="16" r="1.6" fill="#FFFFFF" fill-opacity="0.07"/>
+    </pattern>
+  </defs>
+
+  <!-- Fondo -->
+  <rect width="1024" height="1440" fill="url(#bg)"/>
+  <rect width="1024" height="1440" fill="url(#dots)"/>
+  <rect width="1024" height="1440" fill="url(#glow)"/>
+
+  <!-- Pistas de circuito -->
+  <g fill="none" stroke="#D4B27A" stroke-opacity="0.28" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M214 200 H330 L370 160 H560"/>
+    <path d="M214 236 H360 L404 300 H690 L720 326"/>
+    <path d="M139 276 V330 L100 360"/>
+    <path d="M30 1040 H120 L160 1080"/>
+    <path d="M994 1040 H900 L860 1000"/>
+    <path d="M512 1010 V1040 L470 1080"/>
+  </g>
+  <g fill="#0B0D11" stroke="#D4B27A" stroke-opacity="0.5" stroke-width="3">
+    <circle cx="560" cy="160" r="8"/>
+    <circle cx="720" cy="326" r="8"/>
+    <circle cx="100" cy="360" r="8"/>
+    <circle cx="160" cy="1080" r="8"/>
+    <circle cx="860" cy="1000" r="8"/>
+    <circle cx="470" cy="1080" r="8"/>
+  </g>
+
+  <!-- Encabezado -->
+  <text x="64" y="104" font-family="Consolas, Menlo, monospace" font-size="26" letter-spacing="6" fill="#D4B27A">DEV ACCESS</text>
+  <circle cx="808" cy="95" r="9" fill="#7BDDB5"/>
+  <circle cx="808" cy="95" r="18" fill="#7BDDB5" fill-opacity="0.18"/>
+  <text x="960" y="104" text-anchor="end" font-family="Consolas, Menlo, monospace" font-size="26" letter-spacing="4" fill="#7BDDB5">ONLINE</text>
+
+  <!-- Chip -->
+  <rect x="64" y="160" width="150" height="116" rx="20" fill="url(#brass)"/>
+  <g fill="none" stroke="#5E4826" stroke-opacity="0.55" stroke-width="3">
+    <path d="M64 199 H112 M64 237 H112 M166 199 H214 M166 237 H214"/>
+    <rect x="112" y="186" width="54" height="64" rx="8"/>
+    <path d="M139 160 V186 M139 250 V276"/>
+  </g>
+  <!-- Sin contacto -->
+  <g fill="none" stroke="#BCC1CB" stroke-opacity="0.6" stroke-width="4" stroke-linecap="round">
+    <path d="M250 196 Q262 218 250 240"/>
+    <path d="M268 184 Q286 218 268 252"/>
+    <path d="M286 172 Q310 218 286 264"/>
+  </g>
+
+  <!-- Identidad -->
+  <text x="960" y="208" text-anchor="end" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="50" font-weight="700" fill="#F1F3F6">Irving Dávila</text>
+  <text x="960" y="256" text-anchor="end" font-family="Consolas, Menlo, monospace" font-size="24" letter-spacing="3" fill="#8A909C">FULL-STACK · IA APLICADA</text>
+
+  <!-- Terminal -->
+  <rect x="64" y="350" width="896" height="660" rx="28" fill="#06070A" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="2"/>
+  <path d="M92 350 H932 A28 28 0 0 1 960 378 V414 H64 V378 A28 28 0 0 1 92 350 Z" fill="#FFFFFF" fill-opacity="0.04"/>
+  <circle cx="106" cy="382" r="9" fill="#F2906B"/>
+  <circle cx="136" cy="382" r="9" fill="#D4B27A"/>
+  <circle cx="166" cy="382" r="9" fill="#7BDDB5"/>
+  <text x="512" y="390" text-anchor="middle" font-family="Consolas, Menlo, monospace" font-size="22" fill="#8A909C">irving@dev: ~</text>
+
+  <g font-family="Consolas, Menlo, monospace" font-size="30">
+    <text x="104" y="480"><tspan fill="#D4B27A">$</tspan><tspan fill="#F1F3F6"> whoami</tspan></text>
+    <text x="104" y="534" fill="#BCC1CB">irving.davila</text>
+
+    <text x="104" y="606"><tspan fill="#D4B27A">$</tspan><tspan fill="#F1F3F6"> cat stack.txt</tspan></text>
+    <text x="104" y="660" fill="#BCC1CB">fastapi · python · react</text>
+    <text x="104" y="714" fill="#BCC1CB">linux · proxmox · aws · ai-apis</text>
+
+    <text x="104" y="786"><tspan fill="#D4B27A">$</tspan><tspan fill="#F1F3F6"> systemctl status automatizacion</tspan></text>
+    <text x="104" y="840"><tspan fill="#7BDDB5">●</tspan><tspan fill="#BCC1CB"> active (running)</tspan></text>
+    <text x="104" y="894" fill="#8A909C"># trabajo manual → flujos automáticos</text>
+
+    <text x="104" y="966"><tspan fill="#D4B27A">$</tspan></text>
+  </g>
+  <rect x="134" y="942" width="18" height="32" fill="#D4B27A"/>
+
+  <!-- Matriz de identidad (decorativa) -->
+  <g fill="#D4B27A">
+    <rect x="64" y="1104" width="28" height="28"/><rect x="176" y="1104" width="28" height="28"/>
+    <rect x="92" y="1104" width="28" height="28" fill-opacity="0.45"/><rect x="148" y="1104" width="28" height="28" fill-opacity="0.45"/>
+    <rect x="120" y="1132" width="28" height="28"/>
+    <rect x="64" y="1160" width="28" height="28" fill-opacity="0.45"/><rect x="176" y="1160" width="28" height="28" fill-opacity="0.45"/>
+    <rect x="92" y="1160" width="28" height="28"/><rect x="148" y="1160" width="28" height="28"/>
+    <rect x="64" y="1188" width="28" height="28"/><rect x="176" y="1188" width="28" height="28"/>
+    <rect x="120" y="1188" width="28" height="28" fill-opacity="0.45"/>
+    <rect x="92" y="1216" width="28" height="28" fill-opacity="0.45"/><rect x="148" y="1216" width="28" height="28" fill-opacity="0.45"/>
+    <rect x="64" y="1244" width="28" height="28"/><rect x="120" y="1244" width="28" height="28"/><rect x="176" y="1244" width="28" height="28"/>
+  </g>
+  <rect x="52" y="1092" width="164" height="192" rx="10" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="2"/>
+
+  <!-- PIN y serie -->
+  <text x="268" y="1124" font-family="Consolas, Menlo, monospace" font-size="22" letter-spacing="5" fill="#8A909C">ACCESS PIN</text>
+  <text x="264" y="1196" font-family="Consolas, Menlo, monospace" font-size="64" font-weight="700" letter-spacing="18" fill="url(#brass)">1024</text>
+  <text x="268" y="1244" font-family="Consolas, Menlo, monospace" font-size="22" letter-spacing="3" fill="#565C68">SERIAL IDT-0001 · NODE 01</text>
+
+  <!-- Código de barras -->
+  <g fill="#BCC1CB" fill-opacity="0.6">
+    <rect x="700" y="1104" width="5" height="140"/><rect x="712" y="1104" width="11" height="140"/>
+    <rect x="730" y="1104" width="4" height="140"/><rect x="741" y="1104" width="9" height="140"/>
+    <rect x="757" y="1104" width="5" height="140"/><rect x="769" y="1104" width="14" height="140"/>
+    <rect x="790" y="1104" width="4" height="140"/><rect x="801" y="1104" width="7" height="140"/>
+    <rect x="815" y="1104" width="11" height="140"/><rect x="833" y="1104" width="4" height="140"/>
+    <rect x="844" y="1104" width="5" height="140"/><rect x="856" y="1104" width="13" height="140"/>
+    <rect x="876" y="1104" width="4" height="140"/><rect x="887" y="1104" width="9" height="140"/>
+    <rect x="903" y="1104" width="5" height="140"/><rect x="915" y="1104" width="11" height="140"/>
+    <rect x="933" y="1104" width="4" height="140"/><rect x="944" y="1104" width="16" height="140"/>
+  </g>
+
+  <line x1="64" y1="1326" x2="960" y2="1326" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="2"/>
+  <text x="512" y="1376" text-anchor="middle" font-family="Consolas, Menlo, monospace" font-size="22" letter-spacing="6" fill="#565C68">PORTFOLIO · ACCESO AUTORIZADO</text>
+</svg>

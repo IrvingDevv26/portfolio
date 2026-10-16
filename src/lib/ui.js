@@ -1,0 +1,31 @@
+/* Estilos reutilizables (clases de Tailwind compuestas) */
+
+export const focusRing =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]";
+
+const BTN_BASE =
+  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-[10px] font-semibold tracking-[-0.005em] transition duration-200 active:translate-y-px motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none";
+
+const BTN_SIZE = {
+  md: "h-12 px-6 text-[15px]",
+  sm: "h-9 px-4 text-sm",
+};
+
+const BTN_VARIANT = {
+  // Marfil con filo de luz y un halo de latón muy leve debajo
+  primary:
+    "bg-[color:var(--btn)] text-[color:var(--btn-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.5),0_14px_32px_-14px_rgba(212,178,122,0.55)] hover:bg-[color:var(--btn-hover)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_1px_2px_rgba(0,0,0,0.5),0_18px_38px_-14px_rgba(212,178,122,0.8)] disabled:hover:bg-[color:var(--btn)]",
+  // Cristal con borde; al pasar el mouse toma el latón
+  secondary:
+    "border border-[color:var(--line-strong)] bg-[color:var(--glass)] text-[color:var(--text)] backdrop-blur hover:border-[color:var(--accent-line)] hover:bg-[color:var(--accent-bg)]",
+};
+
+export const btn = (variant = "primary", size = "md") =>
+  `${BTN_BASE} ${BTN_SIZE[size]} ${BTN_VARIANT[variant]} ${focusRing}`;
+
+export const iconBtn = `inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] text-[color:var(--muted)] transition hover:bg-[color:var(--glass)] hover:text-[color:var(--text)] ${focusRing}`;
+
+export const card =
+  "rounded-2xl border border-[color:var(--line)] bg-[color:var(--raised)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_48px_-24px_rgba(0,0,0,0.6)]";
+
+export const delay = (i) => ({ animationDelay: `${i * 90}ms` });
