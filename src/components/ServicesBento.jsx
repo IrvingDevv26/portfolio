@@ -129,6 +129,8 @@ const ServicesBento = () => (
   <MagicBento
     items={ITEMS}
     columns={4}
+    // Con celdas más angostas el texto y la ilustración se enciman (tablet)
+    minCellWidth={210}
     rowHeight={230}
     gap={12}
     radius={20}

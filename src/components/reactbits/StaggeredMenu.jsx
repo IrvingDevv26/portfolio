@@ -76,7 +76,7 @@ const StaggeredMenu = ({ items, footer, open, onOpenChange }) => {
         aria-controls="menu-movil"
         aria-label={open ? "Cerrar menú" : "Abrir menú"}
         onClick={() => onOpenChange(!open)}
-        className={`relative inline-flex h-9 items-center gap-2 rounded-full border border-[color:var(--line-strong)] bg-[rgba(16,18,23,0.7)] pl-4 pr-3 text-sm font-medium text-[color:var(--text)] backdrop-blur md:hidden ${focusRing}`}
+        className={`relative inline-flex h-9 items-center gap-2 rounded-full border border-[color:var(--line-strong)] bg-[rgba(16,18,23,0.7)] pl-4 pr-3 text-sm font-medium text-[color:var(--text)] backdrop-blur lg:hidden ${focusRing}`}
       >
         <span
           aria-hidden="true"
@@ -116,7 +116,7 @@ const StaggeredMenu = ({ items, footer, open, onOpenChange }) => {
               role="dialog"
               aria-modal="true"
               aria-label="Menú de navegación"
-              className="fixed inset-0 z-[45] md:hidden"
+              className="fixed inset-0 z-[45] lg:hidden"
               exit={{ opacity: reduce ? 0 : 1 }}
               transition={{ duration: reduce ? 0 : 0.5 }}
             >

@@ -197,6 +197,10 @@ const AgentDemo = () => {
             backgroundImage:
               "radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px)",
             backgroundSize: "18px 18px",
+            // Los mensajes que suben se desvanecen en vez de cortarse de golpe
+            maskImage: "linear-gradient(to bottom, transparent, #000 3rem)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, transparent, #000 3rem)",
           }}
         >
           {messages.map((item) => (
@@ -240,7 +244,7 @@ const AgentDemo = () => {
             Herramientas
           </p>
           <ul
-            className="mt-2 space-y-1.5"
+            className="mt-2 min-h-[10.5rem] space-y-1.5"
             aria-label="Herramientas que ejecutó el agente"
           >
             {tools.map((tool) => {

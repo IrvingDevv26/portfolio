@@ -270,7 +270,7 @@ const Marquee = () => (
 /* ── Manifiesto ───────────────────────────────────────────── */
 
 const Manifesto = () => (
-  <Section size="md" className="cv">
+  <Section size="md" className="cv cv-s">
     <ScrollReveal
       text={MANIFESTO.text}
       highlight={MANIFESTO.highlight}
@@ -282,7 +282,7 @@ const Manifesto = () => (
 /* ── Calculadora ──────────────────────────────────────────── */
 
 const CostCalculator = () => (
-  <div className="cv border-t border-[color:var(--line)]">
+  <div className="cv cv-m border-t border-[color:var(--line)]">
     <Section id="calculadora">
       <Deferred minHeight="40rem">
         <Calculator />
@@ -294,7 +294,7 @@ const CostCalculator = () => (
 /* ── Servicios ────────────────────────────────────────────── */
 
 const Services = () => (
-  <Section id="servicios" className="cv">
+  <Section id="servicios" className="cv cv-l">
     <SectionHeading
       index="01"
       eyebrow="Servicios"
@@ -317,9 +317,9 @@ const Project = () => (
       <Showcase />
     </Deferred>
 
-    <div className="cv">
+    <div className="cv cv-xl">
       <Section className="pt-12! md:pt-16!">
-        <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+        <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
           <div>
             <dl className="space-y-7">
               <div>
@@ -411,7 +411,7 @@ const Project = () => (
 const UnderTheHood = () => {
   const wide = useMediaQuery("(min-width: 640px)");
   return (
-    <div className="mt-24 grid items-center gap-10 border-t border-[color:var(--line)] pt-16 lg:grid-cols-[0.9fr_1.1fr]">
+    <div className="mt-24 grid grid-cols-[minmax(0,1fr)] items-center gap-10 border-t border-[color:var(--line)] pt-16 lg:grid-cols-[0.9fr_1.1fr]">
       <div>
         <Eyebrow>Documentación técnica</Eyebrow>
         <h3 className="mt-4 font-display text-3xl font-semibold text-[color:var(--text)]">
@@ -450,7 +450,7 @@ const UnderTheHood = () => {
 /* ── Caso de estudio: AgendaFlow ──────────────────────────── */
 
 const AgendaCase = () => (
-  <div className="cv border-t border-[color:var(--line)]">
+  <div className="cv cv-xl border-t border-[color:var(--line)]">
     <Section id="agenda">
       <SectionHeading
         index="03"
@@ -459,7 +459,7 @@ const AgendaCase = () => (
         intro={AGENDA_PROJECT.tagline}
       />
 
-      <div className="mt-14 grid items-start gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
+      <div className="mt-14 grid grid-cols-[minmax(0,1fr)] items-start gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
         <div>
           <dl className="space-y-7">
             <div>
@@ -556,7 +556,7 @@ const AgendaCase = () => (
 /* ── Más proyectos ────────────────────────────────────────── */
 
 const Projects = () => (
-  <div className="cv border-t border-[color:var(--line)]">
+  <div className="cv cv-m border-t border-[color:var(--line)]">
     <Section id="proyectos">
       <SectionHeading
         index="04"
@@ -597,7 +597,7 @@ const Process = () => {
   const phase = reduce && inView ? PROCESS_TICKS : tick;
 
   return (
-    <div className="cv border-t border-[color:var(--line)]">
+    <div className="cv cv-m border-t border-[color:var(--line)]">
       <Section id="proceso">
         <SectionHeading
           index="05"
@@ -657,14 +657,14 @@ const Process = () => {
 /* ── Sobre mí ─────────────────────────────────────────────── */
 
 const About = () => (
-  <div className="cv border-t border-[color:var(--line)]">
+  <div className="cv cv-xl border-t border-[color:var(--line)]">
     <Section id="sobre-mi">
       <Eyebrow index="06">Sobre mí</Eyebrow>
       {/* Firma: cada letra gana peso al acercar el cursor */}
       <h2 className="mt-6 select-none whitespace-nowrap font-display text-[clamp(3.2rem,12.5vw,10.5rem)] leading-[0.9] tracking-[-0.04em] text-[color:var(--text)]">
         <VariableProximity label={PROFILE.shortName} />
       </h2>
-      <div className="mt-14 grid items-start gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+      <div className="mt-14 grid grid-cols-[minmax(0,1fr)] items-start gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
         <AnimatedContent className="lg:sticky lg:top-28">
           <TiltedCard
             imageSrc="/irving-about.jpg"
@@ -744,9 +744,9 @@ const About = () => (
 /* ── Preguntas frecuentes ─────────────────────────────────── */
 
 const Questions = () => (
-  <div className="cv border-t border-[color:var(--line)]">
+  <div className="cv cv-m border-t border-[color:var(--line)]">
     <Section id="preguntas">
-      <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
         <SectionHeading
           index="07"
           eyebrow="Preguntas frecuentes"
@@ -793,7 +793,7 @@ const Contact = () => {
   return (
     <div
       ref={areaRef}
-      className="cv relative isolate overflow-hidden border-t border-[color:var(--line)]"
+      className="cv cv-m relative isolate overflow-hidden border-t border-[color:var(--line)]"
     >
       <Squares className="-z-10" />
       {finePointer && (
@@ -816,7 +816,7 @@ const Contact = () => {
         }}
       />
       <Section id="contacto">
-        <div className="grid items-start gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+        <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
           <div className="lg:pt-6">
             <Eyebrow index="08">Contacto</Eyebrow>
             <h2 className="balance mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.05] tracking-tight text-[color:var(--text)] md:text-6xl">
@@ -878,7 +878,7 @@ const Contact = () => {
 const footerLink = `inline-flex items-center gap-1.5 rounded-md text-[color:var(--soft)] transition-colors hover:text-[color:var(--text)] ${focusRing}`;
 
 const Footer = () => (
-  <footer className="cv relative overflow-hidden border-t border-[color:var(--line)]">
+  <footer className="cv cv-m relative overflow-hidden border-t border-[color:var(--line)]">
     <div className="mx-auto max-w-6xl px-6 pt-16 md:px-10">
       <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="sm:col-span-2 md:col-span-1">
