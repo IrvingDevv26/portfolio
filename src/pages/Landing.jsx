@@ -1,6 +1,7 @@
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import AgentDemo from "../components/AgentDemo";
 import CleaningDemo from "../components/CleaningDemo";
 import Deferred from "../components/Deferred";
 import Faq from "../components/Faq";
@@ -40,6 +41,7 @@ import {
 } from "../components/icons";
 import {
   ABOUT,
+  AGENDA_PROJECT,
   CONTACT,
   DATAREFINE_FIXES,
   HERO,
@@ -445,16 +447,122 @@ const UnderTheHood = () => {
   );
 };
 
+/* ── Caso de estudio: AgendaFlow ──────────────────────────── */
+
+const AgendaCase = () => (
+  <div className="cv border-t border-[color:var(--line)]">
+    <Section id="agenda">
+      <SectionHeading
+        index="03"
+        eyebrow="Caso de estudio"
+        title={AGENDA_PROJECT.name}
+        intro={AGENDA_PROJECT.tagline}
+      />
+
+      <div className="mt-14 grid items-start gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
+        <div>
+          <dl className="space-y-7">
+            <div>
+              <dt className={label}>El reto</dt>
+              <dd className="mt-2 leading-relaxed text-[color:var(--soft)]">
+                {AGENDA_PROJECT.challenge}
+              </dd>
+            </div>
+            <div>
+              <dt className={label}>La solución</dt>
+              <dd className="mt-2 leading-relaxed text-[color:var(--soft)]">
+                {AGENDA_PROJECT.solution}
+              </dd>
+            </div>
+          </dl>
+
+          <ul className="mt-8 space-y-3 text-[color:var(--soft)]">
+            {AGENDA_PROJECT.highlights.map((item) => (
+              <li key={item} className="flex gap-3">
+                <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-[color:var(--accent)]" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+
+          <ul
+            className="mt-8 flex flex-wrap gap-2"
+            aria-label="Tecnologías del proyecto"
+          >
+            {AGENDA_PROJECT.tags.map((tag) => (
+              <Tag key={tag}>{tag}</Tag>
+            ))}
+          </ul>
+
+          <div className="mt-10 flex flex-wrap items-center gap-3">
+            <Magnet>
+              <Link to="/demo/agenda" className={btn("primary")}>
+                Probar el agente en vivo <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+            </Magnet>
+            <VideoButton url={AGENDA_PROJECT.video} />
+          </div>
+        </div>
+
+        <AnimatedContent blur distance={24}>
+          <AgentDemo />
+        </AnimatedContent>
+      </div>
+
+      {/* Cifras */}
+      <ul className="mt-20 grid divide-y divide-[color:var(--line)] overflow-hidden rounded-2xl border border-[color:var(--line)] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        {AGENDA_PROJECT.metrics.map((metric, i) => (
+          <li key={metric.label} className="bg-[color:var(--glass)] p-7">
+            <p className="font-display text-5xl font-semibold tracking-tight text-[color:var(--text)] md:text-6xl">
+              <CountUp to={metric.value} delay={i * 0.15} />
+              {metric.unit && (
+                <span className="ml-1.5 text-2xl text-[color:var(--accent)] md:text-3xl">
+                  {metric.unit}
+                </span>
+              )}
+            </p>
+            <p className="mt-3 font-medium text-[color:var(--text)]">
+              {metric.label}
+            </p>
+            <p className="mt-1 text-sm text-[color:var(--muted)]">
+              {metric.detail}
+            </p>
+          </li>
+        ))}
+      </ul>
+
+      <h3 className="mt-24 font-display text-2xl font-semibold text-[color:var(--text)]">
+        Cómo funciona
+      </h3>
+      <ol className="mt-8 grid gap-8 border-t border-[color:var(--line)] pt-8 md:grid-cols-3 md:gap-10">
+        {AGENDA_PROJECT.steps.map((step, i) => (
+          <AnimatedContent as="li" key={step.title} delay={i * 0.1}>
+            <span className="font-mono text-sm text-[color:var(--accent)]">
+              {pad(i + 1)}
+            </span>
+            <h4 className="mt-3 font-display text-xl font-semibold text-[color:var(--text)]">
+              {step.title}
+            </h4>
+            <p className="mt-2 max-w-sm leading-relaxed text-[color:var(--soft)]">
+              {step.text}
+            </p>
+          </AnimatedContent>
+        ))}
+      </ol>
+    </Section>
+  </div>
+);
+
 /* ── Más proyectos ────────────────────────────────────────── */
 
 const Projects = () => (
   <div className="cv border-t border-[color:var(--line)]">
     <Section id="proyectos">
       <SectionHeading
-        index="03"
+        index="04"
         eyebrow="Más proyectos"
         title="También construyo plataformas completas."
-        intro="Agentes de IA y sistemas de punta a punta, de la base de datos a la red. Uno de ellos lo puedes probar ahora mismo."
+        intro="Sistemas de punta a punta, de la base de datos a la red. Así se ve por dentro uno de ellos."
       />
       <Deferred minHeight="60rem" className="mt-12">
         <MoreProjects />
@@ -492,7 +600,7 @@ const Process = () => {
     <div className="cv border-t border-[color:var(--line)]">
       <Section id="proceso">
         <SectionHeading
-          index="04"
+          index="05"
           eyebrow="Proceso"
           title="Un proceso claro, de la idea a producción."
           intro="Sin sorpresas: sabes qué se va a construir, cuándo se entrega y cómo vamos a medir el resultado."
@@ -551,7 +659,7 @@ const Process = () => {
 const About = () => (
   <div className="cv border-t border-[color:var(--line)]">
     <Section id="sobre-mi">
-      <Eyebrow index="05">Sobre mí</Eyebrow>
+      <Eyebrow index="06">Sobre mí</Eyebrow>
       {/* Firma: cada letra gana peso al acercar el cursor */}
       <h2 className="mt-6 select-none whitespace-nowrap font-display text-[clamp(3.2rem,12.5vw,10.5rem)] leading-[0.9] tracking-[-0.04em] text-[color:var(--text)]">
         <VariableProximity label={PROFILE.shortName} />
@@ -640,7 +748,7 @@ const Questions = () => (
     <Section id="preguntas">
       <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
         <SectionHeading
-          index="06"
+          index="07"
           eyebrow="Preguntas frecuentes"
           title="Lo que suelen preguntarme antes de empezar."
           intro="Si tu duda no está aquí, escríbeme: respondo personalmente."
@@ -710,7 +818,7 @@ const Contact = () => {
       <Section id="contacto">
         <div className="grid items-start gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
           <div className="lg:pt-6">
-            <Eyebrow index="07">Contacto</Eyebrow>
+            <Eyebrow index="08">Contacto</Eyebrow>
             <h2 className="balance mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.05] tracking-tight text-[color:var(--text)] md:text-6xl">
               {CONTACT.title} <GradientText>{CONTACT.highlight}</GradientText>
             </h2>
@@ -891,6 +999,7 @@ const Landing = () => {
         <CostCalculator />
         <Services />
         <Project />
+        <AgendaCase />
         <Projects />
         <Process />
         <About />
