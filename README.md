@@ -3,7 +3,7 @@
 # Irving Dávila — Portfolio
 
 **Full-stack developer · AI automation.**
-A Spanish-language portfolio that sells by showing: a live AI data-cleaning demo, a 3D badge you can grab, and real projects.
+A Spanish-language portfolio that sells by showing: two live AI demos (data cleaning and an appointment agent), a 3D badge you can grab, and real projects.
 
 [![CI](https://github.com/IrvingDevv26/portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/IrvingDevv26/portfolio/actions/workflows/ci.yml)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
@@ -17,8 +17,9 @@ A Spanish-language portfolio that sells by showing: a live AI data-cleaning demo
 ![Hero with the interactive 3D badge](docs/screenshots/hero.jpg)
 
 > **Resumen en español.** Portfolio de Irving Dávila, desarrollador full-stack
-> especializado en automatización con IA. Incluye una demo en vivo de
-> **DataRefine** (sube un Excel desordenado y recíbelo limpio), una credencial 3D
+> especializado en automatización con IA. Incluye dos demos en vivo:
+> **DataRefine** (sube un Excel desordenado y recíbelo limpio) y **AgendaFlow**
+> (un agente de IA que agenda, cambia y cancela citas), una credencial 3D
 > interactiva, calculadora del costo del trabajo manual, proyectos reales y un
 > brief de proyecto para contacto. Hecho con React 19, Vite, Tailwind CSS 4 y
 > 40 componentes de React Bits. Ver [Resumen en español](#resumen-en-español).
@@ -34,6 +35,11 @@ A Spanish-language portfolio that sells by showing: a live AI data-cleaning demo
   highlighted cell by cell), then cleaned by the
   [DataRefine API](#related) and compared before and after. Public-demo limits
   are handled gracefully.
+- **Live AgendaFlow demo** (`/demo/agenda`): a WhatsApp-style chat with an AI
+  agent that books, reschedules and cancels appointments of a fictional
+  clinic. Next to the chat, the clinic's calendar updates live and every tool
+  the agent ran is listed, so visitors see what happens behind the
+  conversation. Backed by the AgendaFlow API.
 - **Interactive 3D badge** built with three.js and react-three-fiber, with a
   lightweight CSS fallback when the browser has no hardware WebGL.
 - **Sales-oriented content**: manual-work cost calculator, case study with real
@@ -75,7 +81,8 @@ npm run dev              # http://localhost:5173
 
 | Variable | Purpose |
 | --- | --- |
-| `VITE_API_URL` | DataRefine API used by the live demo (e.g. `http://localhost:8000`) |
+| `VITE_API_URL` | DataRefine API used by the data-cleaning demo (e.g. `http://localhost:8000`) |
+| `VITE_AGENDA_API_URL` | AgendaFlow API used by the appointment agent demo (e.g. `http://localhost:8001`) |
 | `VITE_SITE_URL` | Public site URL without trailing `/`, used for the canonical URL and social previews |
 
 ## Project structure
@@ -86,6 +93,7 @@ src/
   pages/
     Landing.jsx         Home page sections
     DataLab.jsx         DataRefine live demo
+    AgendaLab.jsx       AgendaFlow live demo (AI appointment agent)
     NotFound.jsx        404 page
   components/
     reactbits/          React Bits components adapted to the site
@@ -138,24 +146,28 @@ Static site, deployed on [Cloudflare Pages](https://pages.cloudflare.com):
 | --- | --- |
 | Build command | `npm run build` |
 | Output directory | `dist` |
-| Environment | `VITE_API_URL`, `VITE_SITE_URL` |
+| Environment | `VITE_API_URL`, `VITE_AGENDA_API_URL`, `VITE_SITE_URL` |
 
 Client-side routes such as `/demo/datarefine` work out of the box: without a
 top-level `404.html`, Pages serves the app for every path.
 
 ## Related
 
-- **DataRefine API** (private): FastAPI + pandas backend behind the live demo,
-  with deterministic cleaning rules, free AI providers with validation and
-  caching, and public-demo limits.
+- **DataRefine API** (private): FastAPI + pandas backend behind the
+  data-cleaning demo, with deterministic cleaning rules, free AI providers
+  with validation and caching, and public-demo limits.
+- **AgendaFlow API** (private): FastAPI backend behind the appointment agent
+  demo: LLM tool calling over validated scheduling rules, one sandboxed
+  calendar per visitor and free AI providers.
 
 ## Resumen en español
 
 - **Qué es:** el portfolio de Irving Dávila, en español, pensado para vender
   servicios de automatización y desarrollo full-stack.
-- **Lo más importante:** la demo en vivo de DataRefine
-  (`/demo/datarefine`). Primero diagnostica tu archivo en el navegador y luego
-  lo limpia con el backend, mostrando el antes y el después.
+- **Lo más importante:** las dos demos en vivo. DataRefine
+  (`/demo/datarefine`) diagnostica tu archivo en el navegador y luego lo limpia
+  con el backend; AgendaFlow (`/demo/agenda`) es un agente de IA que agenda
+  citas mientras ves la agenda actualizarse.
 - **Cómo correrlo:** `npm install`, copia `.env.example` como `.env` y ejecuta
   `npm run dev`.
 - **Dónde editar:** todos los textos, enlaces y proyectos están en
