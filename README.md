@@ -1,92 +1,169 @@
-# Portfolio — Irving Dávila
+<div align="center">
 
-Portfolio personal: automatización con IA y desarrollo full-stack.
-Incluye una demo en vivo de **DataRefine** (`/demo/datarefine`).
+# Irving Dávila — Portfolio
 
-## Scripts
+**Full-stack developer · AI automation.**
+A Spanish-language portfolio that sells by showing: a live AI data-cleaning demo, a 3D badge you can grab, and real projects.
+
+[![CI](https://github.com/IrvingDevv26/portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/IrvingDevv26/portfolio/actions/workflows/ci.yml)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
+![three.js](https://img.shields.io/badge/three.js-000000?logo=threedotjs&logoColor=white)
+![Lighthouse](https://img.shields.io/badge/Lighthouse-100_a11y_·_100_SEO-0CCE6B?logo=lighthouse&logoColor=white)
+
+</div>
+
+![Hero with the interactive 3D badge](docs/screenshots/hero.jpg)
+
+> **Resumen en español.** Portfolio de Irving Dávila, desarrollador full-stack
+> especializado en automatización con IA. Incluye una demo en vivo de
+> **DataRefine** (sube un Excel desordenado y recíbelo limpio), una credencial 3D
+> interactiva, calculadora del costo del trabajo manual, proyectos reales y un
+> brief de proyecto para contacto. Hecho con React 19, Vite, Tailwind CSS 4 y
+> 40 componentes de React Bits. Ver [Resumen en español](#resumen-en-español).
+
+| Services | Live demo | Projects |
+| --- | --- | --- |
+| ![Services bento grid](docs/screenshots/services.jpg) | ![DataRefine live demo](public/demo-datarefine.jpg) | ![VillaNet project](docs/screenshots/projects.jpg) |
+
+## Highlights
+
+- **Live DataRefine demo** (`/demo/datarefine`): the file is diagnosed in the
+  browser first (duplicates, empty cells, mixed formats, casing and spaces,
+  highlighted cell by cell), then cleaned by the
+  [DataRefine API](#related) and compared before and after. Public-demo limits
+  are handled gracefully.
+- **Interactive 3D badge** built with three.js and react-three-fiber, with a
+  lightweight CSS fallback when the browser has no hardware WebGL.
+- **Sales-oriented content**: manual-work cost calculator, case study with real
+  numbers, process timeline, FAQ and a 3-step project brief.
+- **Accessible and fast**: Lighthouse 100 for accessibility, best practices and
+  SEO; 98 performance on desktop. `prefers-reduced-motion` is respected
+  everywhere.
+- **All copy in one file**: every text, link and project lives in
+  `src/content.js`.
+
+## Tech stack
+
+| Area | Tools |
+| --- | --- |
+| UI | React 19, React Router 7, Tailwind CSS 4, framer-motion |
+| 3D | three.js, @react-three/fiber, @react-three/drei |
+| Components | [React Bits](https://reactbits.dev) (adapted to the site palette) |
+| Data | fflate (reads `.xlsx` in the browser for the demo preview) |
+| Tooling | Vite 8, ESLint, GitHub Actions |
+
+## Getting started
+
+Requires Node.js 22 or newer.
 
 ```bash
-npm run dev      # servidor de desarrollo
-npm run build    # build de producción en dist/
-npm run preview  # sirve el build localmente
-npm run lint     # ESLint
+npm install
+cp .env.example .env     # Windows: copy .env.example .env
+npm run dev              # http://localhost:5173
 ```
 
-Variables en `.env`:
-
-- `VITE_API_URL`: URL del backend de DataRefine (la demo).
-- `VITE_SITE_URL`: URL pública del sitio, sin `/` final. Se usa para la URL
-  canónica y la imagen al compartir en redes (`public/og-image.jpg`).
-
-## Dónde editar
-
-| Qué | Archivo |
+| Script | What it does |
 | --- | --- |
-| Textos, menú, servicios, proyectos, calculadora, proceso, bio, FAQ, contacto | `src/content.js` |
-| Correo, GitHub y LinkedIn | `PROFILE` en `src/content.js` |
-| Paleta, fuentes y animaciones globales | `src/styles/GlobalStyles.jsx`, `index.html` |
-| Secciones de la página principal | `src/pages/Landing.jsx` |
-| Fotos | `public/irving-card.jpg` (credencial), `public/irving-about.jpg` (Sobre mí) |
-| Imágenes de proyectos | `public/project-villanet.jpg`, `public/villanet-alta.jpg`, `public/villanet-pago.jpg`; captura de la vitrina: `public/demo-datarefine.jpg` |
-| Reverso de la credencial 3D (incluye el PIN `1024`) | `public/card-back.svg` |
-| PIN del modo desarrollador y datos del panel | `DEV_MODE` en `src/content.js` |
-| Videos (Loom o YouTube) de cada demo | campos `video` en `PROJECT` y `PROJECTS`; `SHOWCASE.video` acepta un .mp4 en `public/` |
+| `npm run dev` | Development server |
+| `npm run build` | Production build in `dist/` |
+| `npm run preview` | Serves the production build |
+| `npm run lint` | ESLint |
 
-## Componentes de React Bits
+### Environment variables
 
-Adaptados a la paleta del sitio y con soporte para `prefers-reduced-motion`,
-en `src/components/reactbits/`. Los de la categoría Micro, Folder y Crosshair
-conservan el código original (con framer-motion e íconos SVG propios):
-
-| Componente | Dónde se usa |
+| Variable | Purpose |
 | --- | --- |
-| Lanyard | Credencial 3D del hero (`src/components/Lanyard.jsx`) |
-| BlurText | Titular del hero y título de la demo |
-| RotatingText | Especialidades rotando en el hero |
-| ShinyText | Insignia "Disponible" y "Demo en vivo" |
-| GradientText | Palabras destacadas en latón |
-| DecryptedText | Etiquetas numeradas de cada sección |
-| ScrollVelocity | Franjas de texto bajo el hero |
-| SpotlightCard | Ficha del explorador de herramientas y tarjetas de la demo |
-| MagicBento | Servicios en rejilla bento con mini visuales |
-| ScrollExpand | Apertura del caso de estudio: la demo crece a pantalla completa |
-| PixelTransition | Comparación antes/después en portadas de proyectos (campo `compare`) |
-| CountUp | Cifras del caso de estudio |
-| AnimatedContent | Aparición de bloques al hacer scroll |
-| Magnet | Botones principales |
-| TiltedCard | Foto de "Sobre mí" |
-| StaggeredMenu | Menú móvil |
-| Squares | Fondo de la sección de contacto y de la demo |
-| VariableProximity | Nombre grande que abre "Sobre mí" |
-| ClickSpark | Chispas al hacer clic (global) |
-| FuzzyText | Página 404 |
-| Folder | Fichas técnicas de DataRefine ("Bajo el capó") |
-| BranchedMenu | Explorador de herramientas en "Sobre mí" |
-| StatusMark | Línea de tiempo del Proceso y pasos de la demo |
-| ThoughtLine | IA "pensando" en la demo animada, en DataLab y en el modo desarrollador |
-| CodeSlots | Modo desarrollador del pie (PIN del reverso de la credencial) |
-| Crosshair | Mira con coordenadas en la sección de contacto (sólo con mouse) |
-| Stepper | Brief de proyecto en 3 pasos (Contacto) |
-| SwipeToast | Avisos al copiar el correo o el mensaje |
-| WarmTooltip | Tooltips de los íconos sociales |
-| LogoLoop | Cinta con los logos del stack (Simple Icons, CC0) |
-| ScrollReveal | Manifiesto que se enciende al hacer scroll (versión sin GSAP) |
-| LatticeLoader | Carga de las páginas secundarias |
-| ScrollStack | "Más proyectos": tarjetas que se apilan al hacer scroll (lista normal en móvil) |
-| GlareHover | Destello sobre las portadas de los proyectos |
-| ElasticSlider | Controles de la calculadora de costo del trabajo manual |
-| Counter | Cifras animadas de la calculadora |
-| StarBorder | Botón secundario del hero |
-| Stack | Diagramas arrastrables de VillaNet |
-| ElectricBorder | Zona de carga y tabla en proceso de la demo (sólo con WebGL acelerado) |
-| AnimatedList | Problemas detectados en la demo (filtra la vista previa) |
+| `VITE_API_URL` | DataRefine API used by the live demo (e.g. `http://localhost:8000`) |
+| `VITE_SITE_URL` | Public site URL without trailing `/`, used for the canonical URL and social previews |
 
-## Rendimiento
+## Project structure
 
-- Las fuentes se alojan en el propio sitio (Fontsource), sin CSS bloqueante de Google.
-- Los widgets de más abajo (carpeta, explorador, brief, modo dev, mira, logos)
-  se descargan cuando están por verse (`src/components/Deferred.jsx`), y las
-  secciones fuera de pantalla usan `content-visibility: auto`.
-- La credencial 3D se monta cuando el navegador queda libre y compila sus
-  shaders en paralelo. Sin aceleración gráfica (WebGL por software) se muestra
-  una versión ligera en CSS (`src/components/StaticBadge.jsx`).
+```
+src/
+  content.js            Every text, link, service and project
+  pages/
+    Landing.jsx         Home page sections
+    DataLab.jsx         DataRefine live demo
+    NotFound.jsx        404 page
+  components/
+    reactbits/          React Bits components adapted to the site
+    Lanyard.jsx         3D badge (three.js)
+    SheetPreview.jsx    Demo preview table and detected problems
+    ...
+  lib/
+    sheet.js            In-browser CSV/XLSX reader and diagnosis
+    hooks.js, gpu.js    Shared hooks and WebGL detection
+  styles/
+    GlobalStyles.jsx    Palette, fonts and global animations
+public/                 Images, icons, social preview and manifest
+```
+
+## Performance
+
+- Self-hosted fonts (Fontsource), no render-blocking Google Fonts CSS.
+- Sections below the fold are lazy-loaded when they are about to be seen
+  (`src/components/Deferred.jsx`) and use `content-visibility: auto`.
+- The 3D badge mounts when the browser is idle and compiles its shaders in
+  parallel; heavy WebGL effects in the demo are only created when needed.
+
+## React Bits components
+
+Adapted to the site palette and to `prefers-reduced-motion`, in
+`src/components/reactbits/`:
+
+| Component | Where |
+| --- | --- |
+| Lanyard | 3D badge in the hero |
+| BlurText, RotatingText, ShinyText, GradientText, DecryptedText | Headlines, highlights and section labels |
+| ScrollVelocity, ScrollReveal, AnimatedContent | Scroll-driven text and reveals |
+| MagicBento | Services bento grid with mini visuals |
+| ScrollExpand | Case study opening: the demo grows to full screen |
+| CountUp, Counter, ElasticSlider | Case study numbers and cost calculator |
+| Folder | Technical sheets of DataRefine |
+| Stack, ScrollStack, GlareHover, PixelTransition | Projects section |
+| TiltedCard, VariableProximity, BranchedMenu | About section |
+| StatusMark, Stepper, ThoughtLine | Process timeline, project brief and demo steps |
+| Squares, Crosshair | Backgrounds of contact and demo |
+| ElectricBorder, AnimatedList, LatticeLoader | Live demo |
+| StaggeredMenu, Magnet, StarBorder, ClickSpark | Navigation and buttons |
+| SwipeToast, WarmTooltip, LogoLoop, CodeSlots, FuzzyText | Toasts, tooltips, stack logos, dev mode and 404 |
+
+## Deployment
+
+Static site, deployed on [Cloudflare Pages](https://pages.cloudflare.com):
+
+| Setting | Value |
+| --- | --- |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Environment | `VITE_API_URL`, `VITE_SITE_URL` |
+
+Client-side routes such as `/demo/datarefine` work out of the box: without a
+top-level `404.html`, Pages serves the app for every path.
+
+## Related
+
+- **DataRefine API** (private): FastAPI + pandas backend behind the live demo,
+  with deterministic cleaning rules, free AI providers with validation and
+  caching, and public-demo limits.
+
+## Resumen en español
+
+- **Qué es:** el portfolio de Irving Dávila, en español, pensado para vender
+  servicios de automatización y desarrollo full-stack.
+- **Lo más importante:** la demo en vivo de DataRefine
+  (`/demo/datarefine`). Primero diagnostica tu archivo en el navegador y luego
+  lo limpia con el backend, mostrando el antes y el después.
+- **Cómo correrlo:** `npm install`, copia `.env.example` como `.env` y ejecuta
+  `npm run dev`.
+- **Dónde editar:** todos los textos, enlaces y proyectos están en
+  `src/content.js`; la paleta y las animaciones globales en
+  `src/styles/GlobalStyles.jsx`.
+
+## License
+
+© 2026 Irving de Jesús Dávila Torres. All rights reserved. The source code is
+public for reference only; see [LICENSE](LICENSE). Third-party components keep
+their own licenses (React Bits, Simple Icons, Fontsource fonts).

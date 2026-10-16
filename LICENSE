@@ -1,0 +1,17 @@
+Copyright (c) 2026 Irving de Jesús Dávila Torres. All rights reserved.
+
+The source code of this website is publicly visible for reference only.
+No permission is granted to copy, use, modify, publish, distribute,
+sublicense or sell this website, its design, texts, photos or code, in whole
+or in part, without the prior written consent of the copyright holder.
+
+Third-party software included in this repository keeps its own license:
+
+- React Bits components (src/components/reactbits, src/components/Lanyard.jsx)
+  Copyright (c) David Haz. MIT + Commons Clause License Condition v1.0.
+  https://github.com/DavidHDev/react-bits
+- Simple Icons (src/components/logos.js): CC0 1.0.
+- Fontsource fonts (Bricolage Grotesque, Instrument Sans, JetBrains Mono):
+  SIL Open Font License 1.1.
+
+Contact: irvingdevv26@hotmail.com
