@@ -38,12 +38,15 @@ const API_URL = import.meta.env.VITE_API_URL ?? "";
 const ENDPOINT = `${API_URL}/api/datarefine/clean`;
 
 const ACCEPTED = [".xlsx", ".xls", ".csv"];
-const MAX_MB = 10;
+// Límites de la demo pública: deben coincidir con los del backend (.env)
+const MAX_MB = 1;
 const MAX_BYTES = MAX_MB * 1024 * 1024;
+const MAX_ROWS = 300;
+const PER_HOUR = 5;
 
 const MSG = {
   format: "Formato no compatible. Sube un archivo .xlsx, .xls o .csv.",
-  size: `El archivo pesa más de ${MAX_MB} MB. Sube uno más pequeño.`,
+  size: `La demo acepta archivos de hasta ${MAX_MB} MB. Sube uno más pequeño.`,
   empty: "El archivo está vacío. Sube uno que tenga datos.",
   generic:
     "No se pudo procesar el archivo. Verifica el formato o inténtalo de nuevo.",
@@ -228,7 +231,7 @@ const Dropzone = ({ dragging, setDragging, onFile, glow, onArm }) => {
           ))}
         </ul>
         <span className="text-xs text-[color:var(--muted)]">
-          Máximo {MAX_MB} MB
+          Hasta {MAX_MB} MB y {MAX_ROWS} filas
         </span>
       </label>
     </Charged>
@@ -403,6 +406,7 @@ const Working = ({ analysis, elapsed, glow }) => (
 const Result = ({ result, baseName, duration, before, after, onReset }) => {
   const [view, setView] = useState("after");
   const fileName = `${baseName}_limpio.xlsx`;
+  const noAI = result.ai === "unavailable" || result.ai === "limited";
   const shown = view === "before" && before ? before : after;
 
   return (
@@ -425,7 +429,7 @@ const Result = ({ result, baseName, duration, before, after, onReset }) => {
             steps={[
               "Archivo revisado en tu navegador",
               "Fechas, montos y duplicados corregidos",
-              result.ai === "unavailable"
+              noAI
                 ? "Revisión de textos con IA omitida"
                 : "Textos revisados con IA",
               "Excel limpio generado",
@@ -435,11 +439,11 @@ const Result = ({ result, baseName, duration, before, after, onReset }) => {
             fontSize={14}
           />
         </div>
-        {result.ai === "unavailable" && (
+        {noAI && (
           <p className="mx-auto mt-4 max-w-md text-sm text-[color:var(--muted)]">
-            La IA está saturada en este momento: se aplicaron las reglas
-            automáticas. Inténtalo de nuevo en unos minutos para revisar también
-            los textos.
+            {result.ai === "limited"
+              ? "La IA llegó a su límite diario en la demo: se aplicaron las reglas automáticas."
+              : "La IA está saturada en este momento: se aplicaron las reglas automáticas. Inténtalo de nuevo en unos minutos para revisar también los textos."}
           </p>
         )}
       </div>
@@ -530,7 +534,7 @@ const Result = ({ result, baseName, duration, before, after, onReset }) => {
 
 const FACTS = [
   "CSV, XLSX y XLS",
-  `Hasta ${MAX_MB} MB`,
+  `Hasta ${MAX_ROWS} filas`,
   "Diagnóstico en tu navegador",
   "Resultado en .xlsx",
 ];
@@ -578,6 +582,12 @@ const DataLab = () => {
 
   // Cancela una petición en curso al salir de la página
   useEffect(() => () => abortRef.current?.abort(), []);
+
+  // En hosting gratuito el backend se duerme: se despierta al abrir la demo,
+  // mientras el visitante elige su archivo
+  useEffect(() => {
+    fetch(`${API_URL}/api/health`).catch(() => {});
+  }, []);
 
   // Libera la URL del archivo limpio cuando cambia o al salir
   useEffect(
@@ -682,10 +692,10 @@ const DataLab = () => {
         signal: controller.signal,
       });
 
-      // 400, 413 y 422 traen un mensaje claro en español; el resto, genérico
+      // 400, 413, 422 y 429 traen un mensaje claro en español; el resto, genérico
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        const clear = [400, 413, 422].includes(res.status);
+        const clear = [400, 413, 422, 429].includes(res.status);
         throw new Error(
           clear && typeof data.detail === "string" ? data.detail : MSG.generic,
         );
@@ -701,7 +711,7 @@ const DataLab = () => {
       setResult({
         url: URL.createObjectURL(blob),
         size: blob.size,
-        // "unavailable": la IA estaba saturada y se aplicaron sólo las reglas
+        // "unavailable" (IA saturada) o "limited" (tope diario): sólo reglas
         ai: res.headers.get("X-DataRefine-AI"),
       });
       setStatus("done");
@@ -724,6 +734,7 @@ const DataLab = () => {
   const baseName = file ? file.name.replace(/\.[^.]+$/, "") : "archivo";
   const step = status === "done" ? 3 : file ? 2 : 1;
   const original = before.status === "ready" ? before.analysis : null;
+  const tooManyRows = Boolean(original && original.rows.length > MAX_ROWS);
 
   return (
     <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
@@ -836,13 +847,27 @@ const DataLab = () => {
                     focus={focus}
                     onFocus={setFocus}
                   />
+                  {tooManyRows && (
+                    <div className="mt-6 rounded-xl border border-[color:var(--accent-line)] bg-[color:var(--accent-bg)] p-4 text-sm leading-relaxed text-[color:var(--text)]">
+                      Tu archivo tiene{" "}
+                      {original.rows.length.toLocaleString("es-MX")} filas y la
+                      demo procesa hasta {MAX_ROWS}. Prueba con una parte o{" "}
+                      <Link
+                        to="/#contacto"
+                        className={`rounded font-medium text-[color:var(--accent)] underline underline-offset-4 ${focusRing}`}
+                      >
+                        escríbeme
+                      </Link>{" "}
+                      y lo limpio completo para tu empresa.
+                    </div>
+                  )}
                   <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-[color:var(--line)] pt-6">
                     <Magnet>
                       <button
                         type="button"
                         onClick={handleProcess}
-                        disabled={before.status === "loading"}
-                        className={`${btn("primary")} disabled:cursor-wait disabled:opacity-60`}
+                        disabled={before.status === "loading" || tooManyRows}
+                        className={`${btn("primary")} disabled:cursor-not-allowed disabled:opacity-60`}
                       >
                         {status === "error" ? "Reintentar" : "Limpiar con IA"}
                         <ArrowRightIcon className="h-4 w-4" />
@@ -899,7 +924,8 @@ const DataLab = () => {
                 {[
                   ["Formatos", ACCEPTED.join(", ")],
                   ["Tamaño máximo", `${MAX_MB} MB`],
-                  ["Vista previa", ".csv y .xlsx"],
+                  ["Filas por archivo", `hasta ${MAX_ROWS}`],
+                  ["Pruebas", `${PER_HOUR} por hora`],
                   ["Resultado", ".xlsx limpio"],
                 ].map(([term, value]) => (
                   <div key={term} className="flex justify-between gap-4">
@@ -911,8 +937,8 @@ const DataLab = () => {
                 ))}
               </dl>
               <p className="mt-5 text-sm leading-relaxed text-[color:var(--muted)]">
-                Si la IA está saturada, espera unos minutos y vuelve a
-                intentarlo.
+                Es una demo pública: no subas datos sensibles. La versión para
+                tu empresa no tiene estos límites.
               </p>
             </SpotlightCard>
 

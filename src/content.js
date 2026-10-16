@@ -101,21 +101,21 @@ export const PROJECT_TAGS = ["FastAPI", "Python", "pandas", "React", "AWS", "API
 // Cifras reales de la demo (ver DataLab.jsx)
 export const PROJECT_METRICS = [
   { value: 3, label: "formatos de entrada", detail: ".xlsx, .xls y .csv" },
-  { value: 10, unit: "MB", label: "máximo por archivo", detail: "resultado en .xlsx" },
+  { value: 300, label: "filas por archivo en la demo", detail: "sin límite en tu versión" },
   { value: 3, label: "pasos de principio a fin", detail: "subir, limpiar y descargar" },
 ];
 
 // Fichas técnicas dentro de la carpeta (Folder en el caso de estudio)
 export const PROJECT_DOCS = [
   { title: "Arquitectura", description: "React → FastAPI → reglas en pandas + IA → .xlsx con formato y resumen." },
-  { title: "Validaciones", description: "Acepta .xlsx, .xls o .csv de hasta 10 MB. Cada corrección de la IA se valida antes de aplicarse." },
+  { title: "Validaciones", description: "Demo pública: hasta 1 MB, 300 filas y 5 pruebas por hora por persona. Cada corrección de la IA se valida." },
   { title: "Resiliencia", description: "Si un modelo de IA está saturado prueba otro; si todos fallan, entrega el archivo con las reglas." },
 ];
 
 export const STEPS = [
   {
     title: "Subes tu archivo",
-    text: "Arrastra un Excel o CSV de hasta 10 MB. Sin cuentas ni configuraciones.",
+    text: "Arrastra un Excel o CSV (en la demo, hasta 300 filas). Sin cuentas ni configuraciones.",
   },
   {
     title: "Reglas e IA lo limpian",
