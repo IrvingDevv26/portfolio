@@ -454,7 +454,7 @@ const Projects = () => (
         index="03"
         eyebrow="Más proyectos"
         title="También construyo plataformas completas."
-        intro="Sistemas de punta a punta, de la base de datos a la red. Así se ve por dentro uno de ellos."
+        intro="Agentes de IA y sistemas de punta a punta, de la base de datos a la red. Uno de ellos lo puedes probar ahora mismo."
       />
       <Deferred minHeight="60rem" className="mt-12">
         <MoreProjects />

@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { PROJECTS } from "../content";
 import { useMediaQuery } from "../lib/hooks";
-import { focusRing } from "../lib/ui";
-import { ArrowUpRightIcon, CheckIcon } from "./icons";
+import { btn, focusRing } from "../lib/ui";
+import { ArrowRightIcon, ArrowUpRightIcon, CheckIcon } from "./icons";
 import GlareHover from "./reactbits/GlareHover";
 import PixelTransition from "./reactbits/PixelTransition";
 import ScrollStack, { ScrollStackItem } from "./reactbits/ScrollStack";
@@ -99,14 +100,15 @@ const ProjectMedia = ({ project }) => {
     );
   }
   return (
+    // Proporción fija (16:10, como las capturas) para que no se recorte
     <GlareHover
       width="100%"
-      height="100%"
+      height="auto"
       borderRadius="16px"
       borderColor="rgba(255,255,255,0.08)"
       glareColor="#F3E3C3"
       glareOpacity={0.35}
-      className="min-h-[13rem] overflow-hidden"
+      className="aspect-[16/10] self-center overflow-hidden"
     >
       <img
         src={project.image}
@@ -151,12 +153,19 @@ const ProjectCard = ({ project, index }) => (
       </ul>
 
       <div className="mt-auto pt-6">
-        <VideoButton
-          url={project.video}
-          label="Ver el video"
-          size="sm"
-          className="w-fit"
-        />
+        <div className="flex flex-wrap gap-2">
+          {project.demo && (
+            <Link to={project.demo} className={btn("primary", "sm")}>
+              Probar la demo <ArrowRightIcon className="h-4 w-4" />
+            </Link>
+          )}
+          <VideoButton
+            url={project.video}
+            label="Ver el video"
+            size="sm"
+            className="w-fit"
+          />
+        </div>
         {project.note && (
           <p className="mt-4 flex items-start gap-2.5 text-sm text-[color:var(--muted)]">
             <span
