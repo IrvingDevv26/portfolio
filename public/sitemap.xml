@@ -1,17 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://irvingdevv.dev/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://irvingdevv.dev/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://irvingdevv.dev/en" />
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://irvingdevv.dev/en</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://irvingdevv.dev/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://irvingdevv.dev/en" />
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://irvingdevv.dev/demo/datarefine</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://irvingdevv.dev/demo/datarefine" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://irvingdevv.dev/en/demo/datarefine" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://irvingdevv.dev/en/demo/datarefine</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://irvingdevv.dev/demo/datarefine" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://irvingdevv.dev/en/demo/datarefine" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://irvingdevv.dev/demo/agenda</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://irvingdevv.dev/demo/agenda" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://irvingdevv.dev/en/demo/agenda" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://irvingdevv.dev/en/demo/agenda</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://irvingdevv.dev/demo/agenda" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://irvingdevv.dev/en/demo/agenda" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
