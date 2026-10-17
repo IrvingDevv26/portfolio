@@ -4,7 +4,7 @@ import { useState } from "react";
    gráfica: correa, broche y tarjeta con un balanceo suave hecho con CSS.
    Se voltea al pasar el cursor o al tocarla, para ver el reverso. */
 
-const StaticBadge = () => {
+const StaticBadge = ({ words }) => {
   const [flipped, setFlipped] = useState(false);
 
   return (
@@ -23,7 +23,7 @@ const StaticBadge = () => {
 
         <button
           type="button"
-          aria-label={flipped ? "Ver el frente de la credencial" : "Ver el reverso de la credencial"}
+          aria-label={flipped ? words.badgeFront : words.badgeBack}
           aria-pressed={flipped}
           onClick={() => setFlipped((f) => !f)}
           className="badge-card group pointer-events-auto mt-4 aspect-[1.6/2.25] w-[clamp(180px,21vw,290px)] cursor-pointer rounded-[18px] [perspective:1200px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--accent)]"

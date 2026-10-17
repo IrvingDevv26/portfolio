@@ -8,18 +8,12 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import { animate, useMotionValue, useReducedMotion } from 'framer-motion';
 
 import './StatusMark.css';
+import { useContent } from '../../lib/i18n';
 
 const UI = { type: 'spring', duration: 0.3, bounce: 0 };
 const MORPH = { duration: 0.3, ease: [0.77, 0, 0.175, 1] };
 const CHECK = 'M7.5 12.25 10.5 15.25 16.75 8.75';
 const CROSS = 'M8.5 8.5 15.5 15.5M15.5 8.5 8.5 15.5';
-const TEXT = {
-  pending: 'Pendiente',
-  running: 'En curso',
-  done: 'Completado',
-  failed: 'Falló',
-  cancelled: 'Cancelado'
-};
 const IDLE_DASH = 0.3;
 
 const clamp01 = v => Math.min(1, Math.max(0, v));
@@ -113,6 +107,7 @@ export default function StatusMark({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, determinate, targetArc, reduce, C, P, spinDuration]);
 
+  const TEXT = useContent().UI.bits.status;
   const spoken = TEXT[status] + (determinate ? `, ${Math.round(clamp01(progress) * 100)}%` : '');
   const hasLabel = label !== undefined && label !== null;
 

@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { STACK } from "../content";
+import { useContent } from "../lib/i18n";
 import BranchedMenu from "./reactbits/BranchedMenu";
 import SpotlightCard from "./reactbits/SpotlightCard";
 
@@ -9,22 +9,28 @@ import SpotlightCard from "./reactbits/SpotlightCard";
 
 const slug = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
-const TREE = STACK.map(({ area, items }) => ({
-  label: area,
-  children: items.map((tool) => ({ value: slug(tool.name), label: tool.name })),
-}));
+const treeOf = (stack) =>
+  stack.map(({ area, items }) => ({
+    label: area,
+    children: items.map((tool) => ({
+      value: slug(tool.name),
+      label: tool.name,
+    })),
+  }));
 
-const TOOLS = Object.fromEntries(
-  STACK.flatMap(({ area, items }) =>
-    items.map((tool) => [slug(tool.name), { ...tool, area }]),
-  ),
-);
-
-const OPEN_ALL = TREE.map((_, i) => i);
+const toolsOf = (stack) =>
+  Object.fromEntries(
+    stack.flatMap(({ area, items }) =>
+      items.map((tool) => [slug(tool.name), { ...tool, area }]),
+    ),
+  );
 
 const ToolExplorer = () => {
+  const { STACK } = useContent();
+  const TREE = treeOf(STACK);
+  const OPEN_ALL = TREE.map((_, i) => i);
   const [selected, setSelected] = useState(TREE[0].children[0].value);
-  const tool = TOOLS[selected];
+  const tool = toolsOf(STACK)[selected];
 
   return (
     <div className="grid gap-8 sm:grid-cols-[minmax(0,12.5rem)_1fr] sm:items-start">

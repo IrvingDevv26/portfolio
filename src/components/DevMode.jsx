@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { DEV_MODE } from "../content";
+import { useContent } from "../lib/i18n";
 import CodeSlots from "./reactbits/CodeSlots";
 import ThoughtLine from "./reactbits/ThoughtLine";
 import { Eyebrow } from "./shared";
@@ -9,6 +9,8 @@ import { Eyebrow } from "./shared";
    panel con cómo está construido el sitio. */
 
 const DevMode = () => {
+  const { DEV_MODE, UI } = useContent();
+  const words = UI.devMode;
   const [status, setStatus] = useState("idle"); // idle | error | success
   const [unlocked, setUnlocked] = useState(false);
 
@@ -16,7 +18,7 @@ const DevMode = () => {
     <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--glass)] p-6 md:p-8">
       <div className="grid items-center gap-6 md:grid-cols-[1fr_auto]">
         <div>
-          <Eyebrow>Modo desarrollador</Eyebrow>
+          <Eyebrow>{words.eyebrow}</Eyebrow>
           <p className="mt-3 font-display text-xl font-semibold text-[color:var(--text)]">
             {DEV_MODE.title}
           </p>
@@ -32,7 +34,7 @@ const DevMode = () => {
           onComplete={(code) =>
             setStatus(code === DEV_MODE.pin ? "success" : "error")
           }
-          ariaLabel="PIN de acceso"
+          ariaLabel={words.pin}
           accentColor="#D4B27A"
           inkColor="#F1F3F6"
           slotColor="#16181E"
@@ -52,9 +54,9 @@ const DevMode = () => {
           >
             <div className="pt-6">
               <ThoughtLine
-                label="Verificando acceso…"
-                doneLabel="Acceso concedido en"
-                steps={["PIN verificado", "Abriendo el panel de desarrollo"]}
+                label={words.checking}
+                doneLabel={words.granted}
+                steps={words.steps}
                 settleAfter={1.4}
                 collapseOnSettle={false}
                 onSettle={() => setUnlocked(true)}
@@ -87,7 +89,7 @@ const DevMode = () => {
                       ))}
                     </dl>
                     <p className="border-t border-[color:var(--line)] px-5 py-2.5 text-xs text-[color:var(--muted)]">
-                      # Gracias por explorar con curiosidad: así empiezo cada proyecto.
+                      {words.thanks}
                     </p>
                   </motion.div>
                 )}

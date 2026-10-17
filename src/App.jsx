@@ -6,9 +6,11 @@ import {
   useLocation,
 } from "react-router-dom";
 import GlobalStyles from "./styles/GlobalStyles";
+import LanguageHint from "./components/LanguageHint";
 import ClickSpark from "./components/reactbits/ClickSpark";
 import LatticeLoader from "./components/reactbits/LatticeLoader";
 import { ToastProvider } from "./components/Toast";
+import { LanguageContext, languageOf, useContent } from "./lib/i18n";
 import { scrollToSection } from "./lib/scroll";
 import { WarmTooltipGroup } from "./components/reactbits/WarmTooltip";
 import Landing from "./pages/Landing";
@@ -19,16 +21,31 @@ const AgendaLab = lazy(() => import("./pages/AgendaLab"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Mientras llega el código de una página secundaria
-const PageLoader = () => (
-  <div className="font-body flex min-h-screen items-center justify-center bg-[color:var(--ink)] text-[color:var(--soft)]">
-    <LatticeLoader
-      label="Cargando"
-      pattern="orbit"
-      color="#D4B27A"
-      showTimer={false}
-    />
-  </div>
-);
+const PageLoader = () => {
+  const { UI } = useContent();
+  return (
+    <div className="font-body flex min-h-screen items-center justify-center bg-[color:var(--ink)] text-[color:var(--soft)]">
+      <LatticeLoader
+        label={UI.bits.loading}
+        pattern="orbit"
+        color="#D4B27A"
+        showTimer={false}
+      />
+    </div>
+  );
+};
+
+// El idioma sale de la URL (/en/...) y llega a toda la app por contexto;
+// también se avisa al navegador y a los lectores de pantalla (<html lang>)
+const Language = ({ children }) => {
+  const lang = languageOf(useLocation().pathname);
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+  return (
+    <LanguageContext.Provider value={lang}>{children}</LanguageContext.Provider>
+  );
+};
 
 const sectionFor = (hash) =>
   hash ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
@@ -82,22 +99,29 @@ const ScrollToTop = () => {
 function App() {
   return (
     <Router>
-      <GlobalStyles />
-      <ScrollToTop />
-      <ClickSpark />
-      <ToastProvider>
-        {/* Un solo grupo de tooltips: se miden una vez y pasan de uno a otro al instante */}
-        <WarmTooltipGroup>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/demo/datarefine" element={<DataLab />} />
-              <Route path="/demo/agenda" element={<AgendaLab />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </WarmTooltipGroup>
-      </ToastProvider>
+      <Language>
+        <GlobalStyles />
+        <ScrollToTop />
+        <ClickSpark />
+        <ToastProvider>
+          {/* Un solo grupo de tooltips: se miden una vez y pasan de uno a otro al instante */}
+          <WarmTooltipGroup>
+            <Suspense fallback={<PageLoader />}>
+              {/* Cada página existe en español (raíz) y en inglés (/en) */}
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/en" element={<Landing />} />
+                <Route path="/demo/datarefine" element={<DataLab />} />
+                <Route path="/en/demo/datarefine" element={<DataLab />} />
+                <Route path="/demo/agenda" element={<AgendaLab />} />
+                <Route path="/en/demo/agenda" element={<AgendaLab />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </WarmTooltipGroup>
+          <LanguageHint />
+        </ToastProvider>
+      </Language>
     </Router>
   );
 }

@@ -6,6 +6,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import './ElasticSlider.css';
+import { useContent } from '../../lib/i18n';
 
 const ROOT = 'elastic-slider';
 const VALUE = 'elastic-slider__value';
@@ -98,10 +99,12 @@ function ElasticSlider({
   fillContentColor = 'auto',
   thumbColor = '#ffffff',
   disabled = false,
-  ariaLabel = 'Control deslizante',
+  ariaLabel: ariaLabelProp,
   className = '',
   style
 }) {
+  const bits = useContent().UI.bits;
+  const ariaLabel = ariaLabelProp ?? bits.slider;
   const rootRef = useRef(null);
   const hitRef = useRef(null);
   const bodyRef = useRef(null);

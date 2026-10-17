@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion';
 
 import './SwipeToast.css';
+import { useContent } from '../../lib/i18n';
 
 const EASE_OUT = [0.23, 1, 0.32, 1];
 const FLICK = 0.11;
@@ -49,6 +50,7 @@ export default function SwipeToast({
   dismissible = true,
   className = ''
 }) {
+  const closeWord = useContent().UI.common.close;
   const reduce = useReducedMotion();
   const [phase, setPhase] = useState('open');
   const [instant, setInstant] = useState(false);
@@ -304,7 +306,7 @@ export default function SwipeToast({
               </button>
             ) : null}
             {closeButton ? (
-              <button type="button" className="swipe-toast__close" aria-label="Cerrar" onClick={() => close('close')}>
+              <button type="button" className="swipe-toast__close" aria-label={closeWord} onClick={() => close('close')}>
                 <svg viewBox="0 0 24 24" width={12} height={12} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
               </button>
             ) : null}

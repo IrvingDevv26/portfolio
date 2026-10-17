@@ -1,20 +1,21 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useId, useState } from "react";
-import { FAQ } from "../content";
+import { useContent } from "../lib/i18n";
 import { focusRing } from "../lib/ui";
 
 /* Preguntas frecuentes en acordeón. También publica los datos estructurados
    FAQPage para que los buscadores puedan mostrarlas como resultado enriquecido. */
 
-const STRUCTURED = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: FAQ.map(({ q, a }) => ({
-    "@type": "Question",
-    name: q,
-    acceptedAnswer: { "@type": "Answer", text: a },
-  })),
-});
+const structured = (faq) =>
+  JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map(({ q, a }) => ({
+      "@type": "Question",
+      name: q,
+      acceptedAnswer: { "@type": "Answer", text: a },
+    })),
+  });
 
 const Item = ({ q, a, open, onToggle }) => {
   const id = useId();
@@ -46,7 +47,14 @@ const Item = ({ q, a, open, onToggle }) => {
                 : "border-[color:var(--line-strong)] text-[color:var(--muted)]"
             }`}
           >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <svg
+              viewBox="0 0 24 24"
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
               <path d="M12 5v14M5 12h14" />
             </svg>
           </span>
@@ -74,6 +82,7 @@ const Item = ({ q, a, open, onToggle }) => {
 };
 
 const Faq = () => {
+  const { FAQ } = useContent();
   const [open, setOpen] = useState(0);
   return (
     <>
@@ -89,7 +98,7 @@ const Faq = () => {
       </ul>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: STRUCTURED }}
+        dangerouslySetInnerHTML={{ __html: structured(FAQ) }}
       />
     </>
   );

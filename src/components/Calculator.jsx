@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CALCULATOR } from "../content";
+import { useContent } from "../lib/i18n";
 import { btn } from "../lib/ui";
 import { ArrowRightIcon } from "./icons";
 import Counter from "./reactbits/Counter";
@@ -10,48 +10,54 @@ import { Eyebrow, h2 } from "./shared";
 /* Calculadora del costo del trabajo manual: controles ElasticSlider y cifras
    con Counter (React Bits). Todo sale de los datos que pone el visitante. */
 
-const money = new Intl.NumberFormat("es-MX");
-
-const FIELDS = [
-  {
-    key: "people",
-    label: "Personas que hacen la tarea",
-    min: 1,
-    max: 20,
-    step: 1,
-    show: (v) => `${v} ${v === 1 ? "persona" : "personas"}`,
-  },
-  {
-    key: "hours",
-    label: "Horas por semana, por persona",
-    min: 1,
-    max: 40,
-    step: 1,
-    show: (v) => `${v} h`,
-  },
-  {
-    key: "rate",
-    label: `Costo por hora (${CALCULATOR.currency})`,
-    min: 50,
-    max: 1000,
-    step: 10,
-    show: (v) => `$${money.format(v)}`,
-  },
-  {
-    key: "share",
-    label: "Parte que se podría automatizar",
-    min: 10,
-    max: 100,
-    step: 5,
-    show: (v) => `${v} %`,
-  },
-];
+// Los controles; el costo por hora y su moneda dependen del idioma
+const fieldsFor = (CALCULATOR, words) => {
+  const money = new Intl.NumberFormat(CALCULATOR.locale);
+  const { rate } = CALCULATOR;
+  return [
+    {
+      key: "people",
+      label: words.people,
+      min: 1,
+      max: 20,
+      step: 1,
+      show: words.peopleValue,
+    },
+    {
+      key: "hours",
+      label: words.hours,
+      min: 1,
+      max: 40,
+      step: 1,
+      show: (v) => `${v} h`,
+    },
+    {
+      key: "rate",
+      label: `${words.rate} (${CALCULATOR.currency})`,
+      min: rate.min,
+      max: rate.max,
+      step: rate.step,
+      show: (v) => `$${money.format(v)}`,
+    },
+    {
+      key: "share",
+      label: words.share,
+      min: 10,
+      max: 100,
+      step: 5,
+      show: (v) => `${v} %`,
+    },
+  ];
+};
 
 const Calculator = () => {
+  const { CALCULATOR, UI } = useContent();
+  const words = UI.calculator;
+  const fields = fieldsFor(CALCULATOR, words);
   const [values, setValues] = useState({
     people: 3,
     hours: 6,
-    rate: 150,
+    rate: CALCULATOR.rate.start,
     share: 60,
   });
 
@@ -63,14 +69,14 @@ const Calculator = () => {
   return (
     <div className="grid items-start gap-12 lg:grid-cols-[1fr_0.95fr] lg:gap-16">
       <div>
-        <Eyebrow>Calculadora</Eyebrow>
+        <Eyebrow>{words.eyebrow}</Eyebrow>
         <h2 className={`${h2} mt-5`}>{CALCULATOR.title}</h2>
         <p className="mt-5 max-w-xl text-lg leading-relaxed text-[color:var(--soft)]">
           {CALCULATOR.intro}
         </p>
 
         <div className="mt-10 space-y-7">
-          {FIELDS.map((field) => (
+          {fields.map((field) => (
             <div key={field.key}>
               <div className="flex items-baseline justify-between gap-4 text-sm">
                 <span className="text-[color:var(--soft)]">{field.label}</span>
@@ -104,24 +110,22 @@ const Calculator = () => {
       </div>
 
       <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--raised)] p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_48px_-24px_rgba(0,0,0,0.6)] md:p-8 lg:sticky lg:top-28">
-        <p className="text-sm text-[color:var(--muted)]">
-          Al año, tu equipo dedica
-        </p>
+        <p className="text-sm text-[color:var(--muted)]">{words.perYear}</p>
         <p className="mt-2 font-display font-semibold text-[color:var(--text)]">
           <Counter
             value={hoursYear}
             suffix=" h"
+            locale={CALCULATOR.locale}
             fontSize="clamp(2.6rem, 6vw, 3.6rem)"
           />
         </p>
-        <p className="mt-2 text-sm text-[color:var(--muted)]">
-          a este proceso, con un costo aproximado de
-        </p>
+        <p className="mt-2 text-sm text-[color:var(--muted)]">{words.cost}</p>
         <p className="mt-1 font-display text-2xl font-semibold text-[color:var(--soft)]">
           <Counter
             value={costYear}
             prefix="$"
             suffix={` ${CALCULATOR.currency}`}
+            locale={CALCULATOR.locale}
             fontSize="1.6rem"
           />
         </p>
@@ -129,13 +133,14 @@ const Calculator = () => {
         <div className="my-6 h-px bg-[color:var(--line)]" />
 
         <p className="text-sm text-[color:var(--muted)]">
-          Si automatizas el {values.share} %, podrías recuperar
+          {words.recover(values.share)}
         </p>
         <div className="mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1 font-display font-semibold">
           <span className="text-[color:var(--accent)]">
             <Counter
               value={hoursBack}
               suffix=" h"
+              locale={CALCULATOR.locale}
               fontSize="clamp(2.2rem, 5vw, 3rem)"
             />
           </span>
@@ -144,17 +149,18 @@ const Calculator = () => {
               value={moneyBack}
               prefix="$"
               suffix={` ${CALCULATOR.currency}`}
+              locale={CALCULATOR.locale}
               fontSize="1.35rem"
             />
           </span>
         </div>
         <p className="mt-2 text-xs text-[color:var(--muted)]">
-          Considera {CALCULATOR.weeksPerYear} semanas laborales al año.
+          {words.weeks(CALCULATOR.weeksPerYear)}
         </p>
 
         <Magnet className="mt-7">
           <a href="#contacto" className={btn("primary")}>
-            Quiero recuperar ese tiempo <ArrowRightIcon className="h-4 w-4" />
+            {words.cta} <ArrowRightIcon className="h-4 w-4" />
           </a>
         </Magnet>
       </div>

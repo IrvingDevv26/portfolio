@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { useContent } from "../../lib/i18n";
 import { btn, card, focusRing, iconBtn } from "../../lib/ui";
 import { ArrowUpIcon, CheckIcon, XIcon } from "../icons";
 import LatticeLoader from "../reactbits/LatticeLoader";
@@ -9,18 +10,11 @@ import LatticeLoader from "../reactbits/LatticeLoader";
    backend se conecta (o si falla), el mismo recuadro muestra el estado, así la
    página no cambia de tamaño. */
 
-const SUGGESTIONS = [
-  "¿Qué servicios tienen y cuánto cuestan?",
-  "Quiero una limpieza el jueves en la tarde",
-  "¿Tienen estacionamiento?",
-  "Quiero cambiar mi cita",
-];
-
 // Las respuestas son texto plano; si el modelo usa **negritas** o viñetas, se limpian
 const tidy = (text) =>
   text.replace(/\*\*(.+?)\*\*/g, "$1").replace(/^\s*[-*]\s+/gm, "• ");
 
-const DoubleCheck = ({ className }) => (
+const DoubleCheck = ({ className, label }) => (
   <svg
     viewBox="0 0 18 12"
     fill="none"
@@ -28,7 +22,7 @@ const DoubleCheck = ({ className }) => (
     strokeWidth="1.6"
     strokeLinecap="round"
     strokeLinejoin="round"
-    aria-label="Leído"
+    aria-label={label}
     className={className}
   >
     <path d="M1 6.5l3.2 3.2L11 2.5" />
@@ -36,7 +30,7 @@ const DoubleCheck = ({ className }) => (
   </svg>
 );
 
-const Bubble = ({ message }) => {
+const Bubble = ({ message, readLabel }) => {
   if (message.role === "system") {
     return (
       <p
@@ -63,14 +57,19 @@ const Bubble = ({ message }) => {
       {mine ? message.text : tidy(message.text)}
       <span className="float-right ml-3 mt-2 inline-flex items-center gap-1 font-mono text-[10px] leading-none text-[color:var(--muted)]">
         {message.time}
-        {mine && <DoubleCheck className="h-3 w-4 text-[color:var(--accent)]" />}
+        {mine && (
+          <DoubleCheck
+            label={readLabel}
+            className="h-3 w-4 text-[color:var(--accent)]"
+          />
+        )}
       </span>
     </motion.div>
   );
 };
 
 // Herramienta que ejecutó el agente, entre los mensajes
-const ToolChip = ({ action, onShow }) => (
+const ToolChip = ({ action, onShow, words }) => (
   <motion.div
     data-role="tool"
     initial={{ opacity: 0, scale: 0.96 }}
@@ -100,7 +99,9 @@ const ToolChip = ({ action, onShow }) => (
         </span>
       )}
       {!action.ok && action.error && (
-        <span className="block">Regla: {action.error}</span>
+        <span className="block">
+          {words.rule}: {action.error}
+        </span>
       )}
     </span>
     {action.ok && action.codigo && onShow && (
@@ -109,18 +110,18 @@ const ToolChip = ({ action, onShow }) => (
         onClick={onShow}
         className={`ml-1 shrink-0 rounded font-medium text-[color:var(--accent)] underline-offset-2 hover:underline lg:hidden ${focusRing}`}
       >
-        Ver
+        {words.see}
       </button>
     )}
   </motion.div>
 );
 
-const Typing = () => (
+const Typing = ({ label }) => (
   <motion.div
     initial={{ opacity: 0, y: 6 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0 }}
-    aria-label="El asistente está escribiendo"
+    aria-label={label}
     className="mr-auto flex gap-1 rounded-2xl rounded-bl-md border border-[color:var(--line)] bg-[color:var(--raised)] px-3.5 py-3"
   >
     {[0, 1, 2].map((i) => (
@@ -146,6 +147,7 @@ const Chat = ({
   onRestart,
   onShowAgenda,
 }) => {
+  const words = useContent().AGENDA_LAB.chat;
   const [text, setText] = useState("");
   const logRef = useRef(null);
   const inputRef = useRef(null);
@@ -169,7 +171,7 @@ const Chat = ({
 
   return (
     <section
-      aria-label="Chat con el asistente de la clínica"
+      aria-label={words.label}
       className={`${card} flex h-[min(40rem,calc(100svh_-_5rem))] min-h-[30rem] flex-col overflow-hidden lg:h-[min(46rem,calc(100vh_-_3rem))]`}
     >
       <header className="flex items-center gap-3 border-b border-[color:var(--line)] px-4 py-3">
@@ -186,16 +188,16 @@ const Chat = ({
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium text-[color:var(--text)]">
-            {business?.nombre ?? "Clínica Dental Sonrisa"}
+            {business?.nombre ?? words.fallbackName}
           </p>
           <p className="text-xs text-[color:var(--muted)]">
             {!ready
               ? status === "error"
-                ? "sin conexión"
-                : "conectando…"
+                ? words.offline
+                : words.connecting
               : sending
-                ? "escribiendo…"
-                : "en línea · asistente con IA"}
+                ? words.typing
+                : words.online}
           </p>
         </div>
         <button
@@ -204,7 +206,7 @@ const Chat = ({
           disabled={status === "connecting"}
           className={`${iconBtn} w-auto px-2.5 text-xs disabled:opacity-40`}
         >
-          Reiniciar
+          {words.restart}
         </button>
       </header>
 
@@ -212,7 +214,7 @@ const Chat = ({
         ref={logRef}
         role="log"
         aria-live="polite"
-        aria-label="Mensajes"
+        aria-label={words.messages}
         className="flex flex-1 flex-col gap-2.5 overflow-y-auto px-3 py-4 sm:px-4"
         style={{
           backgroundImage:
@@ -223,17 +225,22 @@ const Chat = ({
         {messages.length > 0 ? (
           <>
             <p className="mx-auto rounded-md border border-[color:var(--line)] bg-[color:var(--ink)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--muted)]">
-              Hoy
+              {words.today}
             </p>
             {messages.map((m) =>
               m.role === "tool" ? (
-                <ToolChip key={m.id} action={m.action} onShow={onShowAgenda} />
+                <ToolChip
+                  key={m.id}
+                  action={m.action}
+                  onShow={onShowAgenda}
+                  words={words}
+                />
               ) : (
-                <Bubble key={m.id} message={m} />
+                <Bubble key={m.id} message={m} readLabel={words.read} />
               ),
             )}
             <AnimatePresence>
-              {sending && <Typing key="typing" />}
+              {sending && <Typing key="typing" label={words.typingLabel} />}
             </AnimatePresence>
           </>
         ) : (
@@ -248,14 +255,14 @@ const Chat = ({
                   onClick={onRestart}
                   className={btn("primary", "sm")}
                 >
-                  Reintentar
+                  {words.retry}
                 </button>
               </>
             ) : (
               <>
                 <div className="text-[color:var(--soft)]">
                   <LatticeLoader
-                    label={slow ? "Despertando el servidor" : "Conectando"}
+                    label={slow ? words.waking : words.connectingLabel}
                     pattern="orbit"
                     color="#D4B27A"
                   />
@@ -265,8 +272,7 @@ const Chat = ({
                     slow ? "opacity-100" : "opacity-0"
                   }`}
                 >
-                  El servidor gratuito se duerme cuando nadie lo usa; la primera
-                  vez puede tardar hasta un minuto.
+                  {words.sleepy}
                 </p>
               </>
             )}
@@ -282,7 +288,7 @@ const Chat = ({
             WebkitMaskImage: "linear-gradient(to right, #000 85%, transparent)",
           }}
         >
-          {SUGGESTIONS.map((suggestion) => (
+          {words.suggestions.map((suggestion) => (
             <button
               key={suggestion}
               type="button"
@@ -304,7 +310,7 @@ const Chat = ({
         className="flex items-center gap-2 border-t border-[color:var(--line)] px-3 pb-1 pt-3"
       >
         <label htmlFor="agenda-message" className="sr-only">
-          Escribe un mensaje
+          {words.inputLabel}
         </label>
         <input
           id="agenda-message"
@@ -314,12 +320,12 @@ const Chat = ({
           maxLength={500}
           autoComplete="off"
           disabled={!ready}
-          placeholder={ready ? "Escribe como en WhatsApp…" : "Conectando…"}
+          placeholder={ready ? words.placeholder : words.placeholderOff}
           className="min-w-0 flex-1 rounded-full border border-[color:var(--line-strong)] bg-[color:var(--ink)] px-4 py-2.5 text-[15px] text-[color:var(--text)] placeholder:text-[color:var(--muted)] focus:border-[color:var(--accent-line)] focus:outline-none disabled:opacity-60"
         />
         <button
           type="submit"
-          aria-label="Enviar"
+          aria-label={words.send}
           disabled={sending || !ready || !text.trim()}
           className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[color:var(--btn)] text-[color:var(--btn-ink)] transition hover:bg-[color:var(--btn-hover)] disabled:opacity-40 ${focusRing}`}
         >
@@ -333,9 +339,7 @@ const Chat = ({
             : "text-[color:var(--muted)]"
         }`}
       >
-        {remaining !== null
-          ? `${remaining} mensajes restantes en esta demo`
-          : " "}
+        {remaining !== null ? words.remaining(remaining) : " "}
       </p>
     </section>
   );

@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useContent } from "../lib/i18n";
 import { btn, iconBtn } from "../lib/ui";
 import { PlayIcon, XIcon } from "./icons";
 
@@ -29,11 +30,13 @@ const toEmbed = (url) => {
 
 const VideoButton = ({
   url,
-  label = "Ver el recorrido en video",
+  label,
   variant = "secondary",
   size = "md",
   className = "",
 }) => {
+  const words = useContent().UI.common;
+  const text = label ?? words.watchWalkthrough;
   const [open, setOpen] = useState(false);
   const closeRef = useRef(null);
   const triggerRef = useRef(null);
@@ -63,7 +66,7 @@ const VideoButton = ({
         onClick={() => setOpen(true)}
         className={`${btn(variant, size)} ${className}`}
       >
-        <PlayIcon className="h-4 w-4 text-[color:var(--accent)]" /> {label}
+        <PlayIcon className="h-4 w-4 text-[color:var(--accent)]" /> {text}
       </button>
 
       {createPortal(
@@ -72,7 +75,7 @@ const VideoButton = ({
             <motion.div
               role="dialog"
               aria-modal="true"
-              aria-label={label}
+              aria-label={text}
               className="fixed inset-0 z-[95] grid place-items-center bg-black/80 p-4 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -89,7 +92,7 @@ const VideoButton = ({
                 <button
                   ref={closeRef}
                   type="button"
-                  aria-label="Cerrar video"
+                  aria-label={words.closeVideo}
                   onClick={() => setOpen(false)}
                   className={`${iconBtn} absolute -top-11 right-0 text-white`}
                 >
@@ -98,7 +101,7 @@ const VideoButton = ({
                 <div className="aspect-video overflow-hidden rounded-xl border border-[color:var(--line)] bg-black">
                   <iframe
                     src={toEmbed(url)}
-                    title={label}
+                    title={text}
                     allow="autoplay; fullscreen; picture-in-picture"
                     allowFullScreen
                     className="h-full w-full"

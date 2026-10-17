@@ -1,5 +1,6 @@
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { useMediaQuery } from "../../lib/hooks";
+import { useContent } from "../../lib/i18n";
 import { card, focusRing, iconBtn } from "../../lib/ui";
 import { ArrowLeftIcon, ArrowRightIcon } from "../icons";
 import {
@@ -9,7 +10,6 @@ import {
   openingHours,
   openRanges,
   shortDate,
-  WEEKDAYS,
   weekdayOf,
 } from "./dates";
 import { proColor, proIndex } from "./team";
@@ -126,12 +126,12 @@ const Appointment = ({ a, business, flash, overlap, pct }) => {
   );
 };
 
-const DayHeader = ({ day, today }) => (
+const DayHeader = ({ day, today, weekdays }) => (
   <div className="border-b border-[color:var(--line)] pb-2 text-center">
     {day ? (
       <>
         <span className="block font-mono text-[10px] uppercase tracking-wider text-[color:var(--muted)]">
-          {WEEKDAYS[weekdayOf(day)]}
+          {weekdays[weekdayOf(day)]}
         </span>
         <span
           className={`mx-auto mt-0.5 flex h-8 w-8 items-center justify-center rounded-full font-display text-base font-semibold ${
@@ -158,6 +158,8 @@ const DayColumn = ({
   highlighted,
   start,
   end,
+  weekdays,
+  dayLabel,
 }) => {
   const pct = (minutes) => ((minutes - start) / (end - start)) * 100;
   const closed = day
@@ -199,7 +201,10 @@ const DayColumn = ({
       {day && (
         <ul
           className="absolute inset-0"
-          aria-label={`Citas del ${WEEKDAYS[weekdayOf(day)]} ${Number(day.slice(8, 10))}`}
+          aria-label={dayLabel(
+            weekdays[weekdayOf(day)],
+            Number(day.slice(8, 10)),
+          )}
         >
           <AnimatePresence initial={false}>
             {items.map((a) => (
@@ -241,6 +246,8 @@ const WeekCalendar = ({
   day,
   onDay,
 }) => {
+  const { AGENDA_LAB, DATES } = useContent();
+  const words = AGENDA_LAB.calendar;
   const wide = useMediaQuery("(min-width: 768px)");
   const loading = !today;
   const [start, end] = openingHours(business?.horario);
@@ -283,22 +290,18 @@ const WeekCalendar = ({
   const mine = agenda.filter((a) => a.origen === "agent").length;
 
   return (
-    <section aria-label="Agenda de la clínica" className={`${card} p-4 sm:p-5`}>
+    <section aria-label={words.label} className={`${card} p-4 sm:p-5`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-display text-lg font-semibold">
-            Agenda de la clínica
-          </h2>
-          <p className="text-xs text-[color:var(--muted)]">
-            Se actualiza con cada acción del agente
-          </p>
+          <h2 className="font-display text-lg font-semibold">{words.title}</h2>
+          <p className="text-xs text-[color:var(--muted)]">{words.subtitle}</p>
         </div>
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => onWeek(week - 1)}
             disabled={loading || week === 0}
-            aria-label="Semana anterior"
+            aria-label={words.previous}
             className={`${iconBtn} disabled:opacity-30`}
           >
             <ArrowLeftIcon className="h-4 w-4" />
@@ -307,14 +310,14 @@ const WeekCalendar = ({
             {loading
               ? "…"
               : week === 0
-                ? "Esta semana"
-                : `${shortDate(range[0])} – ${shortDate(range[6])}`}
+                ? words.thisWeek
+                : `${shortDate(range[0], DATES)} – ${shortDate(range[6], DATES)}`}
           </span>
           <button
             type="button"
             onClick={() => onWeek(week + 1)}
             disabled={loading || week === LAST_WEEK}
-            aria-label="Semana siguiente"
+            aria-label={words.next}
             className={`${iconBtn} disabled:opacity-30`}
           >
             <ArrowRightIcon className="h-4 w-4" />
@@ -323,9 +326,15 @@ const WeekCalendar = ({
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <Stat label="Citas" value={loading ? "–" : weekItems.length} />
-        <Stat label="Ocupación" value={loading ? "–" : `${occupancy} %`} />
-        <Stat label="Tus citas" value={loading ? "–" : mine} />
+        <Stat
+          label={words.appointments}
+          value={loading ? "–" : weekItems.length}
+        />
+        <Stat
+          label={words.occupancy}
+          value={loading ? "–" : `${occupancy} %`}
+        />
+        <Stat label={words.yours} value={loading ? "–" : mine} />
       </div>
 
       <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-[color:var(--muted)]">
@@ -344,7 +353,7 @@ const WeekCalendar = ({
             aria-hidden="true"
             className="h-3 w-3 rounded-sm border border-[color:var(--accent)] bg-[color:var(--accent-bg)]"
           />
-          Tus citas
+          {words.yours}
         </li>
         <li className="flex items-center gap-1.5">
           <span
@@ -352,7 +361,7 @@ const WeekCalendar = ({
             className="h-3 w-3 rounded-sm border border-[color:var(--line-strong)]"
             style={{ backgroundImage: HATCH }}
           />
-          Sin servicio
+          {words.closed}
         </li>
       </ul>
 
@@ -361,7 +370,7 @@ const WeekCalendar = ({
         <div
           className="mt-4 grid grid-cols-6 gap-1"
           role="group"
-          aria-label="Día"
+          aria-label={words.day}
         >
           {(loading ? Array.from({ length: 6 }, () => null) : days).map(
             (d, i) =>
@@ -378,14 +387,14 @@ const WeekCalendar = ({
                   }`}
                 >
                   <span className="block font-mono text-[10px] uppercase tracking-wider text-[color:var(--muted)]">
-                    {d === today ? "hoy" : WEEKDAYS[weekdayOf(d)]}
+                    {d === today ? words.today : DATES.weekdays[weekdayOf(d)]}
                   </span>
                   <span className="block font-display text-base font-semibold">
                     {Number(d.slice(8, 10))}
                   </span>
                   {itemsOf(d).some((a) => a.origen === "agent") && (
                     <span
-                      aria-label="Tienes una cita"
+                      aria-label={words.hasYours}
                       className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[color:var(--accent)]"
                     />
                   )}
@@ -410,7 +419,12 @@ const WeekCalendar = ({
           <>
             <span />
             {columns.map((d, i) => (
-              <DayHeader key={d ?? i} day={d} today={today} />
+              <DayHeader
+                key={d ?? i}
+                day={d}
+                today={today}
+                weekdays={DATES.weekdays}
+              />
             ))}
           </>
         )}
@@ -438,14 +452,15 @@ const WeekCalendar = ({
               highlighted={highlighted}
               start={start}
               end={end}
+              weekdays={DATES.weekdays}
+              dayLabel={words.dayLabel}
             />
           ))}
         </LayoutGroup>
       </div>
 
       <p className="mt-4 text-xs leading-relaxed text-[color:var(--muted)]">
-        Las demás citas son de pacientes ficticios. Cada visitante tiene su
-        propia copia de la agenda; nada se comparte ni se guarda.
+        {words.note}
       </p>
     </section>
   );

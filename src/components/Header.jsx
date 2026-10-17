@@ -1,14 +1,13 @@
 import { motion, useScroll, useSpring } from "framer-motion";
 import { useEffect, useState } from "react";
-import { NAV_LINKS, PROFILE } from "../content";
+import { useContent } from "../lib/i18n";
 import { btn, focusRing } from "../lib/ui";
 import { ArrowRightIcon, GithubIcon, LinkedinIcon } from "./icons";
+import LanguageSwitch from "./LanguageSwitch";
 import StaggeredMenu from "./reactbits/StaggeredMenu";
 import { SocialLink } from "./shared";
 
-const SECTION_IDS = NAV_LINKS.map((link) => link.href.slice(1));
-
-const Logo = () => (
+const Logo = ({ name }) => (
   <a
     href="#inicio"
     className={`pointer-events-auto group flex items-center gap-2.5 rounded-md ${focusRing}`}
@@ -16,13 +15,14 @@ const Logo = () => (
     <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-[color:var(--accent-line)] bg-[color:var(--accent-bg)] font-display text-[13px] font-bold tracking-tight text-[color:var(--accent)] transition-colors group-hover:bg-[color:var(--accent)] group-hover:text-[color:var(--btn-ink)]">
       ID
     </span>
-    <span className="whitespace-nowrap font-display text-base font-semibold text-[color:var(--text)]">
-      {PROFILE.shortName}
+    <span className="whitespace-nowrap font-display text-base font-semibold text-[color:var(--text)] max-[380px]:hidden">
+      {name}
     </span>
   </a>
 );
 
 const Header = () => {
+  const { NAV_LINKS, PROFILE, UI } = useContent();
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("");
   const [hovered, setHovered] = useState(null);
@@ -44,11 +44,18 @@ const Header = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Sección activa: la que cruza la línea central de la pantalla
+  // Sección activa: la que cruza la línea central de la pantalla. Los ids son
+  // los mismos en los dos idiomas
   useEffect(() => {
-    const elements = SECTION_IDS.map((id) =>
-      document.getElementById(id),
-    ).filter(Boolean);
+    const elements = [
+      "servicios",
+      "proyecto",
+      "proceso",
+      "sobre-mi",
+      "contacto",
+    ]
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -81,10 +88,10 @@ const Header = () => {
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-3.5 md:px-10">
-        <Logo />
+        <Logo name={PROFILE.shortName} />
 
         <nav
-          aria-label="Principal"
+          aria-label={UI.header.nav}
           className="pointer-events-auto hidden lg:block"
         >
           <ul
@@ -135,11 +142,12 @@ const Header = () => {
         </nav>
 
         <div className="pointer-events-auto flex items-center gap-2">
+          <LanguageSwitch />
           <a
             href="#contacto"
             className={`${btn("primary", "sm")} max-sm:hidden`}
           >
-            Hablemos <ArrowRightIcon className="h-4 w-4" />
+            {UI.header.talk} <ArrowRightIcon className="h-4 w-4" />
           </a>
           <StaggeredMenu
             items={NAV_LINKS}

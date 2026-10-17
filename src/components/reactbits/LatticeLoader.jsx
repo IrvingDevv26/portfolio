@@ -6,6 +6,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import './LatticeLoader.css';
+import { useContent } from '../../lib/i18n';
 
 const PATTERNS = {
   arrow: { 3: { cells: [1, 2, 3, 0, 1, 2, 1, 2, 3], loop: 7.2, scale: 1 } },
@@ -47,9 +48,9 @@ const spoken = ds =>
     : `${Math.floor(ds / 600)} minutes ${((ds % 600) / 10).toFixed(1)} seconds`;
 
 export default function LatticeLoader({
-  label = 'Cargando',
-  doneLabel = 'Listo en',
-  errorLabel = 'Falló tras',
+  label: labelProp,
+  doneLabel: doneProp,
+  errorLabel: errorProp,
   status = 'working',
   pattern = 'orbit',
   grid = 3,
@@ -69,6 +70,10 @@ export default function LatticeLoader({
   className = '',
   style
 }) {
+  const bits = useContent().UI.bits;
+  const label = labelProp ?? bits.loading;
+  const doneLabel = doneProp ?? bits.readyIn;
+  const errorLabel = errorProp ?? bits.failedAfter;
   const n = grid === 4 ? 4 : 3;
   const pat = resolvePattern(pattern, n);
   const marks = MARKS[n];
@@ -80,7 +85,7 @@ export default function LatticeLoader({
   const markRef = useRef('done');
   const mark = status === 'working' ? markRef.current : status;
   markRef.current = mark;
-  const [announce, setAnnounce] = useState(`${label}, en curso`);
+  const [announce, setAnnounce] = useState(`${label}, ${bits.inProgress}`);
 
   const paint = ds => {
     dsRef.current = ds;
@@ -100,7 +105,7 @@ export default function LatticeLoader({
   }, [status, elapsed]);
 
   useEffect(() => {
-    if (status === 'working') setAnnounce(`${label}, en curso`);
+    if (status === 'working') setAnnounce(`${label}, ${bits.inProgress}`);
     else setAnnounce(`${status === 'done' ? doneLabel : errorLabel}${showTimer ? ` ${spoken(dsRef.current)}` : ''}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
