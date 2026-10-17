@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { DEMO_FILE, DEMO_ROWS } from "../content";
+import { useContent } from "../lib/i18n";
 import { card, focusRing } from "../lib/ui";
 import { FileIcon } from "./icons";
 import ThoughtLine from "./reactbits/ThoughtLine";
 
-const COLUMNS = ["cliente", "fecha", "monto"];
-const COLS = COLUMNS.length;
-const TOTAL_CELLS = DEMO_ROWS.length * COLS;
+const COLS = 3; // cliente, fecha y monto
 const STEP_MS = 90; // velocidad de la "ola" de limpieza
 const GRID = "grid grid-cols-[1.25fr_1fr_0.8fr] gap-x-3";
 
@@ -16,23 +14,15 @@ const STRUCK = "bg-transparent text-[color:var(--muted)] line-through";
 
 const count = (list) => list.filter(Boolean).length;
 
-// Lo que "va pensando" la IA mientras avanza la ola de limpieza
-const AI_STEPS = [
-  "Normalizando nombres",
-  "Unificando fechas y montos",
-  "Fusionando duplicados",
-  "Marcando datos faltantes",
-];
-
 // Cifras calculadas a partir de los datos del ejemplo
-const STATS = (() => {
-  const problems = count(DEMO_ROWS.flatMap((r) => r.bad));
-  const review = count(DEMO_ROWS.flatMap((r) => r.review ?? []));
-  const merged = DEMO_ROWS.filter((r) => r.merged).length;
+const statsOf = (rows) => {
+  const problems = count(rows.flatMap((r) => r.bad));
+  const review = count(rows.flatMap((r) => r.review ?? []));
+  const merged = rows.filter((r) => r.merged).length;
   const fixed =
-    count(DEMO_ROWS.filter((r) => !r.merged).flatMap((r) => r.bad)) - review;
+    count(rows.filter((r) => !r.merged).flatMap((r) => r.bad)) - review;
   return { problems, review, merged, fixed };
-})();
+};
 
 const cellTone = (row, col, cleaned) => {
   if (row.merged) return cleaned ? STRUCK : row.bad[col] ? WARN : NORMAL;
@@ -53,6 +43,12 @@ const Chip = ({ tone, children }) => (
 );
 
 const CleaningDemo = () => {
+  const { DEMO_COLUMNS, DEMO_FILE, DEMO_ROWS, UI } = useContent();
+  const words = UI.cleaningDemo;
+  // Lo que "va pensando" la IA mientras avanza la ola de limpieza
+  const AI_STEPS = words.aiSteps;
+  const STATS = statsOf(DEMO_ROWS);
+  const TOTAL_CELLS = DEMO_ROWS.length * COLS;
   const [mode, setMode] = useState("before"); // before | after
   const [progress, setProgress] = useState(0); // celdas ya limpiadas
   const [run, setRun] = useState(0); // reinicia el cronómetro de la IA
@@ -139,12 +135,12 @@ const CleaningDemo = () => {
 
           <div
             role="group"
-            aria-label="Estado de los datos"
+            aria-label={words.state}
             className="inline-flex rounded-[10px] border border-[color:var(--line)] bg-[color:var(--ink)] p-0.5 text-sm"
           >
             {[
-              ["before", "Antes"],
-              ["after", "Después"],
+              ["before", words.before],
+              ["after", words.after],
             ].map(([key, label]) => (
               <button
                 key={key}
@@ -167,14 +163,14 @@ const CleaningDemo = () => {
         <div className="overflow-x-auto">
           <div
             role="table"
-            aria-label="Ejemplo de datos antes y después de la limpieza"
+            aria-label={words.table}
             className="min-w-[300px] font-mono text-[13px]"
           >
             <div
               role="row"
               className={`${GRID} pb-2 text-[color:var(--muted)]`}
             >
-              {COLUMNS.map((name, c) => (
+              {DEMO_COLUMNS.map((name, c) => (
                 <div
                   key={name}
                   role="columnheader"
@@ -204,7 +200,7 @@ const CleaningDemo = () => {
                       role="row"
                       className={`${GRID} border-t border-[color:var(--line)] py-1.5`}
                     >
-                      {COLUMNS.map((name, c) => {
+                      {DEMO_COLUMNS.map((name, c) => {
                         const cleaned = progress > start + c;
                         const value =
                           cleaned && !row.merged ? row.after[c] : row.before[c];
@@ -235,8 +231,8 @@ const CleaningDemo = () => {
             <ThoughtLine
               key={run}
               working={!done}
-              label="Limpiando con IA…"
-              doneLabel="Limpieza lista en"
+              label={words.working}
+              doneLabel={words.done}
               steps={AI_STEPS.slice(0, stepsShown)}
               color="#BCC1CB"
               glyphColor="#D4B27A"
@@ -253,23 +249,18 @@ const CleaningDemo = () => {
         >
           {done ? (
             <>
-              <Chip tone="clean">{STATS.fixed} celdas corregidas</Chip>
-              <Chip tone="clean">
-                {STATS.merged}{" "}
-                {STATS.merged === 1
-                  ? "duplicado fusionado"
-                  : "duplicados fusionados"}
-              </Chip>
-              <Chip tone="warn">{STATS.review} por revisar</Chip>
+              <Chip tone="clean">{words.fixed(STATS.fixed)}</Chip>
+              <Chip tone="clean">{words.merged(STATS.merged)}</Chip>
+              <Chip tone="warn">{words.review(STATS.review)}</Chip>
             </>
           ) : (
-            <Chip tone="warn">{STATS.problems} celdas con problemas</Chip>
+            <Chip tone="warn">{words.problems(STATS.problems)}</Chip>
           )}
         </div>
       </div>
 
       <figcaption className="mt-3 text-sm text-[color:var(--muted)]">
-        Ejemplo ilustrativo de cómo se transforman los datos.
+        {words.caption}
       </figcaption>
     </figure>
   );

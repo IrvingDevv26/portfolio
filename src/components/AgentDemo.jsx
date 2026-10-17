@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { useContent } from "../lib/i18n";
 import { card, focusRing } from "../lib/ui";
 import StatusMark from "./reactbits/StatusMark";
 
@@ -7,68 +8,7 @@ import StatusMark from "./reactbits/StatusMark";
    se reproduce sola al entrar en pantalla. A la izquierda el chat; a la derecha
    la agenda del jueves y las herramientas que ejecuta el agente, incluida una
    regla que el backend rechaza. Es una animación (sin IA real): la demo en vivo
-   está en /demo/agenda. */
-
-const SCRIPT = [
-  {
-    kind: "user",
-    text: "Hola, ¿tienen una limpieza el jueves en la tarde?",
-    wait: 900,
-  },
-  {
-    kind: "tool",
-    name: "ver_disponibilidad",
-    detail: "limpieza · jueves 22",
-    ok: true,
-    wait: 1000,
-  },
-  {
-    kind: "agent",
-    text: "¡Claro! El jueves 22 tengo 15:00, 16:00 y 17:00. ¿Cuál prefieres?",
-    wait: 1800,
-  },
-  { kind: "user", text: "La de las 4. Soy Laura, 55 8765 4321", wait: 900 },
-  {
-    kind: "tool",
-    name: "agendar_cita",
-    detail: "jueves 22, 16:00 · C-3924",
-    ok: true,
-    wait: 1000,
-  },
-  {
-    kind: "agent",
-    text: "¡Listo, Laura! Quedó el jueves a las 16:00 con la Dra. Ana Torres. Tu código es C-3924.",
-    wait: 2000,
-  },
-  { kind: "user", text: "Mejor cámbiala al domingo", wait: 900 },
-  {
-    kind: "tool",
-    name: "reprogramar_cita",
-    detail: "domingo 25",
-    ok: false,
-    error: "La clínica no abre el domingo.",
-    wait: 1000,
-  },
-  {
-    kind: "agent",
-    text: "Los domingos cerramos. ¿Te la paso al sábado 24 a las 10:00?",
-    wait: 0,
-  },
-];
-
-// Tarde del jueves: lo que ya estaba ocupado y los huecos libres
-const SLOTS = [
-  { time: "15:00" },
-  { time: "15:30", busy: "Revisión general" },
-  { time: "16:00" },
-  { time: "16:30", busy: "Resina para caries" },
-  { time: "17:00" },
-  { time: "17:30", busy: "Blanqueamiento" },
-];
-
-const indexOf = (name) => SCRIPT.findIndex((s) => s.name === name);
-const CHECKED = indexOf("ver_disponibilidad");
-const BOOKED = indexOf("agendar_cita");
+   está en /demo/agenda. El guion y los textos están en AGENT_DEMO (content). */
 
 const Bubble = ({ item }) => {
   const mine = item.kind === "user";
@@ -110,6 +50,10 @@ const Typing = () => (
 );
 
 const AgentDemo = () => {
+  const { AGENT_DEMO: demo } = useContent();
+  const SCRIPT = demo.script;
+  const CHECKED = SCRIPT.findIndex((s) => s.name === "ver_disponibilidad");
+  const BOOKED = SCRIPT.findIndex((s) => s.name === "agendar_cita");
   const [step, setStep] = useState(0); // cuántos elementos del guion se ven
   const rootRef = useRef(null);
   const timer = useRef(null);
@@ -149,6 +93,8 @@ const AgentDemo = () => {
       observer.disconnect();
       clearTimeout(timer.current);
     };
+    // Una sola vez al montarse: al cambiar de idioma la página se monta de nuevo
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const shown = SCRIPT.slice(0, step);
@@ -173,10 +119,10 @@ const AgentDemo = () => {
         </span>
         <div className="min-w-0 flex-1 text-sm">
           <p className="truncate font-medium text-[color:var(--text)]">
-            Clínica Dental Sonrisa
+            {demo.clinic}
           </p>
           <p className="text-xs text-[color:var(--muted)]">
-            {typing ? "escribiendo…" : "asistente con IA"}
+            {typing ? demo.typing : demo.role}
           </p>
         </div>
         <button
@@ -185,7 +131,7 @@ const AgentDemo = () => {
           disabled={!done}
           className={`rounded-md px-2 py-1 text-xs text-[color:var(--muted)] transition-colors hover:text-[color:var(--text)] disabled:opacity-0 ${focusRing}`}
         >
-          Ver otra vez
+          {demo.replay}
         </button>
       </header>
 
@@ -212,10 +158,10 @@ const AgentDemo = () => {
         {/* Lo que pasa detrás: agenda y herramientas */}
         <div className="border-t border-[color:var(--line)] bg-[color:var(--ink)] p-4 md:border-l md:border-t-0">
           <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-[color:var(--muted)]">
-            Agenda · jueves 22
+            {demo.day}
           </p>
           <ul className="mt-2 space-y-1">
-            {SLOTS.map((slot) => {
+            {demo.slots.map((slot) => {
               const mine = booked && slot.time === "16:00";
               const free = !slot.busy && !mine;
               return (
@@ -232,8 +178,8 @@ const AgentDemo = () => {
                   <span className="font-mono">{slot.time}</span>
                   <span className="truncate">
                     {mine
-                      ? "Laura · Limpieza dental"
-                      : (slot.busy ?? (checked ? "libre" : ""))}
+                      ? demo.booked
+                      : (slot.busy ?? (checked ? demo.free : ""))}
                   </span>
                 </li>
               );
@@ -241,11 +187,11 @@ const AgentDemo = () => {
           </ul>
 
           <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.16em] text-[color:var(--muted)]">
-            Herramientas
+            {demo.tools}
           </p>
           <ul
             className="mt-2 min-h-[10.5rem] space-y-1.5"
-            aria-label="Herramientas que ejecutó el agente"
+            aria-label={demo.toolsLabel}
           >
             {tools.map((tool) => {
               const status =
@@ -278,7 +224,7 @@ const AgentDemo = () => {
                     </span>
                     {status === "failed" && (
                       <span className="block text-[color:var(--danger)]">
-                        Regla: {tool.error}
+                        {demo.rule}: {tool.error}
                       </span>
                     )}
                   </span>
@@ -289,7 +235,7 @@ const AgentDemo = () => {
         </div>
       </div>
       <figcaption className="border-t border-[color:var(--line)] px-4 py-2.5 text-xs text-[color:var(--muted)]">
-        Animación de una conversación real. Pruébalo tú en la demo en vivo.
+        {demo.caption}
       </figcaption>
     </figure>
   );

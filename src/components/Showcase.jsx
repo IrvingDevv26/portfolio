@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { PROJECT, SHOWCASE } from "../content";
 import { useMediaQuery } from "../lib/hooks";
+import { useContent, useLocalize } from "../lib/i18n";
 import { btn } from "../lib/ui";
 import { ArrowRightIcon } from "./icons";
 import ScrollExpand from "./reactbits/ScrollExpand";
@@ -12,6 +12,9 @@ import VideoButton from "./VideoButton";
    presentación del proyecto. */
 
 const Showcase = () => {
+  const { PROJECT, SHOWCASE, UI } = useContent();
+  const to = useLocalize();
+  const words = UI.landing.showcase;
   const wide = useMediaQuery("(min-width: 768px)");
   const video = Boolean(SHOWCASE.video);
 
@@ -21,15 +24,15 @@ const Showcase = () => {
       mediaType={video ? "video" : "image"}
       src={video ? SHOWCASE.video : SHOWCASE.poster}
       poster={SHOWCASE.poster}
-      alt="Demo de DataRefine limpiando un archivo con IA"
+      alt={words.alt}
       title={
         <span className="font-display font-semibold tracking-tight">
-          Mírala funcionando
+          {words.title}
         </span>
       }
       scrollHint={
         <span className="font-mono text-xs uppercase tracking-[0.2em]">
-          Desliza ↓
+          {words.hint}
         </span>
       }
       startWidth={wide ? 46 : 86}
@@ -43,7 +46,7 @@ const Showcase = () => {
     >
       <div className="mx-auto max-w-2xl rounded-3xl border border-[color:var(--line-strong)] bg-[#08090C]/92 px-6 py-10 text-center shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9)] backdrop-blur-md md:px-12 md:py-12">
         <div className="flex justify-center">
-          <Eyebrow index="02">Caso de estudio</Eyebrow>
+          <Eyebrow index="02">{UI.landing.caseStudy}</Eyebrow>
         </div>
         <h2 className="mt-5 font-display text-4xl font-semibold tracking-tight text-white md:text-6xl">
           {PROJECT.name}
@@ -55,10 +58,10 @@ const Showcase = () => {
           {PROJECT.summary}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link to="/demo/datarefine" className={btn("primary")}>
-            Probar la demo en vivo <ArrowRightIcon className="h-4 w-4" />
+          <Link to={to("/demo/datarefine")} className={btn("primary")}>
+            {UI.common.tryLiveDemo} <ArrowRightIcon className="h-4 w-4" />
           </Link>
-          <VideoButton url={PROJECT.video} label="Ver el video" />
+          <VideoButton url={PROJECT.video} label={UI.common.watchVideo} />
         </div>
       </div>
     </ScrollExpand>

@@ -20,12 +20,14 @@ import Squares from "../components/reactbits/Squares";
 import StatusMark from "../components/reactbits/StatusMark";
 import ThoughtLine from "../components/reactbits/ThoughtLine";
 import { Eyebrow } from "../components/shared";
+import LanguageSwitch from "../components/LanguageSwitch";
 import { IssueList, PreviewTable, Stat } from "../components/SheetPreview";
 import VideoButton from "../components/VideoButton";
-import { DATAREFINE_FIXES, PROJECT, makeSampleFile } from "../content";
 import { hasHardwareWebGL } from "../lib/gpu";
 import { useDocumentTitle } from "../lib/hooks";
-import { analyze, ISSUE_TYPES, ISSUES, readSheet } from "../lib/sheet";
+import { useContent, useLang, useLocalize } from "../lib/i18n";
+import { useIssues } from "../lib/issues";
+import { analyze, ISSUE_TYPES, readSheet } from "../lib/sheet";
 import { useToast } from "../lib/toast";
 import { btn, card, focusRing, iconBtn } from "../lib/ui";
 
@@ -44,16 +46,6 @@ const MAX_BYTES = MAX_MB * 1024 * 1024;
 const MAX_ROWS = 300;
 const PER_HOUR = 5;
 
-const MSG = {
-  format: "Formato no compatible. Sube un archivo .xlsx, .xls o .csv.",
-  size: `La demo acepta archivos de hasta ${MAX_MB} MB. Sube uno más pequeño.`,
-  empty: "El archivo está vacío. Sube uno que tenga datos.",
-  generic:
-    "No se pudo procesar el archivo. Verifica el formato o inténtalo de nuevo.",
-  network:
-    "No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
-};
-
 const formatSize = (bytes) =>
   bytes < 1024 * 1024
     ? `${Math.max(1, Math.round(bytes / 1024))} KB`
@@ -63,26 +55,24 @@ const extOf = (name) =>
   name.includes(".") ? name.split(".").pop().toUpperCase() : "";
 
 // Devuelve el mensaje de error, o "" si el archivo es válido
-const validate = (file) => {
+const validate = (file, errors) => {
   const dot = file.name.lastIndexOf(".");
   const ext = dot === -1 ? "" : file.name.slice(dot).toLowerCase();
-  if (!ACCEPTED.includes(ext)) return MSG.format;
-  if (file.size === 0) return MSG.empty;
-  if (file.size > MAX_BYTES) return MSG.size;
+  if (!ACCEPTED.includes(ext)) return errors.format;
+  if (file.size === 0) return errors.empty;
+  if (file.size > MAX_BYTES) return errors.size(MAX_MB);
   return "";
 };
 
 // Problemas detectados, en texto: "2 filas duplicadas, 4 celdas vacías"
-const describe = (analysis) =>
+const describe = (analysis, issues) =>
   ISSUE_TYPES.filter((t) => analysis.counts[t] > 0)
-    .map((t) => `${analysis.counts[t]} ${ISSUES[t].label.toLowerCase()}`)
+    .map((t) => `${analysis.counts[t]} ${issues[t].label.toLowerCase()}`)
     .join(", ");
 
 /* ──────────────────────────────────────────────────────────────
    PIEZAS DE LA INTERFAZ
    ────────────────────────────────────────────────────────────── */
-
-const STEP_LABELS = ["Subir archivo", "Revisar y limpiar", "Descargar"];
 
 // Estado de cada paso para StatusMark: pendiente, en curso, completado o fallido
 const markOf = (state, activity) => {
@@ -93,9 +83,9 @@ const markOf = (state, activity) => {
   return "pending";
 };
 
-const Stepper = ({ current, activity }) => (
-  <ol aria-label="Progreso" className="flex items-center gap-3">
-    {STEP_LABELS.map((label, i) => {
+const Stepper = ({ current, activity, words }) => (
+  <ol aria-label={words.progress} className="flex items-center gap-3">
+    {words.steps.map((label, i) => {
       const n = i + 1;
       const state = n < current ? "done" : n === current ? "current" : "todo";
 
@@ -124,7 +114,7 @@ const Stepper = ({ current, activity }) => (
           >
             {label}
           </span>
-          {n < STEP_LABELS.length && (
+          {n < words.steps.length && (
             <span
               aria-hidden="true"
               className="h-px flex-1 bg-[color:var(--line)]"
@@ -159,7 +149,7 @@ const Charged = ({ glow, on, strong = false, radius = 16, children }) =>
     children
   );
 
-const Dropzone = ({ dragging, setDragging, onFile, glow, onArm }) => {
+const Dropzone = ({ dragging, setDragging, onFile, glow, onArm, words }) => {
   const [hover, setHover] = useState(false);
 
   return (
@@ -207,18 +197,16 @@ const Dropzone = ({ dragging, setDragging, onFile, glow, onArm }) => {
           <UploadIcon className="h-6 w-6" />
         </span>
         <span className="font-display text-xl font-semibold text-[color:var(--text)]">
-          {dragging
-            ? "Suelta el archivo para cargarlo"
-            : "Arrastra tu archivo aquí"}
+          {dragging ? words.drop : words.drag}
         </span>
         <span className="text-sm text-[color:var(--muted)]">
-          o{" "}
+          {words.or}{" "}
           <span className="text-[color:var(--text)] underline underline-offset-4">
-            elige uno de tu equipo
+            {words.choose}
           </span>
         </span>
         <ul
-          aria-label="Formatos admitidos"
+          aria-label={words.formats}
           className="flex flex-wrap justify-center gap-2"
         >
           {ACCEPTED.map((ext) => (
@@ -231,14 +219,14 @@ const Dropzone = ({ dragging, setDragging, onFile, glow, onArm }) => {
           ))}
         </ul>
         <span className="text-xs text-[color:var(--muted)]">
-          Hasta {MAX_MB} MB y {MAX_ROWS} filas
+          {words.limits(MAX_MB, MAX_ROWS)}
         </span>
       </label>
     </Charged>
   );
 };
 
-const FileCard = ({ file, onRemove }) => (
+const FileCard = ({ file, onRemove, removeLabel }) => (
   <div className="flex items-center gap-3 rounded-xl border border-[color:var(--line)] bg-[color:var(--ink)] px-4 py-3">
     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[color:var(--clean-bg)] text-[color:var(--clean)]">
       <FileIcon className="h-5 w-5" />
@@ -260,7 +248,7 @@ const FileCard = ({ file, onRemove }) => (
       <button
         type="button"
         onClick={onRemove}
-        aria-label="Quitar archivo"
+        aria-label={removeLabel}
         className={iconBtn}
       >
         <XIcon className="h-5 w-5" />
@@ -286,12 +274,12 @@ const SubTitle = ({ children }) => (
 );
 
 // Diagnóstico del archivo, hecho en el navegador antes de enviarlo
-const Diagnosis = ({ preview, focus, onFocus }) => {
+const Diagnosis = ({ preview, focus, onFocus, words }) => {
   if (preview.status === "loading") {
     return (
       <div className="mt-6 flex justify-center py-12 text-[color:var(--soft)]">
         <LatticeLoader
-          label="Revisando el archivo"
+          label={words.checking}
           pattern="snake"
           color="#D4B27A"
           showTimer={false}
@@ -302,8 +290,7 @@ const Diagnosis = ({ preview, focus, onFocus }) => {
   if (preview.status !== "ready") {
     return (
       <p className="mt-5 rounded-xl border border-dashed border-[color:var(--line-strong)] p-4 text-sm leading-relaxed text-[color:var(--muted)]">
-        La vista previa está disponible para archivos .csv y .xlsx. DataRefine
-        procesa tu archivo igual.
+        {words.noPreview}
       </p>
     );
   }
@@ -312,36 +299,33 @@ const Diagnosis = ({ preview, focus, onFocus }) => {
   return (
     <div className="mt-6">
       <div className="grid grid-cols-3 gap-3">
-        <Stat value={analysis.rows.length} label="Filas" />
-        <Stat value={analysis.headers.length} label="Columnas" />
-        <Stat value={analysis.total} label="Problemas" accent />
+        <Stat value={analysis.rows.length} label={words.rows} />
+        <Stat value={analysis.headers.length} label={words.columns} />
+        <Stat value={analysis.total} label={words.problems} accent />
       </div>
 
       {analysis.total > 0 ? (
         <div className="mt-7 grid items-start gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
           <div>
-            <SubTitle>Qué encontramos</SubTitle>
+            <SubTitle>{words.found}</SubTitle>
             <IssueList analysis={analysis} onFocus={onFocus} />
           </div>
           <div className="min-w-0">
-            <SubTitle>Vista previa</SubTitle>
+            <SubTitle>{words.preview}</SubTitle>
             <PreviewTable
               key={focus ?? "all"}
               analysis={analysis}
               focus={focus}
-              caption="Vista previa del archivo original con los problemas resaltados"
+              caption={words.previewIssues}
             />
           </div>
         </div>
       ) : (
         <div className="mt-7">
           <p className="mb-4 text-sm text-[color:var(--soft)]">
-            No vemos problemas evidentes; la IA revisará el contenido a fondo.
+            {words.noProblems}
           </p>
-          <PreviewTable
-            analysis={analysis}
-            caption="Vista previa del archivo"
-          />
+          <PreviewTable analysis={analysis} caption={words.previewFile} />
         </div>
       )}
     </div>
@@ -349,12 +333,12 @@ const Diagnosis = ({ preview, focus, onFocus }) => {
 };
 
 // Mientras la IA trabaja: cargador y lo que se va a corregir
-const Working = ({ analysis, elapsed, glow }) => (
+const Working = ({ analysis, elapsed, glow, words, issues }) => (
   <div className="mt-5 space-y-5">
     <div className="rounded-xl border border-[color:var(--line)] bg-[color:var(--ink)] p-4 md:p-5">
       <div className="text-[color:var(--text)]">
         <LatticeLoader
-          label="Limpiando con IA"
+          label={words.cleaning}
           pattern="orbit"
           color="#D4B27A"
           glow
@@ -363,10 +347,7 @@ const Working = ({ analysis, elapsed, glow }) => (
         />
       </div>
       {analysis?.total > 0 && (
-        <ul
-          aria-label="Qué se está corrigiendo"
-          className="mt-4 flex flex-wrap gap-2"
-        >
+        <ul aria-label={words.fixing} className="mt-4 flex flex-wrap gap-2">
           {ISSUE_TYPES.filter((t) => analysis.counts[t] > 0).map((t) => (
             <li
               key={t}
@@ -375,17 +356,15 @@ const Working = ({ analysis, elapsed, glow }) => (
               <span
                 aria-hidden="true"
                 className="h-1.5 w-1.5 rounded-full"
-                style={{ backgroundColor: ISSUES[t].color }}
+                style={{ backgroundColor: issues[t].color }}
               />
-              {analysis.counts[t]} · {ISSUES[t].label.toLowerCase()}
+              {analysis.counts[t]} · {issues[t].label.toLowerCase()}
             </li>
           ))}
         </ul>
       )}
       <p className="mt-4 text-sm text-[color:var(--muted)]">
-        {elapsed >= 20
-          ? "Está tardando más de lo normal. Puedes cancelar e intentarlo de nuevo."
-          : "Puede tardar unos segundos, según el tamaño del archivo."}
+        {elapsed >= 20 ? words.slow : words.wait}
       </p>
     </div>
 
@@ -395,7 +374,7 @@ const Working = ({ analysis, elapsed, glow }) => (
           analysis={analysis}
           scanning
           footer={false}
-          caption="Archivo original mientras se limpia"
+          caption={words.scanning}
         />
       </Charged>
     )}
@@ -403,9 +382,18 @@ const Working = ({ analysis, elapsed, glow }) => (
 );
 
 // Resultado: cifras reales de antes y después, comparación y descarga
-const Result = ({ result, baseName, duration, before, after, onReset }) => {
+const Result = ({
+  result,
+  baseName,
+  duration,
+  before,
+  after,
+  onReset,
+  words,
+  issues,
+}) => {
   const [view, setView] = useState("after");
-  const fileName = `${baseName}_limpio.xlsx`;
+  const fileName = `${baseName}_${words.cleanSuffix}.xlsx`;
   const noAI = result.ai === "unavailable" || result.ai === "limited";
   const shown = view === "before" && before ? before : after;
 
@@ -416,7 +404,7 @@ const Result = ({ result, baseName, duration, before, after, onReset }) => {
           <CheckIcon className="h-7 w-7" />
         </span>
         <h2 className="mt-5 font-display text-2xl font-semibold md:text-3xl">
-          Tu archivo está limpio
+          {words.cleanTitle}
         </h2>
         <p className="mt-2 text-[color:var(--soft)]">
           {fileName}, {formatSize(result.size)}
@@ -425,15 +413,8 @@ const Result = ({ result, baseName, duration, before, after, onReset }) => {
           <ThoughtLine
             working={false}
             elapsed={duration}
-            doneLabel="Limpieza lista en"
-            steps={[
-              "Archivo revisado en tu navegador",
-              "Fechas, montos y duplicados corregidos",
-              noAI
-                ? "Revisión de textos con IA omitida"
-                : "Textos revisados con IA",
-              "Excel limpio generado",
-            ]}
+            doneLabel={words.readyIn}
+            steps={words.doneSteps(noAI)}
             color="#BCC1CB"
             glyphColor="#7BDDB5"
             fontSize={14}
@@ -441,9 +422,7 @@ const Result = ({ result, baseName, duration, before, after, onReset }) => {
         </div>
         {noAI && (
           <p className="mx-auto mt-4 max-w-md text-sm text-[color:var(--muted)]">
-            {result.ai === "limited"
-              ? "La IA llegó a su límite diario en la demo: se aplicaron las reglas automáticas."
-              : "La IA está saturada en este momento: se aplicaron las reglas automáticas. Inténtalo de nuevo en unos minutos para revisar también los textos."}
+            {result.ai === "limited" ? words.aiLimited : words.aiBusy}
           </p>
         )}
       </div>
@@ -454,40 +433,38 @@ const Result = ({ result, baseName, duration, before, after, onReset }) => {
             {before && (
               <Stat
                 value={Math.max(0, before.total - after.total)}
-                label="Problemas corregidos"
-                detail={`de ${before.total} detectados`}
+                label={words.fixed}
+                detail={words.ofDetected(before.total)}
                 accent
               />
             )}
             <Stat
               value={after.rows.length}
-              label="Filas finales"
-              detail={
-                before ? `de ${before.rows.length} originales` : undefined
-              }
+              label={words.finalRows}
+              detail={before ? words.ofOriginal(before.rows.length) : undefined}
             />
             <Stat
               value={after.total}
-              label="Por revisar"
+              label={words.toReview}
               detail={
                 after.total
-                  ? `${describe(after)}${after.counts.empty ? ", en amarillo en el Excel" : ""}`
-                  : "Todo en orden"
+                  ? `${describe(after, issues)}${after.counts.empty ? words.inYellow : ""}`
+                  : words.allGood
               }
             />
           </div>
 
           <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-            <SubTitle>Vista previa</SubTitle>
+            <SubTitle>{words.preview}</SubTitle>
             {before && (
               <div
                 role="group"
-                aria-label="Comparar versiones"
+                aria-label={words.compare}
                 className="mb-3 inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--ink)] p-1"
               >
                 {[
-                  ["before", "Antes"],
-                  ["after", "Después"],
+                  ["before", words.before],
+                  ["after", words.after],
                 ].map(([id, label]) => (
                   <button
                     key={id}
@@ -509,7 +486,7 @@ const Result = ({ result, baseName, duration, before, after, onReset }) => {
           <PreviewTable
             key={view}
             analysis={shown}
-            caption={shown === after ? "Archivo limpio" : "Archivo original"}
+            caption={shown === after ? words.cleanFile : words.originalFile}
           />
         </>
       )}
@@ -517,11 +494,11 @@ const Result = ({ result, baseName, duration, before, after, onReset }) => {
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Magnet>
           <a href={result.url} download={fileName} className={btn("primary")}>
-            <DownloadIcon /> Descargar archivo limpio
+            <DownloadIcon /> {words.download}
           </a>
         </Magnet>
         <button type="button" onClick={onReset} className={btn("secondary")}>
-          Limpiar otro archivo
+          {words.another}
         </button>
       </div>
     </div>
@@ -532,15 +509,18 @@ const Result = ({ result, baseName, duration, before, after, onReset }) => {
    PÁGINA
    ────────────────────────────────────────────────────────────── */
 
-const FACTS = [
-  "CSV, XLSX y XLS",
-  `Hasta ${MAX_ROWS} filas`,
-  "Diagnóstico en tu navegador",
-  "Resultado en .xlsx",
-];
-
 const DataLab = () => {
-  useDocumentTitle("DataRefine — Demo en vivo · Irving Dávila");
+  const {
+    DATA_LAB: words,
+    DATAREFINE_FIXES,
+    PROJECT,
+    UI,
+    makeSampleFile,
+  } = useContent();
+  const lang = useLang();
+  const to = useLocalize();
+  const issues = useIssues();
+  useDocumentTitle(words.title);
   const notify = useToast();
   // El borde eléctrico necesita WebGL: comprobarlo y compilar su shader cuesta
   // medio segundo o más, así que se hace la primera vez que hace falta (cursor
@@ -637,7 +617,7 @@ const DataLab = () => {
     setStatus("idle");
     if (!candidate) return;
 
-    const problem = validate(candidate);
+    const problem = validate(candidate, words.errors);
     if (problem) {
       readRef.current += 1;
       setFile(null);
@@ -652,10 +632,7 @@ const DataLab = () => {
 
   const loadSample = () => {
     pickFile(makeSampleFile());
-    notify(
-      "Datos de ejemplo cargados",
-      "Un CSV con errores típicos de captura.",
-    );
+    notify(words.sampleLoaded, words.sampleDetail);
   };
 
   const resetAll = () => {
@@ -686,18 +663,21 @@ const DataLab = () => {
       const body = new FormData();
       body.append("file", file);
 
-      const res = await fetch(ENDPOINT, {
+      // ?lang=: la hoja de resumen del Excel y los errores, en el idioma de la página
+      const res = await fetch(`${ENDPOINT}?lang=${lang}`, {
         method: "POST",
         body,
         signal: controller.signal,
       });
 
-      // 400, 413, 422 y 429 traen un mensaje claro en español; el resto, genérico
+      // 400, 413, 422 y 429 traen un mensaje claro; el resto, genérico
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         const clear = [400, 413, 422, 429].includes(res.status);
         throw new Error(
-          clear && typeof data.detail === "string" ? data.detail : MSG.generic,
+          clear && typeof data.detail === "string"
+            ? data.detail
+            : words.errors.generic,
         );
       }
 
@@ -716,10 +696,10 @@ const DataLab = () => {
       });
       setStatus("done");
       notify(
-        "Archivo limpio",
+        words.toastClean,
         original && checked
-          ? `${Math.max(0, original.total - checked.total)} problemas corregidos.`
-          : "Listo para descargar.",
+          ? words.toastFixed(Math.max(0, original.total - checked.total))
+          : words.toastReady,
       );
     } catch (err) {
       if (err.name === "AbortError") {
@@ -727,7 +707,7 @@ const DataLab = () => {
         return;
       }
       setStatus("error");
-      setError(err instanceof TypeError ? MSG.network : err.message);
+      setError(err instanceof TypeError ? words.errors.network : err.message);
     }
   };
 
@@ -741,15 +721,18 @@ const DataLab = () => {
       <header className="relative z-10 border-b border-[color:var(--line)] bg-[color:var(--ink)]/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-10">
           <Link
-            to="/"
+            to={to("/")}
             className={`inline-flex items-center gap-2 rounded-md text-sm text-[color:var(--muted)] transition-colors hover:text-[color:var(--text)] ${focusRing}`}
           >
-            <ArrowLeftIcon className="h-4 w-4" /> Volver al portfolio
+            <ArrowLeftIcon className="h-4 w-4" /> {UI.common.backToPortfolio}
           </Link>
-          <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium">
-            <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
-            <ShinyText text="Demo en vivo" />
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium max-[420px]:hidden">
+              <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
+              <ShinyText text={UI.common.liveDemo} />
+            </span>
+            <LanguageSwitch />
+          </div>
         </div>
       </header>
 
@@ -769,16 +752,17 @@ const DataLab = () => {
             <Eyebrow>DataRefine</Eyebrow>
             <BlurText
               as="h1"
-              text="Sube un Excel desordenado. Recíbelo limpio."
+              text={words.heading}
               className="balance mt-4 max-w-3xl font-display text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl"
             />
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[color:var(--soft)]">
-              Primero ves, en tu navegador, qué problemas tiene tu archivo.
-              Después la IA los corrige y te devuelve un .xlsx listo para usar.
-              Sin cuentas ni configuraciones.
+              {words.intro}
             </p>
-            <ul className="mt-6 flex flex-wrap gap-2" aria-label="Detalles">
-              {FACTS.map((fact) => (
+            <ul
+              className="mt-6 flex flex-wrap gap-2"
+              aria-label={UI.common.details}
+            >
+              {words.facts(MAX_ROWS).map((fact) => (
                 <li
                   key={fact}
                   className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--ink)]/70 px-3 py-1 text-xs text-[color:var(--soft)] backdrop-blur"
@@ -795,10 +779,10 @@ const DataLab = () => {
           {/* Área de trabajo */}
           <section
             ref={workRef}
-            aria-label="Limpieza de archivo"
+            aria-label={words.workArea}
             className={`${card} p-5 md:p-8`}
           >
-            <Stepper current={step} activity={status} />
+            <Stepper current={step} activity={status} words={words} />
 
             <div className="mt-7">
               {/* Paso 3: listo */}
@@ -810,6 +794,8 @@ const DataLab = () => {
                   before={original}
                   after={after}
                   onReset={resetAll}
+                  words={words}
+                  issues={issues}
                 />
               )}
 
@@ -822,16 +808,17 @@ const DataLab = () => {
                     onFile={pickFile}
                     glow={glow}
                     onArm={armGlow}
+                    words={words}
                   />
                   {error && <ErrorAlert>{error}</ErrorAlert>}
                   <p className="mt-5 text-center text-sm text-[color:var(--muted)]">
-                    ¿No tienes un archivo a la mano?{" "}
+                    {words.noFile}{" "}
                     <button
                       type="button"
                       onClick={loadSample}
                       className={`rounded font-medium text-[color:var(--accent)] underline underline-offset-4 transition-colors hover:text-[color:var(--text)] ${focusRing}`}
                     >
-                      Prueba con datos de ejemplo
+                      {words.sample}
                     </button>
                   </p>
                 </>
@@ -840,25 +827,28 @@ const DataLab = () => {
               {/* Paso 2: revisar y limpiar */}
               {file && (status === "idle" || status === "error") && (
                 <>
-                  <FileCard file={file} onRemove={resetAll} />
+                  <FileCard
+                    file={file}
+                    onRemove={resetAll}
+                    removeLabel={words.remove}
+                  />
                   {error && <ErrorAlert>{error}</ErrorAlert>}
                   <Diagnosis
                     preview={before}
                     focus={focus}
                     onFocus={setFocus}
+                    words={words}
                   />
                   {tooManyRows && (
                     <div className="mt-6 rounded-xl border border-[color:var(--accent-line)] bg-[color:var(--accent-bg)] p-4 text-sm leading-relaxed text-[color:var(--text)]">
-                      Tu archivo tiene{" "}
-                      {original.rows.length.toLocaleString("es-MX")} filas y la
-                      demo procesa hasta {MAX_ROWS}. Prueba con una parte o{" "}
+                      {words.tooManyRows(original.rows.length, MAX_ROWS)[0]}
                       <Link
-                        to="/#contacto"
+                        to={to("/#contacto")}
                         className={`rounded font-medium text-[color:var(--accent)] underline underline-offset-4 ${focusRing}`}
                       >
-                        escríbeme
-                      </Link>{" "}
-                      y lo limpio completo para tu empresa.
+                        {words.tooManyRows(original.rows.length, MAX_ROWS)[1]}
+                      </Link>
+                      {words.tooManyRows(original.rows.length, MAX_ROWS)[2]}
                     </div>
                   )}
                   <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-[color:var(--line)] pt-6">
@@ -869,14 +859,12 @@ const DataLab = () => {
                         disabled={before.status === "loading" || tooManyRows}
                         className={`${btn("primary")} disabled:cursor-not-allowed disabled:opacity-60`}
                       >
-                        {status === "error" ? "Reintentar" : "Limpiar con IA"}
+                        {status === "error" ? words.retry : words.clean}
                         <ArrowRightIcon className="h-4 w-4" />
                       </button>
                     </Magnet>
                     <p className="text-sm text-[color:var(--muted)]">
-                      {original?.total
-                        ? `Corrige ${original.total === 1 ? "el problema" : `los ${original.total} problemas`} y te devuelve un .xlsx.`
-                        : "Te devuelve un .xlsx limpio y consistente."}
+                      {words.willFix(original?.total ?? 0)}
                     </p>
                   </div>
                 </>
@@ -885,14 +873,20 @@ const DataLab = () => {
               {file && status === "processing" && (
                 <>
                   <FileCard file={file} />
-                  <Working analysis={original} elapsed={elapsed} glow={glow} />
+                  <Working
+                    analysis={original}
+                    elapsed={elapsed}
+                    glow={glow}
+                    words={words}
+                    issues={issues}
+                  />
                   <div className="mt-6">
                     <button
                       type="button"
                       onClick={cancel}
                       className={btn("secondary")}
                     >
-                      Cancelar
+                      {words.cancel}
                     </button>
                   </div>
                 </>
@@ -904,7 +898,7 @@ const DataLab = () => {
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             <SpotlightCard className={`${card} p-6`}>
               <h2 className="font-display text-lg font-semibold">
-                Qué corrige DataRefine
+                {words.whatItFixes}
               </h2>
               <ul className="mt-4 space-y-3 text-sm text-[color:var(--soft)]">
                 {DATAREFINE_FIXES.map((fix) => (
@@ -918,46 +912,39 @@ const DataLab = () => {
 
             <SpotlightCard className={`${card} p-6`}>
               <h2 className="font-display text-lg font-semibold">
-                Antes de subir
+                {words.beforeUpload}
               </h2>
               <dl className="mt-4 space-y-3 text-sm">
-                {[
-                  ["Formatos", ACCEPTED.join(", ")],
-                  ["Tamaño máximo", `${MAX_MB} MB`],
-                  ["Filas por archivo", `hasta ${MAX_ROWS}`],
-                  ["Pruebas", `${PER_HOUR} por hora`],
-                  ["Resultado", ".xlsx limpio"],
-                ].map(([term, value]) => (
-                  <div key={term} className="flex justify-between gap-4">
-                    <dt className="text-[color:var(--muted)]">{term}</dt>
-                    <dd className="text-right text-[color:var(--soft)]">
-                      {value}
-                    </dd>
-                  </div>
-                ))}
+                {words
+                  .rules(ACCEPTED.join(", "), MAX_MB, MAX_ROWS, PER_HOUR)
+                  .map(([term, value]) => (
+                    <div key={term} className="flex justify-between gap-4">
+                      <dt className="text-[color:var(--muted)]">{term}</dt>
+                      <dd className="text-right text-[color:var(--soft)]">
+                        {value}
+                      </dd>
+                    </div>
+                  ))}
               </dl>
               <p className="mt-5 text-sm leading-relaxed text-[color:var(--muted)]">
-                Es una demo pública: no subas datos sensibles. La versión para
-                tu empresa no tiene estos límites.
+                {words.publicDemo}
               </p>
             </SpotlightCard>
 
             <SpotlightCard className={`${card} flex flex-col p-6`}>
               <h2 className="font-display text-lg font-semibold">
-                ¿Lo necesitas para tu negocio?
+                {words.forBusiness}
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-[color:var(--soft)]">
-                Lo adapto a tus archivos: reglas de tu operación, más columnas o
-                conexión directa con tu sistema. En una llamada te digo cómo
-                quedaría.
+                {words.forBusinessText}
               </p>
               <div className="mt-auto flex flex-wrap gap-2 pt-6">
-                <Link to="/#contacto" className={btn("primary", "sm")}>
-                  Platiquemos <ArrowRightIcon className="h-4 w-4" />
+                <Link to={to("/#contacto")} className={btn("primary", "sm")}>
+                  {UI.common.letsTalk} <ArrowRightIcon className="h-4 w-4" />
                 </Link>
                 <VideoButton
                   url={PROJECT.video}
-                  label="Ver el video"
+                  label={UI.common.watchVideo}
                   size="sm"
                 />
               </div>

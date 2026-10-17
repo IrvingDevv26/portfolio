@@ -3,7 +3,7 @@
 # Irving Dávila — Portfolio
 
 **Full-stack developer · AI automation.**
-A Spanish-language portfolio that sells by showing: two live AI demos (data cleaning and an appointment agent), a 3D badge you can grab, and real projects.
+A bilingual (Spanish and English) portfolio that sells by showing: two live AI demos (data cleaning and an appointment agent), a 3D badge you can grab, and real projects.
 
 [![CI](https://github.com/IrvingDevv26/portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/IrvingDevv26/portfolio/actions/workflows/ci.yml)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
@@ -47,8 +47,14 @@ A Spanish-language portfolio that sells by showing: two live AI demos (data clea
 - **Accessible and fast**: Lighthouse 100 for accessibility, best practices and
   SEO; 98 performance on desktop. `prefers-reduced-motion` is respected
   everywhere.
-- **All copy in one file**: every text, link and project lives in
-  `src/content.js`.
+- **Bilingual**: Spanish at `/` and English at `/en` (`/en/demo/agenda`…),
+  with an ES/EN switch, a gentle language hint for visitors whose browser uses
+  the other language, `hreflang` links and per-language link previews. Both
+  demo APIs answer in the page language (`?lang=en`).
+- **All copy in one file per language**: every text, link and project lives in
+  `src/content/es.js` and `src/content/en.js`, which share the same shape;
+  `npm run check:content` (also in CI) fails if one of them is missing
+  something.
 
 ## Tech stack
 
@@ -89,7 +95,8 @@ npm run dev              # http://localhost:5173
 
 ```
 src/
-  content.js            Every text, link, service and project
+  content/
+    es.js, en.js        Every text, link, service and project, per language
   pages/
     Landing.jsx         Home page sections
     DataLab.jsx         DataRefine live demo
@@ -102,6 +109,7 @@ src/
     ...
   lib/
     sheet.js            In-browser CSV/XLSX reader and diagnosis
+    i18n.js             Language from the URL, useContent() and the ES/EN links
     hooks.js, gpu.js    Shared hooks and WebGL detection
   styles/
     GlobalStyles.jsx    Palette, fonts and global animations
@@ -151,12 +159,12 @@ Static site, deployed on [Cloudflare Pages](https://pages.cloudflare.com):
 Client-side routes such as `/demo/datarefine` work out of the box: without a
 top-level `404.html`, Pages serves the app for every path.
 
-**Link previews per demo.** Chat apps and social networks read the HTML
-without running JavaScript, so a small Vite plugin (`vite.config.js`) writes
-`dist/demo/agenda.html` and `dist/demo/datarefine.html`: copies of
-`index.html` with each demo's title, description and preview image
-(`public/og-*.jpg`). Pages serves them at `/demo/agenda` and
-`/demo/datarefine`.
+**Link previews per page and language.** Chat apps and social networks read
+the HTML without running JavaScript, so a small Vite plugin (`vite.config.js`)
+writes `dist/en.html`, `dist/demo/agenda.html`, `dist/en/demo/agenda.html`
+and the DataRefine pair: copies of `index.html` with each page's language,
+title, description, preview image (`public/og-*.jpg`) and `hreflang` links.
+Pages serves them at `/en`, `/demo/agenda`, `/en/demo/agenda` and so on.
 
 **Demo APIs awake in business hours.** Both APIs run on Render's free plan,
 which sleeps after 15 minutes without traffic. The
@@ -177,8 +185,9 @@ repository activity; re-enable it from the Actions tab if that happens.
 
 ## Resumen en español
 
-- **Qué es:** el portfolio de Irving Dávila, en español, pensado para vender
-  servicios de automatización y desarrollo full-stack.
+- **Qué es:** el portfolio de Irving Dávila, en español (`/`) y en inglés
+  (`/en`), pensado para vender servicios de automatización y desarrollo
+  full-stack.
 - **Lo más importante:** las dos demos en vivo. DataRefine
   (`/demo/datarefine`) diagnostica tu archivo en el navegador y luego lo limpia
   con el backend; AgendaFlow (`/demo/agenda`) es un agente de IA que agenda
@@ -189,8 +198,9 @@ repository activity; re-enable it from the Actions tab if that happens.
 - **Cómo correrlo:** `npm install`, copia `.env.example` como `.env` y ejecuta
   `npm run dev`.
 - **Dónde editar:** todos los textos, enlaces y proyectos están en
-  `src/content.js`; la paleta y las animaciones globales en
-  `src/styles/GlobalStyles.jsx`.
+  `src/content/es.js` y su versión en inglés en `src/content/en.js` (con la
+  misma forma; `npm run check:content` avisa si falta algo); la paleta y las
+  animaciones globales en `src/styles/GlobalStyles.jsx`.
 
 ## License
 

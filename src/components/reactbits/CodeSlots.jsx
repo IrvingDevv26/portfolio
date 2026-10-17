@@ -8,6 +8,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { animate, motion, motionValue, useMotionValue, useReducedMotion, useTransform } from 'framer-motion';
 
 import './CodeSlots.css';
+import { useContent } from '../../lib/i18n';
 
 const EASE_OUT = [0.23, 1, 0.32, 1];
 const WASH_IN = 0.3;
@@ -53,9 +54,11 @@ export default function CodeSlots({
   settle = 0.3,
   rise = 8,
   cascade = 20,
-  ariaLabel = 'Código',
+  ariaLabel: ariaLabelProp,
   className = ''
 }) {
+  const bits = useContent().UI.bits;
+  const ariaLabel = ariaLabelProp ?? bits.code;
   const uid = useId();
   const reduce = useReducedMotion();
   const inputRef = useRef(null);
@@ -430,7 +433,7 @@ export default function CodeSlots({
         </motion.span>
       </div>
       <span id={`${uid}-count`} className="code-slots__sr" aria-live="polite">
-        {status === 'success' ? 'Código aceptado' : `${view.filter(Boolean).length} de ${length} dígitos`}
+        {status === 'success' ? bits.codeAccepted : bits.digits(view.filter(Boolean).length, length)}
       </span>
     </div>
   );

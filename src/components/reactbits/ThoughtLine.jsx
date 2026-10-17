@@ -7,6 +7,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { animate, useReducedMotion } from 'framer-motion';
 import './ThoughtLine.css';
+import { useContent } from '../../lib/i18n';
 
 const EASE_OUT = [0.23, 1, 0.32, 1];
 const EASE_IN_OUT = [0.77, 0, 0.175, 1];
@@ -20,7 +21,7 @@ const spoken = ds =>
     : `${Math.floor(ds / 600)} minutos ${((ds % 600) / 10).toFixed(1)} segundos`;
 
 export default function ThoughtLine({
-  label = 'Pensando…',
+  label: labelProp,
   doneLabel = '',
   renderLabel,
   glyph = 'sparkle',
@@ -44,6 +45,8 @@ export default function ThoughtLine({
   className = '',
   style
 }) {
+  const bits = useContent().UI.bits;
+  const label = labelProp ?? bits.thinking;
   const reduce = useReducedMotion();
   const [autoSettled, setAutoSettled] = useState(false);
   const [open, setOpen] = useState(true);

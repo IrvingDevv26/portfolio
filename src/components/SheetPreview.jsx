@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { useContent } from "../lib/i18n";
+import { useIssues } from "../lib/issues";
 import { ISSUE_TYPES, ISSUES } from "../lib/sheet";
 import { focusRing } from "../lib/ui";
 import AnimatedList from "./reactbits/AnimatedList";
@@ -44,23 +46,23 @@ const LIST_THEME = {
 };
 
 export const IssueList = ({ analysis, onFocus }) => {
+  const issues = useIssues();
   // El primer elemento muestra todos los problemas a la vez
   const items = useMemo(
     () => [
       {
         id: "all",
-        label: "Todos los problemas",
-        hint: "Resaltados en la tabla",
+        ...issues.all,
         color: "#F1F3F6",
         count: analysis.total,
       },
       ...ISSUE_TYPES.filter((t) => analysis.counts[t] > 0).map((t) => ({
         id: t,
-        ...ISSUES[t],
+        ...issues[t],
         count: analysis.counts[t],
       })),
     ],
-    [analysis],
+    [analysis, issues],
   );
 
   return (
@@ -117,12 +119,12 @@ const Visible = ({ value }) =>
     ),
   );
 
-const Cell = ({ value, types, focus }) => {
+const Cell = ({ value, types, focus, issues, emptyLabel }) => {
   const shown = types.filter((t) => focus === null || t === focus);
   const color = shown.length ? ISSUES[shown[0]].color : null;
   return (
     <td
-      title={shown.map((t) => ISSUES[t].label).join(" · ") || undefined}
+      title={shown.map((t) => issues[t].label).join(" · ") || undefined}
       className="max-w-[16rem] truncate whitespace-nowrap px-3 py-2 text-[color:var(--soft)]"
       style={
         color
@@ -136,7 +138,7 @@ const Cell = ({ value, types, focus }) => {
     >
       {types.includes("empty") ? (
         <span className="italic text-[color:var(--muted)]">
-          {value.trim() || "vacía"}
+          {value.trim() || emptyLabel}
         </span>
       ) : (
         <Visible value={value} />
@@ -152,6 +154,8 @@ export const PreviewTable = ({
   scanning = false,
   footer = true,
 }) => {
+  const { SHEET_PREVIEW: words } = useContent();
+  const issues = useIssues();
   const [expanded, setExpanded] = useState(false);
   const { headers, rows, flags, dupRows } = analysis;
 
@@ -210,7 +214,7 @@ export const PreviewTable = ({
                   >
                     <td
                       className="px-3 py-2 font-mono text-[11px] text-[color:var(--muted)]"
-                      title={dup ? ISSUES.dup.label : undefined}
+                      title={dup ? issues.dup.label : undefined}
                     >
                       {r + 1}
                       {dup && (
@@ -222,6 +226,8 @@ export const PreviewTable = ({
                         key={c}
                         value={value}
                         types={flags[r][c]}
+                        issues={issues}
+                        emptyLabel={words.empty}
                         focus={focus}
                       />
                     ))}
@@ -237,12 +243,14 @@ export const PreviewTable = ({
       {footer && (
         <figcaption className="mt-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-[color:var(--muted)]">
           <span>
-            {shown.length} de {matching.length}{" "}
-            {matching.length === 1 ? "fila" : "filas"}
-            {focus ? ` con ${ISSUES[focus].label.toLowerCase()}` : ""}
-            {rows.length > matching.length ? ` (${rows.length} en total)` : ""}
+            {words.shown(
+              shown.length,
+              matching.length,
+              rows.length,
+              focus ? issues[focus].label : "",
+            )}
             {analysis.counts.spaces > 0 && (
-              <span className="max-sm:hidden"> · «·» = espacio sobrante</span>
+              <span className="max-sm:hidden">{words.spaces}</span>
             )}
           </span>
           {matching.length > PREVIEW_ROWS && (
@@ -251,7 +259,7 @@ export const PreviewTable = ({
               onClick={() => setExpanded((v) => !v)}
               className={`rounded font-medium text-[color:var(--accent)] underline-offset-4 hover:underline ${focusRing}`}
             >
-              {expanded ? "Ver menos" : "Ver más filas"}
+              {expanded ? words.less : words.more}
             </button>
           )}
         </figcaption>

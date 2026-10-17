@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BRIEF, PROFILE } from "../content";
+import { useContent } from "../lib/i18n";
 import { useToast } from "../lib/toast";
 import { btn, focusRing } from "../lib/ui";
 import { CheckIcon } from "./icons";
@@ -60,6 +60,8 @@ const toggle = (list, value) =>
   list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 
 const ProjectBrief = () => {
+  const { BRIEF, PROFILE, UI } = useContent();
+  const words = UI.brief;
   const notify = useToast();
   const [step, setStep] = useState(1);
   const [areas, setAreas] = useState([]);
@@ -70,31 +72,27 @@ const ProjectBrief = () => {
   const [company, setCompany] = useState("");
   const [error, setError] = useState("");
 
-  const subject = `Proyecto de automatización${company ? ` · ${company}` : ""}`;
-  const body = [
-    "Hola Irving,",
-    "",
-    `Soy ${name.trim()}${company.trim() ? `, de ${company.trim()}` : ""}.`,
-    "",
-    `Me gustaría automatizar: ${areas.join(", ") || "—"}`,
-    ...(detail.trim() ? [`Detalle: ${detail.trim()}`] : []),
-    `Herramientas que usamos hoy: ${tools.join(", ") || "—"}`,
-    `Tiempo que le dedicamos por semana: ${hours || "—"}`,
-    "",
-    "¿Lo platicamos?",
-  ].join("\n");
+  const subject = words.subject(company.trim());
+  const body = words.body({
+    name: name.trim(),
+    company: company.trim(),
+    areas: areas.join(", "),
+    detail: detail.trim(),
+    tools: tools.join(", "),
+    hours,
+  });
   const mailto = `mailto:${PROFILE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
   // Cada paso valida antes de avanzar
   const validate = (event) => {
     if (step === 1 && !areas.length && !detail.trim()) {
       event.preventDefault();
-      setError("Elige al menos una opción o descríbelo en una frase.");
+      setError(words.needArea);
       return;
     }
     if (step === 3 && !name.trim()) {
       event.preventDefault();
-      setError("Escribe tu nombre para firmar el mensaje.");
+      setError(words.needName);
       return;
     }
     setError("");
@@ -103,9 +101,9 @@ const ProjectBrief = () => {
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(
-        `Para: ${PROFILE.email}\nAsunto: ${subject}\n\n${body}`,
+        `${words.to}: ${PROFILE.email}\n${words.subjectLabel}: ${subject}\n\n${body}`,
       );
-      notify("Mensaje copiado", `Pégalo en un correo para ${PROFILE.email}`);
+      notify(words.copied, words.copiedDetail(PROFILE.email));
     } catch {
       window.location.href = mailto;
     }
@@ -132,27 +130,33 @@ const ProjectBrief = () => {
         accentColor="#D4B27A"
         style={STEPPER_THEME}
         nextButtonProps={{ onClick: validate }}
-        completeButtonText="Generar mensaje"
+        backButtonText={words.back}
+        nextButtonText={words.next}
+        completeButtonText={words.complete}
         completedContent={
           <div className="text-center">
             <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--clean-line)] bg-[color:var(--clean-bg)] text-[color:var(--clean)]">
               <CheckIcon className="h-5 w-5" />
             </span>
             <p className="mt-3 font-display text-lg font-semibold text-[color:var(--text)]">
-              Tu mensaje está listo
+              {words.ready}
             </p>
             <p className="mt-1 text-sm text-[color:var(--muted)]">
-              Ábrelo en tu correo o cópialo y envíalo a {PROFILE.email}.
+              {words.readyText(PROFILE.email)}
             </p>
             <pre className="mt-4 max-h-44 overflow-auto whitespace-pre-wrap rounded-lg border border-[color:var(--line)] bg-[color:var(--ink)] p-3 text-left font-mono text-xs leading-relaxed text-[color:var(--soft)]">
               {body}
             </pre>
             <div className="mt-4 flex flex-wrap justify-center gap-2">
               <a href={mailto} className={btn("primary", "sm")}>
-                Abrir en mi correo
+                {words.open}
               </a>
-              <button type="button" onClick={copy} className={btn("secondary", "sm")}>
-                Copiar mensaje
+              <button
+                type="button"
+                onClick={copy}
+                className={btn("secondary", "sm")}
+              >
+                {words.copy}
               </button>
             </div>
             <button
@@ -160,42 +164,42 @@ const ProjectBrief = () => {
               onClick={() => setStep(1)}
               className={`mt-3 rounded text-sm text-[color:var(--muted)] underline underline-offset-4 hover:text-[color:var(--text)] ${focusRing}`}
             >
-              Editar respuestas
+              {words.edit}
             </button>
           </div>
         }
       >
-        <Step title="Proceso">
+        <Step title={words.steps[0]}>
           <div className="space-y-4">
             <ChipGroup
-              legend="¿Qué te gustaría automatizar?"
+              legend={words.areas}
               options={BRIEF.areas}
               isSelected={(o) => areas.includes(o)}
               onPick={(o) => setAreas((list) => toggle(list, o))}
             />
             <label className="block">
-              <span className={label}>Descríbelo en una frase (opcional)</span>
+              <span className={label}>{words.describe}</span>
               <textarea
                 rows={2}
                 value={detail}
                 onChange={(e) => setDetail(e.target.value)}
-                placeholder="Ej. Cada lunes unimos 4 Excel para el reporte de ventas."
+                placeholder={words.describePlaceholder}
                 className={`${field} resize-none`}
               />
             </label>
           </div>
         </Step>
 
-        <Step title="Contexto">
+        <Step title={words.steps[1]}>
           <div className="space-y-5">
             <ChipGroup
-              legend="¿Con qué trabajan hoy?"
+              legend={words.tools}
               options={BRIEF.tools}
               isSelected={(o) => tools.includes(o)}
               onPick={(o) => setTools((list) => toggle(list, o))}
             />
             <ChipGroup
-              legend="¿Cuánto tiempo le dedican por semana?"
+              legend={words.hours}
               options={BRIEF.hours}
               isSelected={(o) => hours === o}
               onPick={(o) => setHours((current) => (current === o ? "" : o))}
@@ -203,25 +207,25 @@ const ProjectBrief = () => {
           </div>
         </Step>
 
-        <Step title="Tus datos">
+        <Step title={words.steps[2]}>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
-              <span className={label}>Nombre</span>
+              <span className={label}>{words.name}</span>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 autoComplete="name"
-                placeholder="Tu nombre"
+                placeholder={words.namePlaceholder}
                 className={field}
               />
             </label>
             <label className="block">
-              <span className={label}>Empresa (opcional)</span>
+              <span className={label}>{words.company}</span>
               <input
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 autoComplete="organization"
-                placeholder="Nombre de la empresa"
+                placeholder={words.companyPlaceholder}
                 className={field}
               />
             </label>

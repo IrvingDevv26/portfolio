@@ -1,4 +1,5 @@
-import { SERVICES } from "../content";
+import { useMemo } from "react";
+import { useContent } from "../lib/i18n";
 import {
   CloudIcon,
   CodeIcon,
@@ -22,40 +23,35 @@ const ICONS = {
 const mono = "font-mono text-[11px] leading-relaxed sm:text-xs";
 
 // Bitácora de una automatización corriendo sola
-const AutomationLog = () => (
+const AutomationLog = ({ words }) => (
   <div
     className={`${mono} w-full rounded-xl border border-[color:var(--line)] bg-[#08090C]/70 p-4`}
   >
-    {[
-      ["08:00:00", "Llegó reporte_ventas.xlsx", "text-[color:var(--soft)]"],
-      [
-        "08:00:02",
-        "Datos validados y normalizados",
-        "text-[color:var(--soft)]",
-      ],
-      ["08:00:04", "Resumen generado con IA", "text-[color:var(--soft)]"],
-      ["08:00:05", "Enviado a dirección ✓", "text-[color:var(--clean)]"],
-    ].map(([time, text, tone]) => (
-      <p key={time} className="flex gap-3">
-        <span className="text-[color:var(--muted)]">{time}</span>
-        <span className={tone}>{text}</span>
-      </p>
-    ))}
+    {["08:00:00", "08:00:02", "08:00:04", "08:00:05"]
+      .map((time, i, all) => [
+        time,
+        words.log[i],
+        i === all.length - 1
+          ? "text-[color:var(--clean)]"
+          : "text-[color:var(--soft)]",
+      ])
+      .map(([time, text, tone]) => (
+        <p key={time} className="flex gap-3">
+          <span className="text-[color:var(--muted)]">{time}</span>
+          <span className={tone}>{text}</span>
+        </p>
+      ))}
     <p className="mt-1 flex items-center gap-2 text-[color:var(--muted)]">
       <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[color:var(--clean)] motion-reduce:animate-none" />
-      0 clics manuales
+      {words.clicks}
     </p>
   </div>
 );
 
 // Antes y después de limpiar
-const CleanRows = () => (
+const CleanRows = ({ words }) => (
   <div className={`${mono} grid w-full gap-1.5`}>
-    {[
-      ["  juan pérez ", "Juan Pérez"],
-      ["03/12/24", "2024-12-03"],
-      ["$1,200.50", "1200.50"],
-    ].map(([before, after]) => (
+    {words.clean.map(([before, after]) => (
       <div
         key={before}
         className="grid grid-cols-[1fr_auto_1fr] items-center gap-2"
@@ -86,38 +82,42 @@ const ApiCall = () => (
 );
 
 // Estado de la infraestructura
-const InfraStatus = () => (
+const InfraStatus = ({ words }) => (
   <ul className={`${mono} w-full space-y-1`}>
-    {["proxmox-01", "mikrotik-norte", "wg0 · túnel"].map((name) => (
+    {words.servers.map((name) => (
       <li key={name} className="flex items-center justify-between gap-2">
         <span className="text-[color:var(--soft)]">{name}</span>
         <span className="flex items-center gap-1.5 text-[color:var(--clean)]">
           <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
-          activo
+          {words.active}
         </span>
       </li>
     ))}
   </ul>
 );
 
-const VISUALS = {
-  workflow: { visual: <AutomationLog />, colSpan: 2, rowSpan: 2 },
-  table: { visual: <CleanRows />, colSpan: 2 },
+const visuals = (words) => ({
+  workflow: { visual: <AutomationLog words={words} />, colSpan: 2, rowSpan: 2 },
+  table: { visual: <CleanRows words={words} />, colSpan: 2 },
   code: { visual: <ApiCall /> },
-  server: { visual: <InfraStatus /> },
-};
-
-const ITEMS = SERVICES.map((service) => {
-  const Icon = ICONS[service.icon];
-  return {
-    id: service.title,
-    icon: <Icon className="h-4 w-4" />,
-    label: service.tags.join(" · "),
-    title: service.title,
-    description: service.short ?? service.text,
-    ...VISUALS[service.icon],
-  };
+  server: { visual: <InfraStatus words={words} /> },
 });
+
+const itemsFor = (SERVICES, words) => {
+  const byIcon = visuals(words);
+  return SERVICES.map((service) => {
+    const Icon = ICONS[service.icon];
+    return {
+      // El id es el ícono: no cambia con el idioma
+      id: service.icon,
+      icon: <Icon className="h-4 w-4" />,
+      label: service.tags.join(" · "),
+      title: service.title,
+      description: service.short ?? service.text,
+      ...byIcon[service.icon],
+    };
+  });
+};
 
 const THEME = {
   "--mb-surface": "linear-gradient(180deg, #14161C 0%, #0E1014 100%)",
@@ -125,23 +125,27 @@ const THEME = {
   "--mb-tile": "linear-gradient(180deg, #1F222A 0%, #16181E 100%)",
 };
 
-const ServicesBento = () => (
-  <MagicBento
-    items={ITEMS}
-    columns={4}
-    // Con celdas más angostas el texto y la ilustración se enciman (tablet)
-    minCellWidth={210}
-    rowHeight={230}
-    gap={12}
-    radius={20}
-    glowColor="#D4B27A"
-    textAutoHide={false}
-    enableStars={false}
-    enableTilt={false}
-    enableMagnetism={false}
-    spotlightRadius={320}
-    style={THEME}
-  />
-);
+const ServicesBento = () => {
+  const { SERVICES, UI } = useContent();
+  const items = useMemo(() => itemsFor(SERVICES, UI.bento), [SERVICES, UI]);
+  return (
+    <MagicBento
+      items={items}
+      columns={4}
+      // Con celdas más angostas el texto y la ilustración se enciman (tablet)
+      minCellWidth={210}
+      rowHeight={230}
+      gap={12}
+      radius={20}
+      glowColor="#D4B27A"
+      textAutoHide={false}
+      enableStars={false}
+      enableTilt={false}
+      enableMagnetism={false}
+      spotlightRadius={320}
+      style={THEME}
+    />
+  );
+};
 
 export default ServicesBento;

@@ -6,6 +6,7 @@
 import { Children, isValidElement, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import './Stepper.css';
+import { useContent } from '../../lib/i18n';
 
 const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
@@ -138,6 +139,7 @@ export default function Stepper({
   style,
   ...rest
 }) {
+  const stepWord = useContent().UI.bits.step;
   const steps = Children.toArray(children).filter(isValidElement);
   const total = steps.length;
   const controlled = typeof step === 'number';
@@ -332,7 +334,7 @@ export default function Stepper({
                 type="button"
                 className="stepper__dot"
                 data-status={status}
-                aria-label={entry.props.title ? `Paso ${number}: ${entry.props.title}` : `Paso ${number}`}
+                aria-label={entry.props.title ? `${stepWord} ${number}: ${entry.props.title}` : `${stepWord} ${number}`}
                 aria-current={number === current ? 'step' : undefined}
                 disabled={!reachable(number)}
                 onClick={() => go(number)}
@@ -356,7 +358,7 @@ export default function Stepper({
                 type="button"
                 className="stepper__bar"
                 data-status={completed || number < current ? 'complete' : number === current ? 'active' : 'upcoming'}
-                aria-label={entry.props.title ? `Paso ${number}: ${entry.props.title}` : `Paso ${number}`}
+                aria-label={entry.props.title ? `${stepWord} ${number}: ${entry.props.title}` : `${stepWord} ${number}`}
                 aria-current={number === current ? 'step' : undefined}
                 disabled={!reachable(number)}
                 onClick={() => go(number)}
@@ -411,7 +413,7 @@ export default function Stepper({
               type="button"
               className="stepper__segment"
               data-status={status}
-              aria-label={typeof title === 'string' ? `Paso ${number}: ${title}` : `Paso ${number}`}
+              aria-label={typeof title === 'string' ? `${stepWord} ${number}: ${title}` : `${stepWord} ${number}`}
               aria-current={number === current ? 'step' : undefined}
               disabled={!reachable(number)}
               onClick={() => go(number)}

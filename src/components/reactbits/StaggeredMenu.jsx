@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useContent } from "../../lib/i18n";
 import { focusRing } from "../../lib/ui";
 
 /* React Bits · StaggeredMenu
@@ -15,6 +16,7 @@ const StaggeredMenu = ({ items, footer, open, onOpenChange }) => {
   const buttonRef = useRef(null);
   const panelRef = useRef(null);
   const reduce = useReducedMotion();
+  const words = useContent().UI.header;
 
   // Bloquea el scroll, gestiona teclado y foco mientras está abierto
   useEffect(() => {
@@ -74,7 +76,7 @@ const StaggeredMenu = ({ items, footer, open, onOpenChange }) => {
         type="button"
         aria-expanded={open}
         aria-controls="menu-movil"
-        aria-label={open ? "Cerrar menú" : "Abrir menú"}
+        aria-label={open ? words.closeMenu : words.openMenu}
         onClick={() => onOpenChange(!open)}
         className={`relative inline-flex h-9 items-center gap-2 rounded-full border border-[color:var(--line-strong)] bg-[rgba(16,18,23,0.7)] pl-4 pr-3 text-sm font-medium text-[color:var(--text)] backdrop-blur lg:hidden ${focusRing}`}
       >
@@ -87,8 +89,8 @@ const StaggeredMenu = ({ items, footer, open, onOpenChange }) => {
             animate={{ y: open ? "-50%" : "0%" }}
             transition={t(0, 0.4)}
           >
-            <span className="h-5 leading-5">Menú</span>
-            <span className="h-5 leading-5">Cerrar</span>
+            <span className="h-5 leading-5">{words.menu}</span>
+            <span className="h-5 leading-5">{words.close}</span>
           </motion.span>
         </span>
         <motion.svg
@@ -115,7 +117,7 @@ const StaggeredMenu = ({ items, footer, open, onOpenChange }) => {
               id="menu-movil"
               role="dialog"
               aria-modal="true"
-              aria-label="Menú de navegación"
+              aria-label={words.menuPanel}
               className="fixed inset-0 z-[45] lg:hidden"
               exit={{ opacity: reduce ? 0 : 1 }}
               transition={{ duration: reduce ? 0 : 0.5 }}
@@ -141,7 +143,7 @@ const StaggeredMenu = ({ items, footer, open, onOpenChange }) => {
                 exit={{ x: "100%", transition: t(0, 0.45) }}
                 transition={t(0.14, 0.55)}
               >
-                <nav aria-label="Móvil">
+                <nav aria-label={words.mobileNav}>
                   <ul className="space-y-1">
                     {items.map((item, i) => (
                       <li key={item.href} className="overflow-hidden">

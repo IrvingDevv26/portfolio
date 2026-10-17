@@ -4,6 +4,7 @@
 
 import { Children, isValidElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import './Folder.css';
+import { useContent } from '../../lib/i18n';
 
 const TAU = Math.PI * 2;
 const STEP = 1 / 240;
@@ -792,6 +793,7 @@ const Folder = ({
   style,
   children
 }) => {
+  const folderWord = useContent().UI.bits.folder;
   const rootRef = useRef(null);
   const backRef = useRef(null);
   const frontRef = useRef(null);
@@ -1849,7 +1851,7 @@ const Folder = ({
         role="button"
         tabIndex={0}
         aria-expanded={isOpen}
-        aria-label={label ? `Carpeta ${label}` : 'Carpeta'}
+        aria-label={label ? `${folderWord} ${label}` : folderWord}
         onClick={toggle}
         onKeyDown={event => {
           if (event.target !== event.currentTarget) return;

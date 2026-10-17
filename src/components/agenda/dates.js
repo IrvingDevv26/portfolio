@@ -1,10 +1,9 @@
 /* Fechas y horas de la demo de AgendaFlow. Todo se maneja como texto
    ("AAAA-MM-DD", "HH:MM") en la hora de la clínica que manda el backend, así
-   no depende de la zona horaria del visitante. */
+   no depende de la zona horaria del visitante. Los nombres que se muestran
+   (días, meses) vienen de DATES, en src/content, según el idioma. */
 
-export const WEEKDAYS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
-
-// Nombres de los días como los usa el backend en el horario del negocio
+// Llaves del horario que manda el backend: en español en los dos idiomas
 export const DAY_NAMES = [
   "domingo",
   "lunes",
@@ -13,21 +12,6 @@ export const DAY_NAMES = [
   "jueves",
   "viernes",
   "sábado",
-];
-
-const MONTHS = [
-  "ene",
-  "feb",
-  "mar",
-  "abr",
-  "may",
-  "jun",
-  "jul",
-  "ago",
-  "sep",
-  "oct",
-  "nov",
-  "dic",
 ];
 
 const noon = (iso) => new Date(`${iso}T12:00:00Z`);
@@ -43,8 +27,12 @@ export const weekdayOf = (iso) => noon(iso).getUTCDay();
 export const daysBetween = (from, to) =>
   Math.round((noon(to) - noon(from)) / 864e5);
 
-export const shortDate = (iso) =>
-  `${Number(iso.slice(8, 10))} ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
+// "2026-10-22" → "22 oct" / "Oct 22"
+export const shortDate = (iso, dates) =>
+  dates.shortDate(
+    Number(iso.slice(8, 10)),
+    dates.months[Number(iso.slice(5, 7)) - 1],
+  );
 
 // "09:30" → 570 minutos desde la medianoche
 export const toMinutes = (hhmm) =>
@@ -58,8 +46,8 @@ export const clock = (minutes) =>
   `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`;
 
 // Hora del visitante para los mensajes del chat ("16:46")
-export const timeNow = () =>
-  new Date().toLocaleTimeString("es-MX", {
+export const timeNow = (locale) =>
+  new Date().toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -82,33 +70,25 @@ export const openingHours = (horario) => {
 };
 
 // Horario resumido por grupos de días iguales: "Lun–Vie 9:00–14:00 · 15:00–19:00"
+// (de lunes a domingo; dates.days trae los nombres cortos en ese orden)
 const ORDER = DAY_NAMES.slice(1).concat(DAY_NAMES[0]);
-const SHORT = {
-  lunes: "Lun",
-  martes: "Mar",
-  miércoles: "Mié",
-  jueves: "Jue",
-  viernes: "Vie",
-  sábado: "Sáb",
-  domingo: "Dom",
-};
 
-export const scheduleSummary = (horario) => {
+export const scheduleSummary = (horario, dates, closed) => {
   const groups = [];
-  for (const day of ORDER) {
+  ORDER.forEach((day, index) => {
     const ranges = horario?.[day] ?? [];
     const key = JSON.stringify(ranges);
     const last = groups.at(-1);
-    if (last && last.key === key) last.to = day;
-    else groups.push({ key, from: day, to: day, ranges });
-  }
+    if (last && last.key === key) last.to = index;
+    else groups.push({ key, from: index, to: index, ranges });
+  });
   return groups.map((group) => ({
     days:
       group.from === group.to
-        ? SHORT[group.from]
-        : `${SHORT[group.from]}–${SHORT[group.to]}`,
+        ? dates.days[group.from]
+        : `${dates.days[group.from]}–${dates.days[group.to]}`,
     hours: group.ranges.length
       ? group.ranges.map(([from, to]) => `${from}–${to}`).join(" · ")
-      : "Cerrado",
+      : closed,
   }));
 };

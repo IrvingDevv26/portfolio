@@ -211,6 +211,9 @@ const PLACEHOLDERS = new Set([
   "vacío",
   "(vacío)",
   "(vacio)",
+  "empty",
+  "(empty)",
+  "missing",
 ]);
 const MONTHS = {
   ene: 1,
@@ -340,33 +343,14 @@ const columnKind = (values) => {
 /** Tipos de problema, en el orden en que se muestran. */
 export const ISSUE_TYPES = ["dup", "empty", "format", "case", "spaces"];
 
-/** Nombre, explicación y color de cada tipo de problema. */
+/** Color de cada tipo de problema. El nombre y la explicación, en cada idioma,
+    están en ISSUE_TEXT (src/content); useIssues() (lib/issues.js) los junta. */
 export const ISSUES = {
-  dup: {
-    label: "Filas duplicadas",
-    hint: "El mismo registro, escrito distinto",
-    color: "#FF9AA8",
-  },
-  empty: {
-    label: "Celdas vacías",
-    hint: "Sin dato o con N/A",
-    color: "#F2906B",
-  },
-  format: {
-    label: "Formatos mixtos",
-    hint: "Fechas y montos dispares",
-    color: "#D4B27A",
-  },
-  case: {
-    label: "Mayúsculas mezcladas",
-    hint: "MAYÚSCULAS y minúsculas",
-    color: "#C9B6F2",
-  },
-  spaces: {
-    label: "Espacios sobrantes",
-    hint: "Al inicio, al final o dobles",
-    color: "#BCC1CB",
-  },
+  dup: { color: "#FF9AA8" },
+  empty: { color: "#F2906B" },
+  format: { color: "#D4B27A" },
+  case: { color: "#C9B6F2" },
+  spaces: { color: "#BCC1CB" },
 };
 
 /**

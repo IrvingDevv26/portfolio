@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { useContent } from "../../lib/i18n";
 import { card } from "../../lib/ui";
 import { CheckIcon, XIcon } from "../icons";
 
@@ -14,19 +15,16 @@ const TOOLS = [
 ];
 
 const ActionLog = ({ actions }) => {
+  const words = useContent().AGENDA_LAB.actions;
   const blocked = actions.filter((a) => !a.ok).length;
 
   return (
-    <section aria-label="Acciones del agente" className={`${card} p-4 sm:p-5`}>
+    <section aria-label={words.label} className={`${card} p-4 sm:p-5`}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 className="font-display text-lg font-semibold">
-          Lo que hizo el agente
-        </h2>
+        <h2 className="font-display text-lg font-semibold">{words.title}</h2>
         {actions.length > 0 && (
           <p className="text-xs text-[color:var(--muted)]">
-            {actions.length} {actions.length === 1 ? "acción" : "acciones"}
-            {blocked > 0 &&
-              ` · ${blocked} ${blocked === 1 ? "frenada" : "frenadas"} por reglas`}
+            {words.count(actions.length, blocked)}
           </p>
         )}
       </div>
@@ -34,13 +32,9 @@ const ActionLog = ({ actions }) => {
       {actions.length === 0 ? (
         <>
           <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted)]">
-            Aquí verás cada herramienta que ejecuta el agente detrás del chat.
-            Todas pasan por reglas del backend; la IA no puede saltárselas.
+            {words.empty}
           </p>
-          <ul
-            className="mt-4 flex flex-wrap gap-2"
-            aria-label="Herramientas del agente"
-          >
+          <ul className="mt-4 flex flex-wrap gap-2" aria-label={words.tools}>
             {TOOLS.map((tool) => (
               <li
                 key={tool}
@@ -90,7 +84,7 @@ const ActionLog = ({ actions }) => {
                   )}
                   {!action.ok && action.error && (
                     <p className="mt-1 rounded-md bg-[color:var(--danger-bg)] px-2 py-1 text-[13px] text-[color:var(--danger)]">
-                      Regla del backend: {action.error}
+                      {words.rule}: {action.error}
                     </p>
                   )}
                 </div>

@@ -13,8 +13,9 @@ import SpotlightCard from "../components/reactbits/SpotlightCard";
 import Squares from "../components/reactbits/Squares";
 import { Eyebrow } from "../components/shared";
 import VideoButton from "../components/VideoButton";
-import { AGENDA_PROJECT } from "../content";
+import LanguageSwitch from "../components/LanguageSwitch";
 import { useDocumentTitle, useMediaQuery } from "../lib/hooks";
+import { useContent, useLang, useLocalize } from "../lib/i18n";
 import { btn, card, focusRing } from "../lib/ui";
 
 /* Demo en vivo de AgendaFlow: un agente de IA que agenda, cambia y cancela
@@ -25,23 +26,21 @@ import { btn, card, focusRing } from "../lib/ui";
 
 const API_URL = import.meta.env.VITE_AGENDA_API_URL ?? "";
 
-const MSG = {
-  network:
-    "No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
-  generic: "Algo salió mal. Inténtalo de nuevo.",
-  asleep:
-    "El servidor de la demo no despertó a tiempo. Inténtalo de nuevo en un momento.",
-};
-
 const WAKE_TIMEOUT = 120_000; // un servidor gratuito tarda hasta ~1 minuto en despertar
 const WAKE_RETRY = 3_000;
 
 // Ids de mensajes y acciones (sólo para las keys de React)
 let lastId = 0;
 const newId = () => ++lastId;
-const message = (role, text) => ({ id: newId(), role, text, time: timeNow() });
+const message = (role, text, locale) => ({
+  id: newId(),
+  role,
+  text,
+  time: timeNow(locale),
+});
 
-async function request(path, options = {}) {
+// `errors`: los mensajes de AGENDA_LAB.errors en el idioma de la página
+async function request(path, options, errors) {
   let response;
   try {
     response = await fetch(`${API_URL}${path}`, {
@@ -49,28 +48,29 @@ async function request(path, options = {}) {
       ...options,
     });
   } catch {
-    throw Object.assign(new Error(MSG.network), { status: 0 });
+    throw Object.assign(new Error(errors.network), { status: 0 });
   }
   // Mientras el servidor gratuito despierta, su proxy puede responder con una
   // página HTML en vez de JSON: se trata como "todavía no está listo"
   const json = (response.headers.get("content-type") || "").includes("json");
   const data = json ? await response.json().catch(() => ({})) : {};
   if (!response.ok || !json) {
-    const detail = typeof data.detail === "string" ? data.detail : MSG.generic;
+    const detail =
+      typeof data.detail === "string" ? data.detail : errors.generic;
     throw Object.assign(new Error(detail), { status: response.status, json });
   }
   return data;
 }
 
 // Espera a que el backend responda /api/health (lo despierta si dormía)
-async function wakeUp(onWaiting) {
+async function wakeUp(onWaiting, errors) {
   const started = Date.now();
   for (;;) {
     try {
-      return await request("/api/health");
+      return await request("/api/health", {}, errors);
     } catch {
       if (Date.now() - started > WAKE_TIMEOUT) {
-        throw Object.assign(new Error(MSG.asleep), { status: 503 });
+        throw Object.assign(new Error(errors.asleep), { status: 503 });
       }
       onWaiting();
       await new Promise((resolve) => setTimeout(resolve, WAKE_RETRY));
@@ -78,22 +78,20 @@ async function wakeUp(onWaiting) {
   }
 }
 
-const FACTS = [
-  "Clínica de ejemplo",
-  "Usa datos inventados",
-  "Agenda, cambia y cancela",
-  "Reglas validadas en el backend",
-];
-
-// Pestañas del área de trabajo en pantallas angostas
+// Pestañas del área de trabajo en pantallas angostas (llave → texto)
 const TABS = [
-  ["chat", "Chat"],
-  ["agenda", "Agenda"],
-  ["acciones", "Acciones"],
+  ["chat", "chat"],
+  ["agenda", "agenda"],
+  ["acciones", "actions"],
 ];
 
 const AgendaLab = () => {
-  useDocumentTitle("AgendaFlow — Demo en vivo · Irving Dávila");
+  const { AGENDA_LAB: words, AGENDA_PROJECT, DATES, UI } = useContent();
+  const lang = useLang();
+  const to = useLocalize();
+  const { errors } = words;
+  const locale = DATES.locale;
+  useDocumentTitle(words.title);
   const desktop = useMediaQuery("(min-width: 1024px)");
 
   const [status, setStatus] = useState("connecting"); // connecting | ready | error
@@ -124,7 +122,7 @@ const AgendaLab = () => {
         negocio: data.negocio,
         ahora: data.ahora,
       });
-      setMessages([message("agent", data.saludo)]);
+      setMessages([message("agent", data.saludo, locale)]);
       setAgenda(data.agenda);
       setActions([]);
       setHighlighted([]);
@@ -139,14 +137,21 @@ const AgendaLab = () => {
       setConnectError(error.message);
       setStatus("error");
     };
-    return wakeUp(() => setSlow(true))
-      .then(() => request("/api/agenda/sessions", { method: "POST" }))
+    // ?lang=: la clínica, el agente y sus reglas, en el idioma de la página
+    return wakeUp(() => setSlow(true), errors)
+      .then(() =>
+        request(
+          `/api/agenda/sessions?lang=${lang}`,
+          { method: "POST" },
+          errors,
+        ),
+      )
       .then(opened, failed)
       .finally(() => {
         clearTimeout(timer);
         setSlow(false);
       });
-  }, []);
+  }, [lang, errors, locale]);
 
   useEffect(() => {
     connect();
@@ -187,7 +192,7 @@ const AgendaLab = () => {
 
   const send = async (text) => {
     if (!session || sending) return;
-    setMessages((list) => [...list, message("user", text)]);
+    setMessages((list) => [...list, message("user", text, locale)]);
     setSending(true);
     try {
       const data = await request(
@@ -196,14 +201,15 @@ const AgendaLab = () => {
           method: "POST",
           body: JSON.stringify({ message: text }),
         },
+        errors,
       );
-      const time = timeNow();
+      const time = timeNow(locale);
       const fresh = data.acciones.map((a) => ({ ...a, id: newId(), time }));
       // Las herramientas se ven en el chat antes de la respuesta del agente
       setMessages((list) => [
         ...list,
         ...fresh.map((action) => ({ id: newId(), role: "tool", action })),
-        message("agent", data.respuesta),
+        message("agent", data.respuesta, locale),
       ]);
       setAgenda(data.agenda);
       setRemaining(data.mensajes_restantes);
@@ -232,11 +238,8 @@ const AgendaLab = () => {
         setDay(date);
       }
     } catch (error) {
-      const text =
-        error.status === 404
-          ? "La conversación expiró. Pulsa «Reiniciar» para empezar otra."
-          : error.message;
-      setMessages((list) => [...list, message("system", text)]);
+      const text = error.status === 404 ? errors.expired : error.message;
+      setMessages((list) => [...list, message("system", text, locale)]);
     } finally {
       setSending(false);
     }
@@ -251,15 +254,18 @@ const AgendaLab = () => {
         <header className="relative z-10 border-b border-[color:var(--line)] bg-[color:var(--ink)]/80 backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-10">
             <Link
-              to="/"
+              to={to("/")}
               className={`inline-flex items-center gap-2 rounded-md text-sm text-[color:var(--muted)] transition-colors hover:text-[color:var(--text)] ${focusRing}`}
             >
-              <ArrowLeftIcon className="h-4 w-4" /> Volver al portfolio
+              <ArrowLeftIcon className="h-4 w-4" /> {UI.common.backToPortfolio}
             </Link>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium">
-              <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
-              <ShinyText text="Demo en vivo" />
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium max-[420px]:hidden">
+                <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
+                <ShinyText text={UI.common.liveDemo} />
+              </span>
+              <LanguageSwitch />
+            </div>
           </div>
         </header>
 
@@ -280,16 +286,17 @@ const AgendaLab = () => {
                 <Eyebrow>AgendaFlow</Eyebrow>
                 <BlurText
                   as="h1"
-                  text="Un agente de IA que agenda citas por ti."
+                  text={words.heading}
                   className="balance mt-4 max-w-3xl font-display text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl"
                 />
                 <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[color:var(--soft)]">
-                  Escríbele como a WhatsApp: consulta horarios, agenda, cambia o
-                  cancela. Mientras conversan, la agenda de la clínica se
-                  actualiza y ves cada acción que ejecuta el agente.
+                  {words.intro}
                 </p>
-                <ul className="mt-6 flex flex-wrap gap-2" aria-label="Detalles">
-                  {FACTS.map((fact) => (
+                <ul
+                  className="mt-6 flex flex-wrap gap-2"
+                  aria-label={UI.common.details}
+                >
+                  {words.facts.map((fact) => (
                     <li
                       key={fact}
                       className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--ink)]/70 px-3 py-1 text-xs text-[color:var(--soft)] backdrop-blur"
@@ -314,10 +321,10 @@ const AgendaLab = () => {
               <div className="sticky top-0 z-20 -mx-6 mb-4 bg-[color:var(--ink)]/85 px-6 py-2 backdrop-blur md:-mx-10 md:px-10">
                 <div
                   role="group"
-                  aria-label="Vista de la demo"
+                  aria-label={words.tabs.label}
                   className="grid grid-cols-3 gap-1 rounded-xl border border-[color:var(--line)] bg-[color:var(--raised)] p-1"
                 >
-                  {TABS.map(([key, label]) => (
+                  {TABS.map(([key, word]) => (
                     <button
                       key={key}
                       type="button"
@@ -340,7 +347,7 @@ const AgendaLab = () => {
                           }}
                         />
                       )}
-                      <span className="relative">{label}</span>
+                      <span className="relative">{words.tabs[word]}</span>
                       {tab !== key && unseen[key] > 0 && (
                         <span className="relative inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[color:var(--accent)] px-1 text-[10px] font-semibold text-[color:var(--btn-ink)]">
                           {unseen[key]}
@@ -396,7 +403,7 @@ const AgendaLab = () => {
             <div className="mt-6 grid gap-4 md:grid-cols-3">
               <SpotlightCard className={`${card} p-6`}>
                 <h2 className="font-display text-lg font-semibold">
-                  Qué hay detrás
+                  {words.cards.behind}
                 </h2>
                 <ul className="mt-4 space-y-3 text-sm text-[color:var(--soft)]">
                   {AGENDA_PROJECT.highlights.map((item) => (
@@ -410,7 +417,7 @@ const AgendaLab = () => {
 
               <SpotlightCard className={`${card} p-6`}>
                 <h2 className="font-display text-lg font-semibold">
-                  En tu negocio
+                  {words.cards.business}
                 </h2>
                 <ul className="mt-4 space-y-3 text-sm text-[color:var(--soft)]">
                   {AGENDA_PROJECT.forBusiness.map((item) => (
@@ -424,19 +431,18 @@ const AgendaLab = () => {
 
               <SpotlightCard className={`${card} flex flex-col p-6`}>
                 <h2 className="font-display text-lg font-semibold">
-                  ¿Lo quieres para tu negocio?
+                  {words.cards.want}
                 </h2>
                 <p className="mt-3 text-sm leading-relaxed text-[color:var(--soft)]">
-                  Consultorios, salones, talleres o despachos: lo adapto a tus
-                  servicios, horarios y equipo, y lo conecto a tu WhatsApp.
+                  {words.cards.wantText}
                 </p>
                 <div className="mt-auto flex flex-wrap gap-2 pt-6">
-                  <Link to="/#contacto" className={btn("primary", "sm")}>
-                    Platiquemos <ArrowRightIcon className="h-4 w-4" />
+                  <Link to={to("/#contacto")} className={btn("primary", "sm")}>
+                    {UI.common.letsTalk} <ArrowRightIcon className="h-4 w-4" />
                   </Link>
                   <VideoButton
                     url={AGENDA_PROJECT.video}
-                    label="Ver el video"
+                    label={UI.common.watchVideo}
                     size="sm"
                   />
                 </div>
