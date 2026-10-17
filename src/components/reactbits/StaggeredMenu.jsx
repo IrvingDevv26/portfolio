@@ -58,7 +58,7 @@ const StaggeredMenu = ({ items, footer, open, onOpenChange }) => {
 
   // Si la ventana pasa a escritorio, el menú móvil se cierra solo
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)");
+    const mq = window.matchMedia("(min-width: 1024px)");
     const onChange = (e) => e.matches && onOpenChange(false);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);

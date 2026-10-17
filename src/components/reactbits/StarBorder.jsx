@@ -144,6 +144,9 @@ const StarBorder = ({
   stars = 1,
   glow = 0.6,
   sparkle = false,
+  // false: las estrellas descansan y sólo dan una vuelta al pasar el cursor,
+  // enfocar o tocar (ahorra el dibujo continuo en celulares)
+  cruise = true,
   direction = 'clockwise',
   hover = 'lap',
   clickPulse = true,
@@ -169,6 +172,7 @@ const StarBorder = ({
     stars: clamp(Math.round(stars), 1, 6),
     glow: clamp(glow, 0, 1),
     sparkle,
+    cruise,
     direction: direction === 'counterclockwise' ? -1 : 1,
     hover: HOVERS.includes(hover) ? hover : 'lap',
     clickPulse
@@ -411,7 +415,7 @@ const StarBorder = ({
       const total = shape.total;
       const spacing = total / s.stars;
       const engaged = state.hovered || state.focused;
-      const cruise = reduce ? 0 : (s.direction * total) / s.duration;
+      const cruise = reduce || !s.cruise ? 0 : (s.direction * total) / s.duration;
 
       const revealTarget = s.hover === 'reveal' && !engaged ? 0 : 1;
       state.reveal += (revealTarget - state.reveal) * (1 - Math.exp(-dt / (revealTarget > state.reveal ? 0.16 : 0.45)));

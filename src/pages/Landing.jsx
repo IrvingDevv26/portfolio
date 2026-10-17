@@ -1,5 +1,13 @@
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import {
+  lazy,
+  startTransition,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import AgentDemo from "../components/AgentDemo";
 import CleaningDemo from "../components/CleaningDemo";
@@ -88,6 +96,9 @@ const Hero = () => {
   // La credencial se monta cuando el navegador queda libre (el texto pinta
   // primero) y, sin GPU, se usa la versión ligera en lugar de la escena 3D
   const idle = useIdle();
+  // El borde animado del botón gira solo en equipos con mouse y cuando la página
+  // ya cargó: en celulares dibujarlo en cada cuadro costaba ~1 s de CPU
+  const finePointer = useMediaQuery("(hover: hover) and (pointer: fine)");
   const badge = useMemo(
     () => (idle ? (hasHardwareWebGL() ? "3d" : "static") : null),
     [idle],
@@ -208,6 +219,7 @@ const Hero = () => {
               textColor="#F1F3F6"
               borderColor="rgba(255,255,255,0.16)"
               radius={10}
+              cruise={finePointer && idle}
               className={`h-12 px-6 text-[15px] font-semibold backdrop-blur ${focusRing}`}
             >
               Hablemos de tu proyecto
@@ -978,10 +990,36 @@ const PERSON = JSON.stringify({
   ],
 });
 
+/* Primero se pinta lo que se ve al abrir (Hero y marquesina); el resto de las
+   secciones se monta enseguida como transición, que React reparte en tareas
+   cortas en vez de un solo bloque. Si el enlace apunta a una sección
+   (/#contacto), se monta todo de una vez para poder llegar a ella. */
+const BELOW_THE_FOLD = [
+  Manifesto,
+  CostCalculator,
+  Services,
+  Project,
+  AgendaCase,
+  Projects,
+  Process,
+  About,
+  Questions,
+  Contact,
+];
+
+const useRestOfPage = () => {
+  const [ready, setReady] = useState(() => Boolean(window.location.hash));
+  useEffect(() => {
+    if (!ready) startTransition(() => setReady(true));
+  }, [ready]);
+  return ready;
+};
+
 const Landing = () => {
   useDocumentTitle(
     "Irving Dávila — Automatización con IA y desarrollo full-stack",
   );
+  const rest = useRestOfPage();
 
   return (
     <div className="grain font-body bg-[color:var(--ink)] text-[color:var(--text)]">
@@ -995,22 +1033,13 @@ const Landing = () => {
       <main id="contenido">
         <Hero />
         <Marquee />
-        <Manifesto />
-        <CostCalculator />
-        <Services />
-        <Project />
-        <AgendaCase />
-        <Projects />
-        <Process />
-        <About />
-        <Questions />
-        <Contact />
+        {rest && BELOW_THE_FOLD.map((Section, i) => <Section key={i} />)}
       </main>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: PERSON }}
       />
-      <Footer />
+      {rest && <Footer />}
     </div>
   );
 };
