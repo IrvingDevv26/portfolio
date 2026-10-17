@@ -9,6 +9,7 @@ import GlobalStyles from "./styles/GlobalStyles";
 import ClickSpark from "./components/reactbits/ClickSpark";
 import LatticeLoader from "./components/reactbits/LatticeLoader";
 import { ToastProvider } from "./components/Toast";
+import { scrollToSection } from "./lib/scroll";
 import { WarmTooltipGroup } from "./components/reactbits/WarmTooltip";
 import Landing from "./pages/Landing";
 
@@ -29,22 +30,52 @@ const PageLoader = () => (
   </div>
 );
 
-// Al cambiar de página: arriba, o a la sección del enlace (ej. /#contacto)
+const sectionFor = (hash) =>
+  hash ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
+
+// Al cambiar de página: arriba, o a la sección del enlace (ej. /#contacto).
+// Los enlaces internos (#servicios) también pasan por scrollToSection para
+// llegar justo a su sección aunque la página siga cargando partes
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
-    const { hash } = window.location;
-    const target =
-      hash && document.getElementById(decodeURIComponent(hash.slice(1)));
+    const target = sectionFor(window.location.hash);
     if (!target) {
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
       return undefined;
     }
-    const id = requestAnimationFrame(() =>
-      target.scrollIntoView({ behavior: "instant" }),
-    );
-    return () => cancelAnimationFrame(id);
+    let stop = () => {};
+    const id = requestAnimationFrame(() => {
+      stop = scrollToSection(target);
+    });
+    return () => {
+      cancelAnimationFrame(id);
+      stop();
+    };
   }, [pathname]);
+
+  useEffect(() => {
+    let stop = () => {};
+    const onClick = (event) => {
+      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+        return;
+      const href = event.target.closest?.('a[href^="#"]')?.getAttribute("href");
+      const target = href && sectionFor(href);
+      if (!target) return;
+      event.preventDefault();
+      window.history.pushState(null, "", href);
+      stop();
+      stop = scrollToSection(target, {
+        smooth: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      });
+    };
+    document.addEventListener("click", onClick);
+    return () => {
+      document.removeEventListener("click", onClick);
+      stop();
+    };
+  }, []);
   return null;
 };
 

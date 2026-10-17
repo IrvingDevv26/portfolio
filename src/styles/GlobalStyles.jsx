@@ -101,6 +101,8 @@ const GlobalStyles = () => (
        "brinca" al hacer scroll. Por eso cada sección declara su tamaño
        aproximado en móvil, tablet y escritorio (medido). */
     .cv { content-visibility: auto; contain-intrinsic-size: auto var(--cv-h, 900px); }
+    /* Al saltar a una sección se dibujan todas para medir su alto real (src/lib/scroll.js) */
+    .cv-measure .cv { content-visibility: visible; }
     .cv-s { --cv-h: 450px; }
     .cv-m { --cv-h: 1250px; }
     .cv-l { --cv-h: 1750px; }
