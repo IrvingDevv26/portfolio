@@ -143,22 +143,6 @@ export const SHOWCASE = {
 
 export const PROJECTS = [
   {
-    name: "FacturaCheck",
-    kind: "Live demo · Accounting",
-    summary:
-      "Reviews a month of Mexican e-invoices (CFDI) the way an accountant would: checks each one with the SAT, Mexico's tax authority, and returns an Excel file with valid, cancelled and duplicate invoices, issuers on the 69-B list and the tax totals.",
-    highlights: [
-      "Reads loose XML files or the ZIP the SAT portal downloads (CFDI 4.0 and 3.3)",
-      "Checks the SAT in parallel; if it doesn't answer, the review goes on and flags it",
-      "Guarded against malicious XML and ZIP files; nothing is stored",
-    ],
-    tags: ["FastAPI", "Python", "XML", "SAT", "openpyxl", "React"],
-    demo: "/demo/cfdi",
-    image: "/project-facturacheck.jpg",
-    imageAlt: "FacturaCheck: review of 12 invoices with their issues and totals",
-    video: "", // Loom link of the demo walkthrough
-  },
-  {
     name: "VillaNet",
     kind: "SaaS platform · Networking",
     summary:
@@ -220,6 +204,75 @@ export const AGENDA_PROJECT = {
     "It can answer your WhatsApp Business 24/7",
     "It syncs with Google Calendar or your booking system",
     "It sends reminders and confirms attendance the day before",
+  ],
+};
+
+/* ── FacturaCheck case study (/en/demo/cfdi) ────────────────── */
+
+export const FACTURA_PROJECT = {
+  name: "FacturaCheck",
+  video: "", // Loom link of the demo walkthrough
+  tagline:
+    "Upload a month of Mexican invoices and in seconds you know which ones were cancelled, came twice or come from an issuer the tax authority has flagged.",
+  challenge:
+    "At month end, accounting firms in Mexico check every e-invoice (CFDI) by hand on the SAT's portal, the tax authority's site. A cancelled or fake invoice that slips through ends in a rejected deduction and hours of paperwork.",
+  solution:
+    "FacturaCheck reads the XML files or the ZIP the SAT portal downloads, checks each invoice with the SAT's official service and returns an Excel file with the issues and the tax totals, ready for the books.",
+  tags: ["FastAPI", "Python", "XML", "SAT", "openpyxl", "React"],
+  cta: "Try FacturaCheck",
+  catchesTitle: "What it catches",
+  // tone: color of the issue (danger, warn, accent, soft or muted)
+  catches: [
+    { tone: "danger", title: "Cancelled", text: "The issuer cancelled it at the SAT: it can't be deducted anymore." },
+    { tone: "warn", title: "Not on record", text: "The SAT doesn't have it: it may be fake." },
+    { tone: "danger", title: "69-B list", text: "Issuers the SAT flags for invoicing simulated operations." },
+    { tone: "accent", title: "Cancellation pending", text: "The issuer asked to cancel it and is waiting for your answer." },
+    { tone: "soft", title: "Duplicates", text: "The same invoice in two files: counted once." },
+    { tone: "muted", title: "Drafts", text: "XML that was never stamped and has no fiscal folio: not a valid invoice." },
+  ],
+  metrics: [
+    { value: 6, label: "SAT checks at a time", detail: "half a second per invoice; if the SAT doesn't answer, the review goes on" },
+    { value: 4, label: "sheets in the Excel file", detail: "summary, invoices, totals per RFC and issues" },
+    { value: 37, label: "automated tests", detail: "XML and ZIP reading, SAT checks and the API" },
+  ],
+  steps: [
+    {
+      title: "Upload your invoices",
+      text: "Loose XML files or the ZIP as the SAT portal downloads it, CFDI 4.0 and 3.3.",
+    },
+    {
+      title: "Each one is checked with the SAT",
+      text: "Through the same service the QR code uses: valid, cancelled, not on record or from an issuer on the 69-B list.",
+    },
+    {
+      title: "Get the report",
+      text: "An Excel file with what needs your attention, the totals in pesos and the detail per RFC, in English or Spanish.",
+    },
+  ],
+};
+
+// Animation of a review for the case study (no real SAT: the live demo is at
+// /en/demo/cfdi). Invoices taken from the demo's samples
+export const FACTURA_DEMO = {
+  file: "september_invoices.zip",
+  files: (n) => `${n} XML`,
+  replay: "Replay",
+  listLabel: "Reviewed invoices",
+  queued: "Queued",
+  checking: "Checking SAT",
+  states: { active: "Valid", cancelled: "Cancelled", not_found: "Not found" },
+  summary: (n, flagged) => `${n} invoices · ${flagged} to review`,
+  excel: "CFDI_Review.xlsx",
+  caption: "Animation with the sample invoices. Try your own in the live demo.",
+  rows: [
+    { number: "R-09", issuer: "Maria Olivia Martinez", amount: "MX$19,066.67", state: "active", alert: "Cancellation pending", tone: "accent" },
+    { number: "A-101", issuer: "Indistria Iluminadora", amount: "MX$21,460.00", state: "active" },
+    { number: "CAP-2208", issuer: "Universidad Robotica", amount: "MX$13,920.00", state: "cancelled" },
+    { number: "A-102", issuer: "Indistria Iluminadora", amount: "MX$8,410.00", state: "active" },
+    { number: "A-102", issuer: "Indistria Iluminadora", amount: "MX$8,410.00", state: "active", alert: "Duplicate", tone: "soft" },
+    { number: "XI-5531", issuer: "Xenon Industrial", amount: "US$1,450.00", state: "active" },
+    { number: "M-777", issuer: "Karla Fuente Nolasco", amount: "MX$5,568.00", state: "not_found" },
+    { number: "HE-310", issuer: "Herreria & Electricos", amount: "MX$11,136.00", state: "active", alert: "69-B list", tone: "danger" },
   ],
 };
 
@@ -525,7 +578,7 @@ export const UI = {
       eyebrow: "More projects",
       title: "I also build complete platforms.",
       intro:
-        "From an invoice reader that checks with Mexico's tax authority to a platform for internet providers: end-to-end systems, from the database to the network.",
+        "End-to-end systems, from the database to the network. Here's a look inside one of them.",
     },
     process: {
       eyebrow: "Process",

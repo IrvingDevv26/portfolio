@@ -29,7 +29,7 @@ import { hasHardwareWebGL } from "../lib/gpu";
 import { useDocumentTitle } from "../lib/hooks";
 import { useContent, useLang, useLocalize } from "../lib/i18n";
 import { useToast } from "../lib/toast";
-import { btn, card, focusRing, iconBtn } from "../lib/ui";
+import { btn, card, focusRing, iconBtn, STATE_CHIP } from "../lib/ui";
 
 /* FacturaCheck: el visitante sube sus CFDI (XML o el ZIP del SAT), el backend
    consulta cada factura en el SAT y devuelve la revisión en JSON con el Excel
@@ -92,16 +92,6 @@ const ALERT_COLOR = {
 };
 // Alertas que el estatus ya dice ("Cancelada"): la tabla no las repite
 const SAID_BY_STATE = new Set(["cancelled", "not_found", "unavailable"]);
-const STATE_STYLE = {
-  active:
-    "border-[color:var(--clean-line)] bg-[color:var(--clean-bg)] text-[color:var(--clean)]",
-  cancelled:
-    "border-[color:var(--danger-line)] bg-[color:var(--danger-bg)] text-[color:var(--danger)]",
-  not_found:
-    "border-[color:var(--accent-line)] bg-[color:var(--accent-bg)] text-[color:var(--accent)]",
-  unavailable:
-    "border-[color:var(--line-strong)] bg-[color:var(--glass)] text-[color:var(--soft)]",
-};
 
 const extensionOf = (name) => {
   const dot = name.lastIndexOf(".");
@@ -231,7 +221,7 @@ const FileList = ({ files, onRemove, words }) => (
 
 const StateChip = ({ state, words }) => (
   <span
-    className={`inline-flex whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium ${STATE_STYLE[state]}`}
+    className={`inline-flex whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium ${STATE_CHIP[state]}`}
   >
     {words.states[state]}
   </span>
@@ -614,14 +604,11 @@ const Result = ({ result, excelUrl, duration, onReset, words, locale }) => {
    ────────────────────────────────────────────────────────────── */
 
 const CfdiLab = () => {
-  const { CFDI_LAB: words, DATES, PROJECTS, UI } = useContent();
+  const { CFDI_LAB: words, DATES, FACTURA_PROJECT, UI } = useContent();
   const lang = useLang();
   const to = useLocalize();
   const notify = useToast();
   useDocumentTitle(words.title);
-  const video = PROJECTS.find(
-    (project) => project.demo === "/demo/cfdi",
-  )?.video;
 
   // Borde eléctrico: WebGL se comprueba la primera vez que hace falta
   const [glow, setGlow] = useState(false);
@@ -1042,7 +1029,7 @@ const CfdiLab = () => {
                   {UI.common.letsTalk} <ArrowRightIcon className="h-4 w-4" />
                 </Link>
                 <VideoButton
-                  url={video}
+                  url={FACTURA_PROJECT.video}
                   label={UI.common.watchVideo}
                   size="sm"
                 />
