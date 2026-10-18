@@ -1,6 +1,11 @@
 import { useState } from "react";
+import {
+  CURRENCIES,
+  rememberCurrency,
+  startingCurrency,
+} from "../lib/currency";
 import { useContent } from "../lib/i18n";
-import { btn } from "../lib/ui";
+import { btn, focusRing } from "../lib/ui";
 import { ArrowRightIcon } from "./icons";
 import Counter from "./reactbits/Counter";
 import ElasticSlider from "./reactbits/ElasticSlider";
@@ -10,10 +15,10 @@ import { Eyebrow, h2 } from "./shared";
 /* Calculadora del costo del trabajo manual: controles ElasticSlider y cifras
    con Counter (React Bits). Todo sale de los datos que pone el visitante. */
 
-// Los controles; el costo por hora y su moneda dependen del idioma
-const fieldsFor = (CALCULATOR, words) => {
+// Los controles; el rango del costo por hora depende de la moneda
+const fieldsFor = (CALCULATOR, words, currency) => {
   const money = new Intl.NumberFormat(CALCULATOR.locale);
-  const { rate } = CALCULATOR;
+  const rate = CALCULATOR.currencies[currency];
   return [
     {
       key: "people",
@@ -33,7 +38,7 @@ const fieldsFor = (CALCULATOR, words) => {
     },
     {
       key: "rate",
-      label: `${words.rate} (${CALCULATOR.currency})`,
+      label: words.rate,
       min: rate.min,
       max: rate.max,
       step: rate.step,
@@ -50,16 +55,55 @@ const fieldsFor = (CALCULATOR, words) => {
   ];
 };
 
+// Selector MXN / USD junto al costo por hora
+const CurrencySwitch = ({ value, onChange, label }) => (
+  <span
+    role="group"
+    aria-label={label}
+    className="inline-flex rounded-full border border-[color:var(--line-strong)] p-0.5 font-mono text-xs font-semibold"
+  >
+    {CURRENCIES.map((code) => (
+      <button
+        key={code}
+        type="button"
+        aria-pressed={code === value}
+        onClick={() => onChange(code)}
+        className={`rounded-full px-2.5 py-1 transition-colors ${focusRing} ${
+          code === value
+            ? "bg-[color:var(--btn)] text-[color:var(--btn-ink)]"
+            : "text-[color:var(--soft)] hover:text-[color:var(--text)]"
+        }`}
+      >
+        {code}
+      </button>
+    ))}
+  </span>
+);
+
 const Calculator = () => {
   const { CALCULATOR, UI } = useContent();
   const words = UI.calculator;
-  const fields = fieldsFor(CALCULATOR, words);
-  const [values, setValues] = useState({
+  const [currency, setCurrency] = useState(() =>
+    startingCurrency(CALCULATOR.currency),
+  );
+  const fields = fieldsFor(CALCULATOR, words, currency);
+  const [values, setValues] = useState(() => ({
     people: 3,
     hours: 6,
-    rate: CALCULATOR.rate.start,
+    rate: CALCULATOR.currencies[currency].start,
     share: 60,
-  });
+  }));
+
+  // Otra moneda: el costo por hora vuelve al valor típico de esa moneda
+  const changeCurrency = (code) => {
+    if (code === currency) return;
+    setCurrency(code);
+    setValues((current) => ({
+      ...current,
+      rate: CALCULATOR.currencies[code].start,
+    }));
+    rememberCurrency(code);
+  };
 
   const hoursYear = values.people * values.hours * CALCULATOR.weeksPerYear;
   const costYear = hoursYear * values.rate;
@@ -79,7 +123,16 @@ const Calculator = () => {
           {fields.map((field) => (
             <div key={field.key}>
               <div className="flex items-baseline justify-between gap-4 text-sm">
-                <span className="text-[color:var(--soft)]">{field.label}</span>
+                <span className="flex items-center gap-2.5 text-[color:var(--soft)]">
+                  {field.label}
+                  {field.key === "rate" && (
+                    <CurrencySwitch
+                      value={currency}
+                      onChange={changeCurrency}
+                      label={words.currency}
+                    />
+                  )}
+                </span>
                 <span className="font-mono tabular-nums text-[color:var(--text)]">
                   {field.show(values[field.key])}
                 </span>
@@ -124,7 +177,7 @@ const Calculator = () => {
           <Counter
             value={costYear}
             prefix="$"
-            suffix={` ${CALCULATOR.currency}`}
+            suffix={` ${currency}`}
             locale={CALCULATOR.locale}
             fontSize="1.6rem"
           />
@@ -148,7 +201,7 @@ const Calculator = () => {
             <Counter
               value={moneyBack}
               prefix="$"
-              suffix={` ${CALCULATOR.currency}`}
+              suffix={` ${currency}`}
               locale={CALCULATOR.locale}
               fontSize="1.35rem"
             />

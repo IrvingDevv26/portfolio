@@ -212,11 +212,16 @@ export const CALCULATOR = {
   title: "¿Cuánto te cuesta hoy el trabajo manual?",
   intro:
     "Mueve los valores con los datos de tu equipo. Es una estimación rápida para dimensionar el problema, no una cotización.",
+  // Moneda con la que empieza (fuera de México empieza en dólares, ver
+  // src/lib/currency.js); el visitante puede cambiarla
   currency: "MXN",
   locale: "es-MX",
   weeksPerYear: 48, // semanas laborales al año
-  // Costo por hora: valor inicial y rango del control
-  rate: { start: 150, min: 50, max: 1000, step: 10 },
+  // Costo por hora en cada moneda: valor inicial y rango del control
+  currencies: {
+    MXN: { start: 150, min: 50, max: 1000, step: 10 },
+    USD: { start: 15, min: 5, max: 150, step: 5 },
+  },
 };
 
 /* ── Proceso de trabajo ─────────────────────────────────────── */
@@ -559,6 +564,7 @@ export const UI = {
     peopleValue: (n) => `${n} ${n === 1 ? "persona" : "personas"}`,
     hours: "Horas por semana, por persona",
     rate: "Costo por hora",
+    currency: "Moneda",
     share: "Parte que se podría automatizar",
     perYear: "Al año, tu equipo dedica",
     cost: "a este proceso, con un costo aproximado de",

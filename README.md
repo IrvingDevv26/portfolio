@@ -42,8 +42,9 @@ A bilingual (Spanish and English) portfolio that sells by showing: two live AI d
   conversation. Backed by the AgendaFlow API.
 - **Interactive 3D badge** built with three.js and react-three-fiber, with a
   lightweight CSS fallback when the browser has no hardware WebGL.
-- **Sales-oriented content**: manual-work cost calculator, case study with real
-  numbers, process timeline, FAQ and a 3-step project brief.
+- **Sales-oriented content**: manual-work cost calculator (in MXN or USD; it
+  starts in pesos only for visitors in Mexico), case study with real numbers,
+  process timeline, FAQ and a 3-step project brief.
 - **Accessible and fast**: Lighthouse 100 for accessibility, best practices and
   SEO; 98 performance on desktop. `prefers-reduced-motion` is respected
   everywhere.
