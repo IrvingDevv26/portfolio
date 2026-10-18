@@ -14,6 +14,7 @@ import CleaningDemo from "../components/CleaningDemo";
 import Deferred from "../components/Deferred";
 import Faq from "../components/Faq";
 import Header from "../components/Header";
+import InvoiceDemo from "../components/InvoiceDemo";
 import VideoButton from "../components/VideoButton";
 import StaticBadge from "../components/StaticBadge";
 import AnimatedContent from "../components/reactbits/AnimatedContent";
@@ -26,6 +27,7 @@ import RotatingText from "../components/reactbits/RotatingText";
 import ScrollReveal from "../components/reactbits/ScrollReveal";
 import ScrollVelocity from "../components/reactbits/ScrollVelocity";
 import ShinyText from "../components/reactbits/ShinyText";
+import SpotlightCard from "../components/reactbits/SpotlightCard";
 import Squares from "../components/reactbits/Squares";
 import StatusMark from "../components/reactbits/StatusMark";
 import TiltedCard from "../components/reactbits/TiltedCard";
@@ -51,7 +53,7 @@ import { hasHardwareWebGL } from "../lib/gpu";
 import { useDocumentTitle, useIdle, useMediaQuery } from "../lib/hooks";
 import { useContent, useLocalize } from "../lib/i18n";
 import { useToast } from "../lib/toast";
-import { btn, card, delay, focusRing } from "../lib/ui";
+import { btn, card, delay, focusRing, TONE_COLOR } from "../lib/ui";
 
 // three.js pesa: la credencial 3D llega en un archivo aparte, sin frenar el texto
 const Lanyard = lazy(() => import("../components/Lanyard"));
@@ -311,6 +313,59 @@ const Services = () => {
   );
 };
 
+/* ── Piezas de los casos de estudio ───────────────────────── */
+
+// Cifras del proyecto, con contador al entrar en pantalla
+const Metrics = ({ items }) => (
+  <ul className="mt-20 grid divide-y divide-[color:var(--line)] overflow-hidden rounded-2xl border border-[color:var(--line)] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+    {items.map((metric, i) => (
+      <li key={metric.label} className="bg-[color:var(--glass)] p-7">
+        <p className="font-display text-5xl font-semibold tracking-tight text-[color:var(--text)] md:text-6xl">
+          <CountUp to={metric.value} delay={i * 0.15} />
+          {metric.unit && (
+            <span className="ml-1.5 text-2xl text-[color:var(--accent)] md:text-3xl">
+              {metric.unit}
+            </span>
+          )}
+        </p>
+        <p className="mt-3 font-medium text-[color:var(--text)]">
+          {metric.label}
+        </p>
+        <p className="mt-1 text-sm text-[color:var(--muted)]">
+          {metric.detail}
+        </p>
+      </li>
+    ))}
+  </ul>
+);
+
+// "Cómo funciona": tres pasos numerados
+const HowItWorks = ({ steps }) => {
+  const { UI } = useContent();
+  return (
+    <>
+      <h3 className="mt-24 font-display text-2xl font-semibold text-[color:var(--text)]">
+        {UI.landing.howItWorks}
+      </h3>
+      <ol className="mt-8 grid gap-8 border-t border-[color:var(--line)] pt-8 md:grid-cols-3 md:gap-10">
+        {steps.map((step, i) => (
+          <AnimatedContent as="li" key={step.title} delay={i * 0.1}>
+            <span className="font-mono text-sm text-[color:var(--accent)]">
+              {pad(i + 1)}
+            </span>
+            <h4 className="mt-3 font-display text-xl font-semibold text-[color:var(--text)]">
+              {step.title}
+            </h4>
+            <p className="mt-2 max-w-sm leading-relaxed text-[color:var(--soft)]">
+              {step.text}
+            </p>
+          </AnimatedContent>
+        ))}
+      </ol>
+    </>
+  );
+};
+
 /* ── Caso de estudio ──────────────────────────────────────── */
 
 const Project = () => {
@@ -372,46 +427,8 @@ const Project = () => {
             </AnimatedContent>
           </div>
 
-          {/* Cifras */}
-          <ul className="mt-20 grid divide-y divide-[color:var(--line)] overflow-hidden rounded-2xl border border-[color:var(--line)] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            {PROJECT_METRICS.map((metric, i) => (
-              <li key={metric.label} className="bg-[color:var(--glass)] p-7">
-                <p className="font-display text-5xl font-semibold tracking-tight text-[color:var(--text)] md:text-6xl">
-                  <CountUp to={metric.value} delay={i * 0.15} />
-                  {metric.unit && (
-                    <span className="ml-1.5 text-2xl text-[color:var(--accent)] md:text-3xl">
-                      {metric.unit}
-                    </span>
-                  )}
-                </p>
-                <p className="mt-3 font-medium text-[color:var(--text)]">
-                  {metric.label}
-                </p>
-                <p className="mt-1 text-sm text-[color:var(--muted)]">
-                  {metric.detail}
-                </p>
-              </li>
-            ))}
-          </ul>
-
-          <h3 className="mt-24 font-display text-2xl font-semibold text-[color:var(--text)]">
-            {UI.landing.howItWorks}
-          </h3>
-          <ol className="mt-8 grid gap-8 border-t border-[color:var(--line)] pt-8 md:grid-cols-3 md:gap-10">
-            {STEPS.map((step, i) => (
-              <AnimatedContent as="li" key={step.title} delay={i * 0.1}>
-                <span className="font-mono text-sm text-[color:var(--accent)]">
-                  {pad(i + 1)}
-                </span>
-                <h4 className="mt-3 font-display text-xl font-semibold text-[color:var(--text)]">
-                  {step.title}
-                </h4>
-                <p className="mt-2 max-w-sm leading-relaxed text-[color:var(--soft)]">
-                  {step.text}
-                </p>
-              </AnimatedContent>
-            ))}
-          </ol>
+          <Metrics items={PROJECT_METRICS} />
+          <HowItWorks steps={STEPS} />
 
           <UnderTheHood />
         </Section>
@@ -526,46 +543,110 @@ const AgendaCase = () => {
           </AnimatedContent>
         </div>
 
-        {/* Cifras */}
-        <ul className="mt-20 grid divide-y divide-[color:var(--line)] overflow-hidden rounded-2xl border border-[color:var(--line)] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          {AGENDA_PROJECT.metrics.map((metric, i) => (
-            <li key={metric.label} className="bg-[color:var(--glass)] p-7">
-              <p className="font-display text-5xl font-semibold tracking-tight text-[color:var(--text)] md:text-6xl">
-                <CountUp to={metric.value} delay={i * 0.15} />
-                {metric.unit && (
-                  <span className="ml-1.5 text-2xl text-[color:var(--accent)] md:text-3xl">
-                    {metric.unit}
-                  </span>
-                )}
-              </p>
-              <p className="mt-3 font-medium text-[color:var(--text)]">
-                {metric.label}
-              </p>
-              <p className="mt-1 text-sm text-[color:var(--muted)]">
-                {metric.detail}
-              </p>
-            </li>
+        <Metrics items={AGENDA_PROJECT.metrics} />
+        <HowItWorks steps={AGENDA_PROJECT.steps} />
+      </Section>
+    </div>
+  );
+};
+
+/* ── Caso de estudio: FacturaCheck ────────────────────────── */
+
+const FacturaCase = () => {
+  const { FACTURA_PROJECT, UI } = useContent();
+  const to = useLocalize();
+  return (
+    <div className="cv cv-xl border-t border-[color:var(--line)]">
+      <Section id="facturacheck">
+        <SectionHeading
+          index="04"
+          eyebrow={UI.landing.caseStudy}
+          title={FACTURA_PROJECT.name}
+          intro={FACTURA_PROJECT.tagline}
+        />
+
+        {/* La revisión animada a la izquierda (en pantallas anchas) para no
+            repetir la composición de AgendaFlow */}
+        <div className="mt-14 grid grid-cols-[minmax(0,1fr)] items-start gap-12 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+          <div>
+            <dl className="space-y-7">
+              <div>
+                <dt className={label}>{UI.landing.challenge}</dt>
+                <dd className="mt-2 leading-relaxed text-[color:var(--soft)]">
+                  {FACTURA_PROJECT.challenge}
+                </dd>
+              </div>
+              <div>
+                <dt className={label}>{UI.landing.solution}</dt>
+                <dd className="mt-2 leading-relaxed text-[color:var(--soft)]">
+                  {FACTURA_PROJECT.solution}
+                </dd>
+              </div>
+            </dl>
+
+            <ul
+              className="mt-8 flex flex-wrap gap-2"
+              aria-label={UI.common.projectTech}
+            >
+              {FACTURA_PROJECT.tags.map((tag) => (
+                <Tag key={tag}>{tag}</Tag>
+              ))}
+            </ul>
+
+            <div className="mt-10 flex flex-wrap items-center gap-3">
+              <Magnet>
+                <Link to={to("/demo/cfdi")} className={btn("primary")}>
+                  {FACTURA_PROJECT.cta} <ArrowRightIcon className="h-4 w-4" />
+                </Link>
+              </Magnet>
+              <VideoButton url={FACTURA_PROJECT.video} />
+            </div>
+          </div>
+
+          <div className="lg:order-first">
+            <AnimatedContent blur distance={24}>
+              <InvoiceDemo />
+            </AnimatedContent>
+          </div>
+        </div>
+
+        {/* Lo que detecta: un color por tipo de alerta, igual que en la demo */}
+        <h3 className="mt-24 font-display text-2xl font-semibold text-[color:var(--text)]">
+          {FACTURA_PROJECT.catchesTitle}
+        </h3>
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {FACTURA_PROJECT.catches.map((item, i) => (
+            <AnimatedContent
+              as="li"
+              key={item.title}
+              delay={(i % 3) * 0.08}
+              className="h-full"
+            >
+              <SpotlightCard className={`${card} h-full p-6`}>
+                <p
+                  className="flex items-center gap-2.5 font-display text-lg font-semibold"
+                  style={{ color: TONE_COLOR[item.tone] }}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="h-2 w-2 rounded-full"
+                    style={{
+                      backgroundColor: TONE_COLOR[item.tone],
+                      boxShadow: `0 0 12px ${TONE_COLOR[item.tone]}`,
+                    }}
+                  />
+                  {item.title}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-[color:var(--soft)]">
+                  {item.text}
+                </p>
+              </SpotlightCard>
+            </AnimatedContent>
           ))}
         </ul>
 
-        <h3 className="mt-24 font-display text-2xl font-semibold text-[color:var(--text)]">
-          {UI.landing.howItWorks}
-        </h3>
-        <ol className="mt-8 grid gap-8 border-t border-[color:var(--line)] pt-8 md:grid-cols-3 md:gap-10">
-          {AGENDA_PROJECT.steps.map((step, i) => (
-            <AnimatedContent as="li" key={step.title} delay={i * 0.1}>
-              <span className="font-mono text-sm text-[color:var(--accent)]">
-                {pad(i + 1)}
-              </span>
-              <h4 className="mt-3 font-display text-xl font-semibold text-[color:var(--text)]">
-                {step.title}
-              </h4>
-              <p className="mt-2 max-w-sm leading-relaxed text-[color:var(--soft)]">
-                {step.text}
-              </p>
-            </AnimatedContent>
-          ))}
-        </ol>
+        <Metrics items={FACTURA_PROJECT.metrics} />
+        <HowItWorks steps={FACTURA_PROJECT.steps} />
       </Section>
     </div>
   );
@@ -578,7 +659,7 @@ const Projects = () => {
   return (
     <div className="cv cv-m border-t border-[color:var(--line)]">
       <Section id="proyectos">
-        <SectionHeading index="04" {...projects} />
+        <SectionHeading index="05" {...projects} />
         <Deferred minHeight="60rem" className="mt-12">
           <MoreProjects />
         </Deferred>
@@ -612,7 +693,7 @@ const Process = () => {
   return (
     <div className="cv cv-m border-t border-[color:var(--line)]">
       <Section id="proceso">
-        <SectionHeading index="05" {...UI.landing.process} />
+        <SectionHeading index="06" {...UI.landing.process} />
 
         <div className="relative mt-16">
           {/* Línea de tiempo que se dibuja al entrar en pantalla */}
@@ -670,7 +751,7 @@ const About = () => {
   return (
     <div className="cv cv-xl border-t border-[color:var(--line)]">
       <Section id="sobre-mi">
-        <Eyebrow index="06">{words.eyebrow}</Eyebrow>
+        <Eyebrow index="07">{words.eyebrow}</Eyebrow>
         {/* Firma: cada letra gana peso al acercar el cursor */}
         <h2 className="mt-6 select-none whitespace-nowrap font-display text-[clamp(3.2rem,12.5vw,10.5rem)] leading-[0.9] tracking-[-0.04em] text-[color:var(--text)]">
           <VariableProximity label={PROFILE.shortName} />
@@ -761,7 +842,7 @@ const Questions = () => {
     <div className="cv cv-m border-t border-[color:var(--line)]">
       <Section id="preguntas">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
-          <SectionHeading index="07" {...faq} />
+          <SectionHeading index="08" {...faq} />
           <Faq />
         </div>
       </Section>
@@ -830,7 +911,7 @@ const Contact = () => {
       <Section id="contacto">
         <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
           <div className="lg:pt-6">
-            <Eyebrow index="08">{words.eyebrow}</Eyebrow>
+            <Eyebrow index="09">{words.eyebrow}</Eyebrow>
             <h2 className="balance mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.05] tracking-tight text-[color:var(--text)] md:text-6xl">
               {CONTACT.title} <GradientText>{CONTACT.highlight}</GradientText>
             </h2>
@@ -995,6 +1076,7 @@ const BELOW_THE_FOLD = [
   Services,
   Project,
   AgendaCase,
+  FacturaCase,
   Projects,
   Process,
   About,

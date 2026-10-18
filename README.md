@@ -47,7 +47,9 @@ A bilingual (Spanish and English) portfolio that sells by showing: three live de
   (cancelled, unknown to the SAT, issuer on the 69-B list, pending
   cancellation, duplicates, drafts), the tax totals in pesos and every invoice
   with its status, plus the Excel report to download. Twelve sample invoices
-  (`public/samples/cfdi`) get a simulated, clearly labeled status.
+  (`public/samples/cfdi`) get a simulated, clearly labeled status. On the home
+  page it has its own case study, with an animated review of a batch of
+  invoices.
 - **Interactive 3D badge** built with three.js and react-three-fiber, with a
   lightweight CSS fallback when the browser has no hardware WebGL.
 - **Sales-oriented content**: manual-work cost calculator (in MXN or USD; it
@@ -116,6 +118,7 @@ src/
     reactbits/          React Bits components adapted to the site
     Lanyard.jsx         3D badge (three.js)
     SheetPreview.jsx    Demo preview table and detected problems
+    AgentDemo.jsx, InvoiceDemo.jsx   Animated demos of the case studies
     LabParts.jsx        Header, steps and drop zone shared by the file demos
     ...
   lib/

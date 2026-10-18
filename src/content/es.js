@@ -142,22 +142,6 @@ export const SHOWCASE = {
 
 export const PROJECTS = [
   {
-    name: "FacturaCheck",
-    kind: "Demo en vivo · Contabilidad",
-    summary:
-      "Revisa las facturas del mes como lo haría un contador: consulta cada CFDI en el SAT y entrega un Excel con vigentes, canceladas, duplicadas, emisores en la lista 69-B y los totales de IVA e ISR.",
-    highlights: [
-      "Lee XML sueltos o el ZIP que descarga el portal del SAT (CFDI 4.0 y 3.3)",
-      "Consulta el SAT en paralelo; si no responde, la revisión sigue y lo marca",
-      "Protegido contra XML y ZIP maliciosos; los archivos no se guardan",
-    ],
-    tags: ["FastAPI", "Python", "XML", "SAT", "openpyxl", "React"],
-    demo: "/demo/cfdi",
-    image: "/project-facturacheck.jpg",
-    imageAlt: "FacturaCheck: revisión de 12 facturas con sus alertas y totales",
-    video: "", // enlace de Loom del recorrido de la demo
-  },
-  {
     name: "VillaNet",
     kind: "Plataforma SaaS · Redes",
     summary:
@@ -219,6 +203,75 @@ export const AGENDA_PROJECT = {
     "Puede atender tu WhatsApp Business las 24 horas",
     "Se sincroniza con Google Calendar o con tu sistema de citas",
     "Envía recordatorios y confirma asistencia un día antes",
+  ],
+};
+
+/* ── Caso de estudio de FacturaCheck (/demo/cfdi) ───────────── */
+
+export const FACTURA_PROJECT = {
+  name: "FacturaCheck",
+  video: "", // enlace de Loom del recorrido de la demo
+  tagline:
+    "Sube las facturas del mes y en segundos sabes cuáles están canceladas, duplicadas o vienen de un emisor que el SAT tiene en la mira.",
+  challenge:
+    "Al cierre de mes, los despachos contables revisan los CFDI uno por uno en el portal del SAT. Una factura cancelada o apócrifa que se cuela termina en una deducción rechazada y en horas de aclaraciones.",
+  solution:
+    "FacturaCheck lee los XML o el ZIP que descarga el SAT, consulta cada factura en el servicio oficial del SAT y entrega un Excel con las alertas y los totales de IVA e ISR, listo para la contabilidad.",
+  tags: ["FastAPI", "Python", "XML", "SAT", "openpyxl", "React"],
+  cta: "Probar FacturaCheck",
+  catchesTitle: "Lo que detecta",
+  // tone: color de la alerta (danger, warn, accent, soft o muted)
+  catches: [
+    { tone: "danger", title: "Canceladas", text: "El emisor la canceló en el SAT: ya no es deducible." },
+    { tone: "warn", title: "No registradas", text: "El SAT no la tiene: puede ser apócrifa." },
+    { tone: "danger", title: "Lista 69-B", text: "Emisores que el SAT señala por facturar operaciones simuladas." },
+    { tone: "accent", title: "Cancelación pendiente", text: "El emisor pidió cancelarla y espera tu respuesta." },
+    { tone: "soft", title: "Duplicadas", text: "La misma factura en dos archivos: se cuenta una sola vez." },
+    { tone: "muted", title: "Borradores", text: "XML sin timbrar ni folio fiscal: no es una factura válida." },
+  ],
+  metrics: [
+    { value: 6, label: "consultas al SAT a la vez", detail: "medio segundo por factura; si el SAT no responde, la revisión sigue" },
+    { value: 4, label: "hojas en el Excel", detail: "resumen, comprobantes, totales por RFC y alertas" },
+    { value: 37, label: "pruebas automáticas", detail: "lectura de XML, ZIP, consultas al SAT y API" },
+  ],
+  steps: [
+    {
+      title: "Subes tus facturas",
+      text: "Los XML sueltos o el ZIP tal como lo descargas del portal del SAT, en versiones 4.0 y 3.3.",
+    },
+    {
+      title: "Se consultan en el SAT",
+      text: "Cada factura pasa por el mismo servicio del código QR: vigente, cancelada, no registrada o de un emisor en la lista 69-B.",
+    },
+    {
+      title: "Recibes el reporte",
+      text: "Un Excel con lo que necesita tu atención, los totales en pesos y el detalle por RFC, en español o inglés.",
+    },
+  ],
+};
+
+// Animación de la revisión para el caso de estudio (sin SAT real: la demo en
+// vivo está en /demo/cfdi). Facturas tomadas de los ejemplos de la demo
+export const FACTURA_DEMO = {
+  file: "facturas_septiembre.zip",
+  files: (n) => `${n} XML`,
+  replay: "Ver otra vez",
+  listLabel: "Facturas revisadas",
+  queued: "En cola",
+  checking: "Consultando SAT",
+  states: { active: "Vigente", cancelled: "Cancelada", not_found: "No encontrada" },
+  summary: (n, flagged) => `${n} facturas · ${flagged} por revisar`,
+  excel: "Revision_CFDI.xlsx",
+  caption: "Animación con las facturas de ejemplo. Prueba con las tuyas en la demo en vivo.",
+  rows: [
+    { number: "R-09", issuer: "Maria Olivia Martinez", amount: "$19,066.67", state: "active", alert: "Cancelación pendiente", tone: "accent" },
+    { number: "A-101", issuer: "Indistria Iluminadora", amount: "$21,460.00", state: "active" },
+    { number: "CAP-2208", issuer: "Universidad Robotica", amount: "$13,920.00", state: "cancelled" },
+    { number: "A-102", issuer: "Indistria Iluminadora", amount: "$8,410.00", state: "active" },
+    { number: "A-102", issuer: "Indistria Iluminadora", amount: "$8,410.00", state: "active", alert: "Duplicada", tone: "soft" },
+    { number: "XI-5531", issuer: "Xenon Industrial", amount: "US$1,450.00", state: "active" },
+    { number: "M-777", issuer: "Karla Fuente Nolasco", amount: "$5,568.00", state: "not_found" },
+    { number: "HE-310", issuer: "Herreria & Electricos", amount: "$11,136.00", state: "active", alert: "Lista 69-B", tone: "danger" },
   ],
 };
 
@@ -525,7 +578,7 @@ export const UI = {
       eyebrow: "Más proyectos",
       title: "También construyo plataformas completas.",
       intro:
-        "De un lector de facturas que consulta al SAT a una plataforma para proveedores de internet: sistemas de punta a punta, de la base de datos a la red.",
+        "Sistemas de punta a punta, de la base de datos a la red. Así se ve por dentro uno de ellos.",
     },
     process: {
       eyebrow: "Proceso",

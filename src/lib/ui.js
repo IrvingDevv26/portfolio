@@ -29,3 +29,24 @@ export const card =
   "rounded-2xl border border-[color:var(--line)] bg-[color:var(--raised)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_48px_-24px_rgba(0,0,0,0.6)]";
 
 export const delay = (i) => ({ animationDelay: `${i * 90}ms` });
+
+// Estatus de una factura en el SAT (FacturaCheck): borde, fondo y texto
+export const STATE_CHIP = {
+  active:
+    "border-[color:var(--clean-line)] bg-[color:var(--clean-bg)] text-[color:var(--clean)]",
+  cancelled:
+    "border-[color:var(--danger-line)] bg-[color:var(--danger-bg)] text-[color:var(--danger)]",
+  not_found:
+    "border-[color:var(--accent-line)] bg-[color:var(--accent-bg)] text-[color:var(--accent)]",
+  unavailable:
+    "border-[color:var(--line-strong)] bg-[color:var(--glass)] text-[color:var(--soft)]",
+};
+
+// Color de cada tipo de alerta, de la más grave a la más leve
+export const TONE_COLOR = {
+  danger: "var(--danger)",
+  warn: "var(--warn)",
+  accent: "var(--accent)",
+  soft: "var(--soft)",
+  muted: "var(--muted)",
+};
