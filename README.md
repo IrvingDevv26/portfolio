@@ -3,7 +3,7 @@
 # Irving Dávila — Portfolio
 
 **Full-stack developer · AI automation.**
-A bilingual (Spanish and English) portfolio that sells by showing: two live AI demos (data cleaning and an appointment agent), a 3D badge you can grab, and real projects.
+A bilingual (Spanish and English) portfolio that sells by showing: three live demos (data cleaning, an AI appointment agent and a Mexican e-invoice reader), a 3D badge you can grab, and real projects.
 
 [![CI](https://github.com/IrvingDevv26/portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/IrvingDevv26/portfolio/actions/workflows/ci.yml)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
@@ -17,9 +17,10 @@ A bilingual (Spanish and English) portfolio that sells by showing: two live AI d
 ![Hero with the interactive 3D badge](docs/screenshots/hero.jpg)
 
 > **Resumen en español.** Portfolio de Irving Dávila, desarrollador full-stack
-> especializado en automatización con IA. Incluye dos demos en vivo:
-> **DataRefine** (sube un Excel desordenado y recíbelo limpio) y **AgendaFlow**
-> (un agente de IA que agenda, cambia y cancela citas), una credencial 3D
+> especializado en automatización con IA. Incluye tres demos en vivo:
+> **DataRefine** (sube un Excel desordenado y recíbelo limpio), **AgendaFlow**
+> (un agente de IA que agenda, cambia y cancela citas) y **FacturaCheck** (sube
+> tus CFDI y cada uno se consulta en el SAT), una credencial 3D
 > interactiva, calculadora del costo del trabajo manual, proyectos reales y un
 > brief de proyecto para contacto. Hecho con React 19, Vite, Tailwind CSS 4 y
 > 40 componentes de React Bits. Ver [Resumen en español](#resumen-en-español).
@@ -40,6 +41,13 @@ A bilingual (Spanish and English) portfolio that sells by showing: two live AI d
   clinic. Next to the chat, the clinic's calendar updates live and every tool
   the agent ran is listed, so visitors see what happens behind the
   conversation. Backed by the AgendaFlow API.
+- **Live FacturaCheck demo** (`/demo/cfdi`): upload Mexican e-invoices (CFDI)
+  as XML files or the ZIP the SAT portal downloads. The DataRefine API checks
+  every invoice with the SAT, and the page lists what needs attention
+  (cancelled, unknown to the SAT, issuer on the 69-B list, pending
+  cancellation, duplicates, drafts), the tax totals in pesos and every invoice
+  with its status, plus the Excel report to download. Twelve sample invoices
+  (`public/samples/cfdi`) get a simulated, clearly labeled status.
 - **Interactive 3D badge** built with three.js and react-three-fiber, with a
   lightweight CSS fallback when the browser has no hardware WebGL.
 - **Sales-oriented content**: manual-work cost calculator (in MXN or USD; it
@@ -102,11 +110,13 @@ src/
     Landing.jsx         Home page sections
     DataLab.jsx         DataRefine live demo
     AgendaLab.jsx       AgendaFlow live demo (AI appointment agent)
+    CfdiLab.jsx         FacturaCheck live demo (CFDI reader)
     NotFound.jsx        404 page
   components/
     reactbits/          React Bits components adapted to the site
     Lanyard.jsx         3D badge (three.js)
     SheetPreview.jsx    Demo preview table and detected problems
+    LabParts.jsx        Header, steps and drop zone shared by the file demos
     ...
   lib/
     sheet.js            In-browser CSV/XLSX reader and diagnosis
@@ -163,7 +173,7 @@ top-level `404.html`, Pages serves the app for every path.
 **Link previews per page and language.** Chat apps and social networks read
 the HTML without running JavaScript, so a small Vite plugin (`vite.config.js`)
 writes `dist/en.html`, `dist/demo/agenda.html`, `dist/en/demo/agenda.html`
-and the DataRefine pair: copies of `index.html` with each page's language,
+and the DataRefine and FacturaCheck pairs: copies of `index.html` with each page's language,
 title, description, preview image (`public/og-*.jpg`) and `hreflang` links.
 Pages serves them at `/en`, `/demo/agenda`, `/en/demo/agenda` and so on.
 
@@ -179,7 +189,10 @@ repository activity; re-enable it from the Actions tab if that happens.
 
 - **DataRefine API** (private): FastAPI + pandas backend behind the
   data-cleaning demo, with deterministic cleaning rules, free AI providers
-  with validation and caching, and public-demo limits.
+  with validation and caching, and public-demo limits. It also serves
+  FacturaCheck: CFDI parsing with `defusedxml`, parallel queries to the SAT's
+  public status service and an Excel report (one server instead of two keeps
+  the free hours of Render within budget).
 - **AgendaFlow API** (private): FastAPI backend behind the appointment agent
   demo: LLM tool calling over validated scheduling rules, one sandboxed
   calendar per visitor and free AI providers.
@@ -189,10 +202,12 @@ repository activity; re-enable it from the Actions tab if that happens.
 - **Qué es:** el portfolio de Irving Dávila, en español (`/`) y en inglés
   (`/en`), pensado para vender servicios de automatización y desarrollo
   full-stack.
-- **Lo más importante:** las dos demos en vivo. DataRefine
+- **Lo más importante:** las tres demos en vivo. DataRefine
   (`/demo/datarefine`) diagnostica tu archivo en el navegador y luego lo limpia
   con el backend; AgendaFlow (`/demo/agenda`) es un agente de IA que agenda
-  citas mientras ves la agenda actualizarse.
+  citas mientras ves la agenda actualizarse; FacturaCheck (`/demo/cfdi`) lee
+  tus CFDI, consulta cada uno en el SAT y te entrega un Excel con canceladas,
+  duplicadas, lista 69-B y totales de IVA.
 - **Siempre listas:** en horario laboral (lun–vie, 8:00–20:00 de CDMX) un
   workflow de GitHub Actions mantiene despiertas las APIs de las demos, y cada
   demo tiene su propia vista previa al compartir el enlace.

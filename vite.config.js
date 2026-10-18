@@ -60,6 +60,24 @@ const PAGES = [
       "Upload a messy Excel or CSV file and download it clean: dates, amounts, names and duplicates fixed with rules and AI, in seconds.",
     image: "og-datarefine-en.jpg",
   },
+  {
+    path: "demo/cfdi",
+    lang: "es",
+    group: "cfdi",
+    title: "FacturaCheck — Demo en vivo · Irving Dávila",
+    description:
+      "Sube tus CFDI en XML o el ZIP del SAT: cada factura se consulta en el SAT y recibes un Excel con canceladas, duplicadas, lista 69-B y totales de IVA.",
+    image: "og-cfdi.jpg",
+  },
+  {
+    path: "en/demo/cfdi",
+    lang: "en",
+    group: "cfdi",
+    title: "FacturaCheck — Live demo · Irving Dávila",
+    description:
+      "Upload Mexican e-invoices (CFDI) as XML or the SAT's ZIP: each one is checked with the SAT and you get an Excel file with cancelled and duplicate invoices and tax totals.",
+    image: "og-cfdi-en.jpg",
+  },
 ];
 
 // Textos fijos de index.html que cambian en inglés (pantalla de carga y aviso

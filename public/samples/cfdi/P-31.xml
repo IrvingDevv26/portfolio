@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xmlns:pago20="http://www.sat.gob.mx/Pagos20" xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd" Version="4.0" Serie="P" Folio="31" Fecha="2026-09-25T09:30:00" Sello="6atrYOvplJo43vu9b/v6iztGmQF63KdZEEsN4D2g1WWly5dGCdr77hB81//RJPik5NY8cbigirJNI8BeV0k7Y4KKMB32aNeqBIEORhDIfy9ZMj8a5lTPZreDRxIvCEoAM+MmIi+u30b9EfhM554GY0tRpDTk/J2fbPKyZwwEXZMWJbz2waYMAd6+TQeZ94WzMovLll+s3YQ6Sc/qJlZDVcHhusUNK45+baC7ITwpFYg/H8e5BArkppkGi9u8X2e4Ztb2+IHRtG39KewOscVdQ3BGxvfY1ni0tvLk2w3KPnknxYC2fGVSdqN1eUZLUgi/Dd+E7LrGJ6xqfjbO6QVl/zIS" NoCertificado="30001000000500003416" Certificado="5wnpo28Hp/vZ4zoTnY2pWg5P2z9Xa5dy7PqOgYOaTvBUqAOCqkFFg0va+EtRsq9EgurkR977QlkAVxq2LPNgkjdvwwjMBgpf8+zEt5xRhQp+WzURV98piSi9ylneX1aEX9HngaH7VSGKT1i8nFWHyauufxACxcLMuXlM+Tt0s4FdHD2px7M7H+lnePZYlQ0BQDvxmc3VMQxGHCRLFG3THOCFJvShRPUT/BwVpBaKiWiFpEV6" SubTotal="0.00" Moneda="XXX" Total="0.00" TipoDeComprobante="P" Exportacion="01" LugarExpedicion="62661">
+  <cfdi:Emisor Rfc="IIA040805DZ4" Nombre="INDISTRIA ILUMINADORA DE ALMACENES" RegimenFiscal="601" />
+  <cfdi:Receptor Rfc="EKU9003173C9" Nombre="ESCUELA KEMPER URGATE" DomicilioFiscalReceptor="42501" RegimenFiscalReceptor="601" UsoCFDI="CP01" />
+  <cfdi:Conceptos>
+    <cfdi:Concepto ClaveProdServ="84111506" Cantidad="1" ClaveUnidad="ACT" Descripcion="Pago" ValorUnitario="0.00" Importe="0.00" ObjetoImp="01" />
+  </cfdi:Conceptos>
+  <cfdi:Complemento>
+    <pago20:Pagos Version="2.0">
+      <pago20:Totales TotalTrasladosBaseIVA16="7250.00" TotalTrasladosImpuestoIVA16="1160.00" MontoTotalPagos="8410.00" />
+      <pago20:Pago FechaPago="2026-09-24T18:00:00" FormaDePagoP="03" MonedaP="MXN" TipoCambioP="1" Monto="8410.00">
+        <pago20:DoctoRelacionado IdDocumento="92A561C7-DE17-4855-B078-042C31D5A2B7" Serie="A" Folio="102" MonedaDR="MXN" EquivalenciaDR="1" NumParcialidad="1" ImpSaldoAnt="8410.00" ImpPagado="8410.00" ImpSaldoInsoluto="0.00" ObjetoImpDR="02" />
+      </pago20:Pago>
+    </pago20:Pagos>
+    <tfd:TimbreFiscalDigital xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd" Version="1.1" UUID="3604F9B7-4546-420B-824F-880AE159C5E8" FechaTimbrado="2026-09-25T09:30:59" RfcProvCertif="SPR190613I52" SelloCFD="6atrYOvplJo43vu9b/v6iztGmQF63KdZEEsN4D2g1WWly5dGCdr77hB81//RJPik5NY8cbigirJNI8BeV0k7Y4KKMB32aNeqBIEORhDIfy9ZMj8a5lTPZreDRxIvCEoAM+MmIi+u30b9EfhM554GY0tRpDTk/J2fbPKyZwwEXZMWJbz2waYMAd6+TQeZ94WzMovLll+s3YQ6Sc/qJlZDVcHhusUNK45+baC7ITwpFYg/H8e5BArkppkGi9u8X2e4Ztb2+IHRtG39KewOscVdQ3BGxvfY1ni0tvLk2w3KPnknxYC2fGVSdqN1eUZLUgi/Dd+E7LrGJ6xqfjbO6QVl/zIS" NoCertificadoSAT="30001000000500003456" SelloSAT="Al0LeNPaXaITay/Hbr/sYzRlBHBpRoVXazB8qRrtu2iLijz7hnkhZ+JsTrpfhuzh1+hb154eVjSXNXPRHCRCJRsVtgvQiLL0zXkKfgC3ZtxnHGCP/VTvSnZGkgak/RdnEke1Fnhd+8LSUVN8Nbfsm9DD6XXnfVq1I9AFco6s6OnpFYcac/rILhfV+T7eQxLwCEY1lsydalas3yBYrUNh8U6lC3s9CJEwa1HWlMCTeC2TqmB1amGD10lhXs4IIdKC8Z5cDzeqP2Q1aX/rhO3dJH+H1qZZ72/JtKuEHjrqBnYZ2Nmj9L/8rT20QLWs0oSjmdHynRDoaWYq4VUoGfIgc3s8" />
+  </cfdi:Complemento>
+</cfdi:Comprobante>

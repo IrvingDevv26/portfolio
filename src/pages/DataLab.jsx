@@ -1,28 +1,30 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  AlertIcon,
-  ArrowLeftIcon,
   ArrowRightIcon,
   CheckIcon,
   DownloadIcon,
   FileIcon,
-  UploadIcon,
   XIcon,
 } from "../components/icons";
+import {
+  Charged,
+  Dropzone,
+  ErrorAlert,
+  LabHeader,
+  Stepper,
+  SubTitle,
+} from "../components/LabParts";
 import BlurText from "../components/reactbits/BlurText";
-import ElectricBorder from "../components/reactbits/ElectricBorder";
 import LatticeLoader from "../components/reactbits/LatticeLoader";
 import Magnet from "../components/reactbits/Magnet";
-import ShinyText from "../components/reactbits/ShinyText";
 import SpotlightCard from "../components/reactbits/SpotlightCard";
 import Squares from "../components/reactbits/Squares";
-import StatusMark from "../components/reactbits/StatusMark";
 import ThoughtLine from "../components/reactbits/ThoughtLine";
 import { Eyebrow } from "../components/shared";
-import LanguageSwitch from "../components/LanguageSwitch";
 import { IssueList, PreviewTable, Stat } from "../components/SheetPreview";
 import VideoButton from "../components/VideoButton";
+import { formatSize } from "../lib/files";
 import { hasHardwareWebGL } from "../lib/gpu";
 import { useDocumentTitle } from "../lib/hooks";
 import { useContent, useLang, useLocalize } from "../lib/i18n";
@@ -46,11 +48,6 @@ const MAX_BYTES = MAX_MB * 1024 * 1024;
 const MAX_ROWS = 300;
 const PER_HOUR = 5;
 
-const formatSize = (bytes) =>
-  bytes < 1024 * 1024
-    ? `${Math.max(1, Math.round(bytes / 1024))} KB`
-    : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-
 const extOf = (name) =>
   name.includes(".") ? name.split(".").pop().toUpperCase() : "";
 
@@ -73,158 +70,6 @@ const describe = (analysis, issues) =>
 /* ──────────────────────────────────────────────────────────────
    PIEZAS DE LA INTERFAZ
    ────────────────────────────────────────────────────────────── */
-
-// Estado de cada paso para StatusMark: pendiente, en curso, completado o fallido
-const markOf = (state, activity) => {
-  if (state === "done") return "done";
-  if (state === "current" && activity === "done") return "done";
-  if (state === "current" && activity === "processing") return "running";
-  if (state === "current" && activity === "error") return "failed";
-  return "pending";
-};
-
-const Stepper = ({ current, activity, words }) => (
-  <ol aria-label={words.progress} className="flex items-center gap-3">
-    {words.steps.map((label, i) => {
-      const n = i + 1;
-      const state = n < current ? "done" : n === current ? "current" : "todo";
-
-      return (
-        <li
-          key={label}
-          aria-current={state === "current" ? "step" : undefined}
-          className="flex flex-1 items-center gap-3 last:flex-none"
-        >
-          <StatusMark
-            status={markOf(state, activity)}
-            size={22}
-            color={state === "todo" ? "#8A909C" : "#D4B27A"}
-            doneColor="#7BDDB5"
-            errorColor="#FF9AA8"
-            strike={false}
-          />
-          <span
-            className={`text-sm ${
-              state === "current" ? "inline" : "hidden sm:inline"
-            } ${
-              state === "todo"
-                ? "text-[color:var(--muted)]"
-                : "text-[color:var(--text)]"
-            }`}
-          >
-            {label}
-          </span>
-          {n < words.steps.length && (
-            <span
-              aria-hidden="true"
-              className="h-px flex-1 bg-[color:var(--line)]"
-            />
-          )}
-        </li>
-      );
-    })}
-  </ol>
-);
-
-// Borde eléctrico (React Bits) sólo con WebGL acelerado
-const Charged = ({ glow, on, strong = false, radius = 16, children }) =>
-  glow ? (
-    <ElectricBorder
-      active={on}
-      color="#D4B27A"
-      borderRadius={radius}
-      intensity={strong ? 0.9 : 0.55}
-      chaos={0.35}
-      spread={0.5}
-      strands={2}
-      thickness={1.2}
-      glow={0.5}
-      arcs={strong ? 1.2 : 0.3}
-      speed={0.8}
-      cursorRadius={70}
-    >
-      {children}
-    </ElectricBorder>
-  ) : (
-    children
-  );
-
-const Dropzone = ({ dragging, setDragging, onFile, glow, onArm, words }) => {
-  const [hover, setHover] = useState(false);
-
-  return (
-    <Charged glow={glow} on={dragging || hover} strong={dragging}>
-      <label
-        onPointerEnter={() => {
-          onArm();
-          setHover(true);
-        }}
-        onPointerLeave={() => setHover(false)}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget)) setDragging(false);
-        }}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragging(false);
-          onFile(e.dataTransfer.files?.[0]);
-        }}
-        className={`group flex cursor-pointer flex-col items-center gap-4 rounded-2xl border-2 border-dashed px-6 py-14 text-center transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[color:var(--accent)] md:py-16 ${
-          dragging
-            ? "border-[color:var(--accent)] bg-[color:var(--accent-bg)]"
-            : "border-[color:var(--line-strong)] bg-[color:var(--ink)] hover:border-[rgba(212,178,122,0.35)]"
-        }`}
-      >
-        <input
-          type="file"
-          accept={ACCEPTED.join(",")}
-          className="sr-only"
-          onChange={(e) => {
-            onFile(e.target.files?.[0]);
-            e.target.value = "";
-          }}
-        />
-        <span
-          className={`flex h-14 w-14 items-center justify-center rounded-full border transition-colors ${
-            dragging
-              ? "border-[color:var(--accent-line)] text-[color:var(--accent)]"
-              : "border-[color:var(--line)] bg-[color:var(--raised)] text-[color:var(--soft)] group-hover:text-[color:var(--accent)]"
-          }`}
-        >
-          <UploadIcon className="h-6 w-6" />
-        </span>
-        <span className="font-display text-xl font-semibold text-[color:var(--text)]">
-          {dragging ? words.drop : words.drag}
-        </span>
-        <span className="text-sm text-[color:var(--muted)]">
-          {words.or}{" "}
-          <span className="text-[color:var(--text)] underline underline-offset-4">
-            {words.choose}
-          </span>
-        </span>
-        <ul
-          aria-label={words.formats}
-          className="flex flex-wrap justify-center gap-2"
-        >
-          {ACCEPTED.map((ext) => (
-            <li
-              key={ext}
-              className="rounded-md border border-[color:var(--line)] px-2 py-0.5 font-mono text-xs text-[color:var(--muted)]"
-            >
-              {ext}
-            </li>
-          ))}
-        </ul>
-        <span className="text-xs text-[color:var(--muted)]">
-          {words.limits(MAX_MB, MAX_ROWS)}
-        </span>
-      </label>
-    </Charged>
-  );
-};
 
 const FileCard = ({ file, onRemove, removeLabel }) => (
   <div className="flex items-center gap-3 rounded-xl border border-[color:var(--line)] bg-[color:var(--ink)] px-4 py-3">
@@ -255,22 +100,6 @@ const FileCard = ({ file, onRemove, removeLabel }) => (
       </button>
     )}
   </div>
-);
-
-const ErrorAlert = ({ children }) => (
-  <div
-    role="alert"
-    className="mt-5 flex gap-3 rounded-xl border border-[color:var(--danger-line)] bg-[color:var(--danger-bg)] p-4 text-sm leading-relaxed text-[color:var(--danger)]"
-  >
-    <AlertIcon className="mt-0.5 h-5 w-5 shrink-0" />
-    <p>{children}</p>
-  </div>
-);
-
-const SubTitle = ({ children }) => (
-  <h3 className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-[color:var(--muted)]">
-    {children}
-  </h3>
 );
 
 // Diagnóstico del archivo, hecho en el navegador antes de enviarlo
@@ -718,23 +547,7 @@ const DataLab = () => {
 
   return (
     <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
-      <header className="relative z-10 border-b border-[color:var(--line)] bg-[color:var(--ink)]/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-10">
-          <Link
-            to={to("/")}
-            className={`inline-flex items-center gap-2 rounded-md text-sm text-[color:var(--muted)] transition-colors hover:text-[color:var(--text)] ${focusRing}`}
-          >
-            <ArrowLeftIcon className="h-4 w-4" /> {UI.common.backToPortfolio}
-          </Link>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium max-[420px]:hidden">
-              <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
-              <ShinyText text={UI.common.liveDemo} />
-            </span>
-            <LanguageSwitch />
-          </div>
-        </div>
-      </header>
+      <LabHeader />
 
       <main className="relative isolate overflow-hidden">
         {/* Presentación sobre una cuadrícula animada */}
@@ -805,10 +618,12 @@ const DataLab = () => {
                   <Dropzone
                     dragging={dragging}
                     setDragging={setDragging}
-                    onFile={pickFile}
+                    onFiles={(files) => pickFile(files?.[0])}
                     glow={glow}
                     onArm={armGlow}
                     words={words}
+                    accept={ACCEPTED}
+                    note={words.limits(MAX_MB, MAX_ROWS)}
                   />
                   {error && <ErrorAlert>{error}</ErrorAlert>}
                   <p className="mt-5 text-center text-sm text-[color:var(--muted)]">

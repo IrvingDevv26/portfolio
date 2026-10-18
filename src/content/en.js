@@ -143,6 +143,22 @@ export const SHOWCASE = {
 
 export const PROJECTS = [
   {
+    name: "FacturaCheck",
+    kind: "Live demo · Accounting",
+    summary:
+      "Reviews a month of Mexican e-invoices (CFDI) the way an accountant would: checks each one with the SAT, Mexico's tax authority, and returns an Excel file with valid, cancelled and duplicate invoices, issuers on the 69-B list and the tax totals.",
+    highlights: [
+      "Reads loose XML files or the ZIP the SAT portal downloads (CFDI 4.0 and 3.3)",
+      "Checks the SAT in parallel; if it doesn't answer, the review goes on and flags it",
+      "Guarded against malicious XML and ZIP files; nothing is stored",
+    ],
+    tags: ["FastAPI", "Python", "XML", "SAT", "openpyxl", "React"],
+    demo: "/demo/cfdi",
+    image: "/project-facturacheck.jpg",
+    imageAlt: "FacturaCheck: review of 12 invoices with their issues and totals",
+    video: "", // Loom link of the demo walkthrough
+  },
+  {
     name: "VillaNet",
     kind: "SaaS platform · Networking",
     summary:
@@ -509,7 +525,7 @@ export const UI = {
       eyebrow: "More projects",
       title: "I also build complete platforms.",
       intro:
-        "End-to-end systems, from the database to the network. Here's a look inside one of them.",
+        "From an invoice reader that checks with Mexico's tax authority to a platform for internet providers: end-to-end systems, from the database to the network.",
     },
     process: {
       eyebrow: "Process",
@@ -958,6 +974,159 @@ export const AGENDA_LAB = {
   },
 };
 
+
+/* ── FacturaCheck demo (/en/demo/cfdi) ──────────────────────── */
+
+export const CFDI_LAB = {
+  title: "FacturaCheck — Live demo · Irving Dávila",
+  heading: "Upload your invoices. See which ones need a look.",
+  intro:
+    "Drop the XML files of your CFDI (Mexican e-invoices) or the ZIP the SAT portal downloads. Every invoice is checked with the SAT, Mexico's tax authority, and you get an Excel file with valid, cancelled and duplicate invoices and the tax totals.",
+  facts: (max) => ["XML or the SAT's ZIP", `Up to ${max} invoices`, "Status checked with the SAT", "Excel report"],
+  errors: {
+    format: (name) => `"${name}" isn't XML or ZIP. Upload your CFDI as .xml files or in a .zip.`,
+    size: (mb) => `The demo reviews up to ${mb} MB at a time. Remove some files.`,
+    count: (max) => `The demo reviews up to ${max} files at a time.`,
+    generic: "The invoices couldn't be reviewed. Try again.",
+    network: "Couldn't reach the server. Check your connection and try again.",
+  },
+  steps: ["Upload invoices", "Check with the SAT", "Download report"],
+  progress: "Progress",
+  workArea: "Invoice review",
+  drop: "Drop your invoices",
+  drag: "Drag your XML files or the ZIP here",
+  or: "or",
+  choose: "pick them from your computer",
+  formats: "Accepted formats",
+  limits: (max, mb) => `Up to ${max} invoices and ${mb} MB`,
+  noFiles: "No invoices at hand?",
+  sample: "Try 12 sample invoices",
+  sampleZip: "download the sample ZIP",
+  sampleLoaded: "Sample invoices loaded",
+  sampleDetail: "September purchases with a few cases to review.",
+  sampleFailed: "The sample invoices couldn't be loaded. Try again.",
+  selected: (n) => `${n} ${n === 1 ? "file" : "files"} ready to review`,
+  zip: "ZIP",
+  add: "Add files",
+  remove: (name) => `Remove ${name}`,
+  clear: "Remove all",
+  review: "Check with the SAT",
+  retry: "Try again",
+  willCheck:
+    "Each invoice is checked with the SAT's public service, the same one the invoice's QR code uses.",
+  cancel: "Cancel",
+  checking: "Checking with the SAT",
+  workingSteps: [
+    "Reading the XML files",
+    "Checking each invoice with the SAT",
+    "Looking for duplicates and issues",
+    "Building the Excel file",
+  ],
+  slow: "The free server sleeps when nobody uses it: the first review can take up to a minute.",
+  wait: "It usually takes a few seconds.",
+  doneTitle: "Review ready",
+  readyIn: "Review ready in",
+  doneSteps: (n) => [
+    `${n} ${n === 1 ? "invoice" : "invoices"} read`,
+    "Status checked with the SAT",
+    "Duplicates and issues found",
+    "Excel file built",
+  ],
+  simulated:
+    "The sample invoices are made up, so their SAT status is simulated. With your own XML files, the status is checked with the SAT.",
+  period: (from, to) => `Invoices from ${from} to ${to}`,
+  stats: {
+    invoices: "Invoices",
+    active: "Valid",
+    cancelled: "Cancelled",
+    flagged: "To review",
+  },
+  duplicatesLeft: (n) => `not counting ${n} ${n === 1 ? "duplicate" : "duplicates"}`,
+  notFoundToo: (n) => `and ${n} the SAT doesn't have`,
+  flaggedDetail: (n) => `${n} ${n === 1 ? "issue" : "issues"} in total`,
+  allClear: "All in order",
+  totalsTitle: "Totals in Mexican pesos",
+  totalsNote: "Valid income invoices minus credit notes, without duplicates.",
+  totals: {
+    net: "Subtotal",
+    iva: "IVA (VAT) charged",
+    iva_withheld: "IVA withheld",
+    isr_withheld: "ISR (income tax) withheld",
+    total: "Total",
+  },
+  attention: "What needs your attention",
+  nothingToCheck: "No invoice needs a second look.",
+  alerts: {
+    cancelled: { label: "Cancelled", text: "The SAT has it as cancelled: it can't be deducted." },
+    not_found: {
+      label: "Not at the SAT",
+      text: "The SAT has no record of it: it may be fake (or just stamped).",
+    },
+    efos: {
+      label: "69-B list",
+      text: "The issuer is on the SAT's list of companies that invoice simulated operations.",
+    },
+    cancellation_pending: {
+      label: "Cancellation pending",
+      text: "The issuer asked to cancel it and is waiting for your answer.",
+    },
+    duplicate: { label: "Duplicate", text: (file) => `Same invoice as ${file}: counted once.` },
+    unavailable: { label: "No answer from the SAT", text: "The SAT didn't answer: check it again later." },
+    unreadable: { label: "Not a stamped CFDI" },
+  },
+  unreadable: {
+    not_xml: "Not a valid XML file.",
+    not_cfdi: "It's XML, but not a CFDI.",
+    version: "Unsupported CFDI version (3.3 and 4.0 are read).",
+    not_stamped: "Not stamped: it's a draft with no fiscal folio.",
+    bad_data: "Required data is missing or an amount is invalid.",
+  },
+  table: {
+    title: "Reviewed invoices",
+    filter: "Show",
+    all: "All",
+    flagged: "With issues",
+    invoice: "Invoice",
+    issuer: "Issuer",
+    date: "Date",
+    total: "Total",
+    status: "SAT status",
+    paid: "paid",
+  },
+  states: {
+    active: "Valid",
+    cancelled: "Cancelled",
+    not_found: "Not found",
+    unavailable: "No answer",
+  },
+  kinds: { I: "Income", E: "Credit note", P: "Payment", N: "Payroll", T: "Transfer" },
+  download: "Download Excel report",
+  another: "Review other invoices",
+  toastDone: "Review ready",
+  toastDetail: (n) => (n ? `${n} ${n === 1 ? "invoice needs" : "invoices need"} a look.` : "All in order."),
+  whatItChecks: "What FacturaCheck checks",
+  checks: [
+    "Whether each invoice is still valid or was cancelled",
+    "Invoices the SAT has no record of",
+    "Issuers on the SAT's 69-B list",
+    "Cancellations waiting for your answer",
+    "Duplicate files and drafts that were never stamped",
+    "IVA, withheld ISR and totals per RFC (tax ID)",
+  ],
+  beforeUpload: "Before you upload",
+  rules: (max, mb, perHour) => [
+    ["Formats", ".xml and .zip"],
+    ["Invoices per review", `up to ${max}`],
+    ["Max size", `${mb} MB`],
+    ["Reviews", `${perHour} per hour`],
+    ["Result", "Excel with 4 sheets"],
+  ],
+  privacy:
+    "Your files are read in memory and never stored. The SAT only gets what each invoice's QR code holds: fiscal folio, RFCs and total.",
+  forBusiness: "Want it for your firm or company?",
+  forBusinessText:
+    "I connect it to the SAT's bulk download so it reviews every month on its own, with your deduction rules and email alerts.",
+};
 // Calendar dates: short weekday and month names, and time format
 export const DATES = {
   locale: "en-US",
