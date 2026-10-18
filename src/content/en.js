@@ -213,11 +213,15 @@ export const CALCULATOR = {
   title: "How much is manual work costing you today?",
   intro:
     "Move the sliders with your team's numbers. It's a quick estimate to size the problem, not a quote.",
+  // Currency it starts with; the visitor can switch it
   currency: "USD",
   locale: "en-US",
   weeksPerYear: 48, // working weeks per year
-  // Cost per hour: starting value and slider range
-  rate: { start: 25, min: 10, max: 150, step: 5 },
+  // Cost per hour in each currency: starting value and slider range
+  currencies: {
+    MXN: { start: 150, min: 50, max: 1000, step: 10 },
+    USD: { start: 25, min: 5, max: 150, step: 5 },
+  },
 };
 
 /* ── How I work ─────────────────────────────────────────────── */
@@ -559,6 +563,7 @@ export const UI = {
     peopleValue: (n) => `${n} ${n === 1 ? "person" : "people"}`,
     hours: "Hours per week, per person",
     rate: "Cost per hour",
+    currency: "Currency",
     share: "Share that could be automated",
     perYear: "Every year, your team spends",
     cost: "on this process, at an approximate cost of",
