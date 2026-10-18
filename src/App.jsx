@@ -18,6 +18,7 @@ import Landing from "./pages/Landing";
 // Las páginas secundarias se descargan sólo cuando se visitan
 const DataLab = lazy(() => import("./pages/DataLab"));
 const AgendaLab = lazy(() => import("./pages/AgendaLab"));
+const CfdiLab = lazy(() => import("./pages/CfdiLab"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Mientras llega el código de una página secundaria
@@ -115,6 +116,8 @@ function App() {
                 <Route path="/en/demo/datarefine" element={<DataLab />} />
                 <Route path="/demo/agenda" element={<AgendaLab />} />
                 <Route path="/en/demo/agenda" element={<AgendaLab />} />
+                <Route path="/demo/cfdi" element={<CfdiLab />} />
+                <Route path="/en/demo/cfdi" element={<CfdiLab />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

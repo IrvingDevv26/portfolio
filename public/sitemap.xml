@@ -43,4 +43,18 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://irvingdevv.dev/demo/cfdi</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://irvingdevv.dev/demo/cfdi" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://irvingdevv.dev/en/demo/cfdi" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://irvingdevv.dev/en/demo/cfdi</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://irvingdevv.dev/demo/cfdi" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://irvingdevv.dev/en/demo/cfdi" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

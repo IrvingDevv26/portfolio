@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd" Version="4.0" Serie="XI" Folio="5531" Fecha="2026-09-15T17:45:10" Sello="p0uU5tYp4HL7W7bAcRj7kfFtXQuaLk3DMwuJKQST5TQjCZEljRXb5z2eMhPeQPJ4VTBwivlTAEjUY0iL6EF2yaFAqpMRfKSr3hp8Wclsk1yPD6QLXkEHm556PkT0PL51DCEaSGW3MGofkaMM8wtHYWtdtP0iva/zRFPu8d8ZRlsjqXFWk5eOiro13uO+e+8+n25I0/W2/X0f4/stcEZMjFO3YKelJTbYqwnSjEbHdLUHdj5qDYFp/LxwlI14vefY9ONZQjtqulC/8WF2lm6QQkNyoV2RZcMXHfVj+2oNGH8MVIC71irAujEK5Zm7i8p0+s+ufEP48nAJbD3RiqqDiqdc" FormaPago="03" NoCertificado="30001000000500003416" Certificado="Pl2G1UqkBAIgJ41OgaPDzCDCC5cwtN8wKrPm00Ew+abmtSxDAWx42kCwMuchivXhDzihwkFEyzP+WFqXvmVkln3LP8UHkyBBKJU5eGqGl8D0dNSFVIBKxzPbNaIkRCyP1ZKYdUvrqXE9U7AuJ97BmIUPCVdmT+U88p/17q4Hkwn3BR/+kz1BAX1YVmbYHox/NgfMRDuwbHcal4+UaB3FMyTsSRX6OiIkQ7AKKVOA48rk7uTw" SubTotal="1250.00" Moneda="USD" TipoCambio="18.4520" Total="1450.00" TipoDeComprobante="I" Exportacion="01" MetodoPago="PUE" LugarExpedicion="76343">
+  <cfdi:Emisor Rfc="XIA190128J61" Nombre="XENON INDUSTRIAL ARTICLES" RegimenFiscal="601" />
+  <cfdi:Receptor Rfc="EKU9003173C9" Nombre="ESCUELA KEMPER URGATE" DomicilioFiscalReceptor="42501" RegimenFiscalReceptor="601" UsoCFDI="G03" />
+  <cfdi:Conceptos>
+    <cfdi:Concepto ClaveProdServ="43212100" Cantidad="1" ClaveUnidad="H87" Descripcion="Impresora 3D industrial" ValorUnitario="1250.00" Importe="1250.00" ObjetoImp="02">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="1250.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="200.00" />
+        </cfdi:Traslados>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+  </cfdi:Conceptos>
+  <cfdi:Impuestos TotalImpuestosTrasladados="200.00">
+    <cfdi:Traslados>
+      <cfdi:Traslado Base="1250.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="200.00" />
+    </cfdi:Traslados>
+  </cfdi:Impuestos>
+  <cfdi:Complemento>
+    <tfd:TimbreFiscalDigital xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd" Version="1.1" UUID="D9A1BEE5-2DFB-4CA2-AB67-0EDFE967B889" FechaTimbrado="2026-09-15T17:45:59" RfcProvCertif="SPR190613I52" SelloCFD="p0uU5tYp4HL7W7bAcRj7kfFtXQuaLk3DMwuJKQST5TQjCZEljRXb5z2eMhPeQPJ4VTBwivlTAEjUY0iL6EF2yaFAqpMRfKSr3hp8Wclsk1yPD6QLXkEHm556PkT0PL51DCEaSGW3MGofkaMM8wtHYWtdtP0iva/zRFPu8d8ZRlsjqXFWk5eOiro13uO+e+8+n25I0/W2/X0f4/stcEZMjFO3YKelJTbYqwnSjEbHdLUHdj5qDYFp/LxwlI14vefY9ONZQjtqulC/8WF2lm6QQkNyoV2RZcMXHfVj+2oNGH8MVIC71irAujEK5Zm7i8p0+s+ufEP48nAJbD3RiqqDiqdc" NoCertificadoSAT="30001000000500003456" SelloSAT="8MFWjOLOq0tWDoJvdbLJVxQ92zHhgB1VY52l91C1auOTTukZ0OCPzEb9V3SJBBYPI3WM847zCtECTPhjmTM1yvzOu3N6bmKbQuGnLnwsLWfIzDk7RXnKeOnNyEE3fXluNVYH1Edef3x0/+LWVDtIL+QD8t4LveOLHGVDBn2Efisc4eDESoQIycapLRPkphObhztfUx+V1rO55JwAWMH0t0opQnHMo7a74qOuBbsONhkiXQFG7amafssehQnWrudhiqXzRKCuPppFTX7Ac9BRnODARehCU2Y/9gaQCGE7+R/+SSoc1L+3I6bLWUarQkw08NGR6XWh//BfHKCU+kquLXgT" />
+  </cfdi:Complemento>
+</cfdi:Comprobante>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd" Version="4.0" Serie="H" Folio="48" Fecha="2026-09-12T13:20:00" Sello="+6Kq6wWiaW8686gvwALoaHC6hIIp9ZPQpAhx+bWo9aIrq5usZrQyW3IJWarpCyJSBkfdGXGh0+YZXP4xTuFBb15sXlBfiCl1AGQoOfDj3/ntc9GIj3Sn0oj6gQmKhNOqFemdE0QDmNgMOizBOUIHzyE1Ab0M6hHtP7zFWSd7I5bXHFblo/NWjHg2tyUKJ7bL545aouH/3XAZEbkOBT5LUQq3ItB3Dul1119SIW2kAqGFXmyGiuosn+jrIJJ3SG7OHw3yqP0O/oD8dNrhdkZcH34u3Rbp2jvXKQrWjO1SvjYoexf5HzxBjeb06atdj91+YO+zZBuR5U9pIL9mPB58Wisw" FormaPago="03" NoCertificado="30001000000500003416" Certificado="FloGjSHVEtHT9E/yfnXLt5yS2E/9Md5rN9HDyyTe5zCCSo8ezwoK4rbTGhnx8JNyInXw+ynogSYRhvVonMF3pC7O8PYdYV6oxrRGmQchKQn1yQLHvQvqLClEo4k6qLxai117r7nm6a7uQsGaYLnGYHXwaSHLTiRrnrAQ0/Yil6DgGgEgJ+P8cOAXyACVNfz2xN/utsT4PzwzpSzDokXsrIBl+x5ghrLaFGlq5wKgQefvGLOY" SubTotal="15000.00" Moneda="MXN" Total="14300.00" TipoDeComprobante="I" Exportacion="01" MetodoPago="PUE" LugarExpedicion="36257">
+  <cfdi:Emisor Rfc="CACX7605101P8" Nombre="XOCHILT CASAS CHAVEZ" RegimenFiscal="612" />
+  <cfdi:Receptor Rfc="EKU9003173C9" Nombre="ESCUELA KEMPER URGATE" DomicilioFiscalReceptor="42501" RegimenFiscalReceptor="601" UsoCFDI="G03" />
+  <cfdi:Conceptos>
+    <cfdi:Concepto ClaveProdServ="84111500" Cantidad="1" ClaveUnidad="E48" Descripcion="Honorarios por asesoría contable, septiembre 2026" ValorUnitario="15000.00" Importe="15000.00" ObjetoImp="02">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="15000.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="2400.00" />
+        </cfdi:Traslados>
+        <cfdi:Retenciones>
+          <cfdi:Retencion Base="15000.00" Impuesto="001" TipoFactor="Tasa" TasaOCuota="0.100000" Importe="1500.00" />
+          <cfdi:Retencion Base="15000.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.106667" Importe="1600.00" />
+        </cfdi:Retenciones>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+  </cfdi:Conceptos>
+  <cfdi:Impuestos TotalImpuestosRetenidos="3100.00" TotalImpuestosTrasladados="2400.00">
+    <cfdi:Retenciones>
+      <cfdi:Retencion Impuesto="001" Importe="1500.00" />
+      <cfdi:Retencion Impuesto="002" Importe="1600.00" />
+    </cfdi:Retenciones>
+    <cfdi:Traslados>
+      <cfdi:Traslado Base="15000.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="2400.00" />
+    </cfdi:Traslados>
+  </cfdi:Impuestos>
+  <cfdi:Complemento>
+    <tfd:TimbreFiscalDigital xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd" Version="1.1" UUID="9C055692-481F-4181-BBB1-35188808F3C3" FechaTimbrado="2026-09-12T13:20:59" RfcProvCertif="SPR190613I52" SelloCFD="+6Kq6wWiaW8686gvwALoaHC6hIIp9ZPQpAhx+bWo9aIrq5usZrQyW3IJWarpCyJSBkfdGXGh0+YZXP4xTuFBb15sXlBfiCl1AGQoOfDj3/ntc9GIj3Sn0oj6gQmKhNOqFemdE0QDmNgMOizBOUIHzyE1Ab0M6hHtP7zFWSd7I5bXHFblo/NWjHg2tyUKJ7bL545aouH/3XAZEbkOBT5LUQq3ItB3Dul1119SIW2kAqGFXmyGiuosn+jrIJJ3SG7OHw3yqP0O/oD8dNrhdkZcH34u3Rbp2jvXKQrWjO1SvjYoexf5HzxBjeb06atdj91+YO+zZBuR5U9pIL9mPB58Wisw" NoCertificadoSAT="30001000000500003456" SelloSAT="yr+GHoTDWK4vqrclMeKsEecdHxwliSnzYCyrr49mSg3HbURbi21P/pYYC91N91he1WyXquuUPpAms0h7vBoi+w/dW3OauMFw/J0HnCyAYVYGH+Xochk7FIg9FmETNZx8TXdqs1bjkeHJLp1oxwmRIMxt/TWu0s+mJwy86SUni2y1yZqZlBrUVwKMbhTmh/fhXm+BzsnkLrK0dgp/8yOfZxkUV92m0Ng6YMBuuyFtZjekIXDlBlLSzfvhjLoS/+zAMZO8wTBIzWUQ5xSxKmviZ2teS5PaPqnKY1qXP9ZRAVZFIIR3B2Pb7hBeN7y8tpDcEYNawkhEs/Er6OeYQKt4lPz+" />
+  </cfdi:Complemento>
+</cfdi:Comprobante>

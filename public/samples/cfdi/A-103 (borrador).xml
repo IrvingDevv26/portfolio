@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd" Version="4.0" Serie="A" Folio="103" Fecha="2026-09-29T12:00:00" Sello="6f+3vL4yxi2DzkpXLUfBWLxYrKhy6dqMfsY9RaUwcqJ7HZMTl6uUwwgQSBJ8ocjrns+8O80J5WNnK2vObkE+UKwENVO+MtJ3eZAunULYl10T0otdQPXfX/xsC1NRxTFjMnHFKMhfinembsYXwM9bHRI4EGq/eI5X4xNa1RJZssB2wNtM5lKA83hBtTIJ54WYY/rSYS1jZ1RcsOcMQdEB58j1n5A9WmAor2ool7tRq3Xu35HEDoj221gD1DRW4LdDS1x2EJQr5jezNDiEvXy/W8tbNF7BcoI2N6TLnFdD+KnMGVNQXtAvxM1ZLmkShYKm/hNCQIqDRV3fA6brnM25D5nx" FormaPago="03" NoCertificado="30001000000500003416" Certificado="5wnpo28Hp/vZ4zoTnY2pWg5P2z9Xa5dy7PqOgYOaTvBUqAOCqkFFg0va+EtRsq9EgurkR977QlkAVxq2LPNgkjdvwwjMBgpf8+zEt5xRhQp+WzURV98piSi9ylneX1aEX9HngaH7VSGKT1i8nFWHyauufxACxcLMuXlM+Tt0s4FdHD2px7M7H+lnePZYlQ0BQDvxmc3VMQxGHCRLFG3THOCFJvShRPUT/BwVpBaKiWiFpEV6" SubTotal="7800.00" Moneda="MXN" Total="9048.00" TipoDeComprobante="I" Exportacion="01" MetodoPago="PUE" LugarExpedicion="62661">
+  <cfdi:Emisor Rfc="IIA040805DZ4" Nombre="INDISTRIA ILUMINADORA DE ALMACENES" RegimenFiscal="601" />
+  <cfdi:Receptor Rfc="EKU9003173C9" Nombre="ESCUELA KEMPER URGATE" DomicilioFiscalReceptor="42501" RegimenFiscalReceptor="601" UsoCFDI="G03" />
+  <cfdi:Conceptos>
+    <cfdi:Concepto ClaveProdServ="39111500" Cantidad="10" ClaveUnidad="H87" Descripcion="Lámpara LED industrial 100 W" ValorUnitario="780.00" Importe="7800.00" ObjetoImp="02">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="7800.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="1248.00" />
+        </cfdi:Traslados>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+  </cfdi:Conceptos>
+  <cfdi:Impuestos TotalImpuestosTrasladados="1248.00">
+    <cfdi:Traslados>
+      <cfdi:Traslado Base="7800.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="1248.00" />
+    </cfdi:Traslados>
+  </cfdi:Impuestos>
+</cfdi:Comprobante>

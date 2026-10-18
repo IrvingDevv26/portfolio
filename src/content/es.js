@@ -142,6 +142,22 @@ export const SHOWCASE = {
 
 export const PROJECTS = [
   {
+    name: "FacturaCheck",
+    kind: "Demo en vivo · Contabilidad",
+    summary:
+      "Revisa las facturas del mes como lo haría un contador: consulta cada CFDI en el SAT y entrega un Excel con vigentes, canceladas, duplicadas, emisores en la lista 69-B y los totales de IVA e ISR.",
+    highlights: [
+      "Lee XML sueltos o el ZIP que descarga el portal del SAT (CFDI 4.0 y 3.3)",
+      "Consulta el SAT en paralelo; si no responde, la revisión sigue y lo marca",
+      "Protegido contra XML y ZIP maliciosos; los archivos no se guardan",
+    ],
+    tags: ["FastAPI", "Python", "XML", "SAT", "openpyxl", "React"],
+    demo: "/demo/cfdi",
+    image: "/project-facturacheck.jpg",
+    imageAlt: "FacturaCheck: revisión de 12 facturas con sus alertas y totales",
+    video: "", // enlace de Loom del recorrido de la demo
+  },
+  {
     name: "VillaNet",
     kind: "Plataforma SaaS · Redes",
     summary:
@@ -509,7 +525,7 @@ export const UI = {
       eyebrow: "Más proyectos",
       title: "También construyo plataformas completas.",
       intro:
-        "Sistemas de punta a punta, de la base de datos a la red. Así se ve por dentro uno de ellos.",
+        "De un lector de facturas que consulta al SAT a una plataforma para proveedores de internet: sistemas de punta a punta, de la base de datos a la red.",
     },
     process: {
       eyebrow: "Proceso",
@@ -959,6 +975,160 @@ export const AGENDA_LAB = {
     wantText:
       "Consultorios, salones, talleres o despachos: lo adapto a tus servicios, horarios y equipo, y lo conecto a tu WhatsApp.",
   },
+};
+
+/* ── Demo de FacturaCheck (/demo/cfdi) ──────────────────────── */
+
+export const CFDI_LAB = {
+  title: "FacturaCheck — Demo en vivo · Irving Dávila",
+  heading: "Sube tus facturas. Te digo cuáles revisar.",
+  intro:
+    "Arrastra los XML de tus CFDI o el ZIP que descargas del portal del SAT. Cada factura se consulta en el SAT y recibes un Excel con vigentes, canceladas, duplicadas y los totales de IVA.",
+  facts: (max) => ["XML o ZIP del SAT", `Hasta ${max} facturas`, "Estatus consultado en el SAT", "Reporte en Excel"],
+  errors: {
+    format: (name) => `«${name}» no es XML ni ZIP. Sube tus CFDI en .xml o en un .zip.`,
+    size: (mb) => `La demo revisa hasta ${mb} MB por vez. Quita algunos archivos.`,
+    count: (max) => `La demo revisa hasta ${max} archivos por vez.`,
+    generic: "No se pudieron revisar las facturas. Inténtalo de nuevo.",
+    network: "No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
+  },
+  steps: ["Subir facturas", "Consultar en el SAT", "Descargar reporte"],
+  progress: "Progreso",
+  workArea: "Revisión de facturas",
+  drop: "Suelta tus facturas",
+  drag: "Arrastra tus XML o el ZIP aquí",
+  or: "o",
+  choose: "elígelos de tu equipo",
+  formats: "Formatos admitidos",
+  limits: (max, mb) => `Hasta ${max} facturas y ${mb} MB`,
+  noFiles: "¿No tienes facturas a la mano?",
+  sample: "Prueba con 12 facturas de ejemplo",
+  sampleZip: "descargar el ZIP de ejemplo",
+  sampleLoaded: "Facturas de ejemplo cargadas",
+  sampleDetail: "Compras de septiembre con casos para revisar.",
+  sampleFailed: "No se pudieron cargar las facturas de ejemplo. Inténtalo de nuevo.",
+  selected: (n) => `${n} ${n === 1 ? "archivo listo" : "archivos listos"} para revisar`,
+  zip: "ZIP",
+  add: "Agregar archivos",
+  remove: (name) => `Quitar ${name}`,
+  clear: "Quitar todos",
+  review: "Consultar en el SAT",
+  retry: "Reintentar",
+  willCheck:
+    "Cada factura se consulta en el servicio público del SAT, el mismo que usa el código QR de la factura.",
+  cancel: "Cancelar",
+  checking: "Consultando el SAT",
+  workingSteps: [
+    "Leyendo los XML",
+    "Consultando cada factura en el SAT",
+    "Buscando duplicados y alertas",
+    "Armando el Excel",
+  ],
+  slow: "El servidor gratuito se duerme cuando nadie lo usa: la primera revisión puede tardar hasta un minuto.",
+  wait: "Suele tardar unos segundos.",
+  doneTitle: "Revisión lista",
+  readyIn: "Revisión lista en",
+  doneSteps: (n) => [
+    `${n} ${n === 1 ? "factura leída" : "facturas leídas"}`,
+    "Estatus consultado en el SAT",
+    "Duplicados y alertas detectados",
+    "Excel generado",
+  ],
+  simulated:
+    "Las facturas de ejemplo son inventadas, así que su estatus en el SAT es simulado. Con tus propios XML, el estatus se consulta en el SAT.",
+  period: (from, to) => `Facturas del ${from} al ${to}`,
+  stats: {
+    invoices: "Facturas",
+    active: "Vigentes",
+    cancelled: "Canceladas",
+    flagged: "Por revisar",
+  },
+  duplicatesLeft: (n) => `sin contar ${n} ${n === 1 ? "duplicada" : "duplicadas"}`,
+  notFoundToo: (n) => `y ${n} que el SAT no tiene`,
+  flaggedDetail: (n) => `${n} ${n === 1 ? "alerta" : "alertas"} en total`,
+  allClear: "Todo en orden",
+  totalsTitle: "Totales en pesos",
+  totalsNote: "Facturas de ingreso vigentes menos notas de crédito, sin duplicados.",
+  totals: {
+    net: "Subtotal",
+    iva: "IVA trasladado",
+    iva_withheld: "IVA retenido",
+    isr_withheld: "ISR retenido",
+    total: "Total",
+  },
+  attention: "Lo que necesita tu atención",
+  nothingToCheck: "Ninguna factura necesita revisión.",
+  alerts: {
+    cancelled: { label: "Cancelada", text: "El SAT la tiene cancelada: no es deducible." },
+    not_found: {
+      label: "No está en el SAT",
+      text: "El SAT no la tiene registrada: podría ser apócrifa (o recién timbrada).",
+    },
+    efos: {
+      label: "Lista 69-B",
+      text: "El emisor está en la lista del SAT de empresas que facturan operaciones simuladas.",
+    },
+    cancellation_pending: {
+      label: "Cancelación pendiente",
+      text: "El emisor pidió cancelarla y espera tu respuesta en el buzón tributario.",
+    },
+    duplicate: { label: "Duplicada", text: (file) => `Es la misma factura que ${file}: se cuenta una sola vez.` },
+    unavailable: { label: "Sin respuesta del SAT", text: "El SAT no respondió: vuelve a consultarla más tarde." },
+    unreadable: { label: "No es un CFDI timbrado" },
+  },
+  unreadable: {
+    not_xml: "No es un XML válido.",
+    not_cfdi: "Es un XML, pero no es un CFDI.",
+    version: "Versión de CFDI no compatible (se leen 3.3 y 4.0).",
+    not_stamped: "No está timbrada: es un borrador sin folio fiscal.",
+    bad_data: "Le faltan datos obligatorios o tiene montos inválidos.",
+  },
+  table: {
+    title: "Facturas revisadas",
+    filter: "Mostrar",
+    all: "Todas",
+    flagged: "Con alertas",
+    invoice: "Factura",
+    issuer: "Emisor",
+    date: "Fecha",
+    total: "Total",
+    status: "Estatus SAT",
+    paid: "pagado",
+  },
+  states: {
+    active: "Vigente",
+    cancelled: "Cancelada",
+    not_found: "No encontrada",
+    unavailable: "Sin respuesta",
+  },
+  kinds: { I: "Ingreso", E: "Nota de crédito", P: "Pago", N: "Nómina", T: "Traslado" },
+  download: "Descargar reporte en Excel",
+  another: "Revisar otras facturas",
+  toastDone: "Revisión lista",
+  toastDetail: (n) =>
+    n ? `${n} ${n === 1 ? "factura necesita" : "facturas necesitan"} revisión.` : "Todo en orden.",
+  whatItChecks: "Qué revisa FacturaCheck",
+  checks: [
+    "Si cada factura sigue vigente o ya la cancelaron",
+    "Facturas que el SAT no tiene registradas",
+    "Emisores en la lista 69-B del SAT",
+    "Cancelaciones que esperan tu respuesta",
+    "Archivos duplicados y borradores sin timbrar",
+    "IVA, ISR retenido y totales por RFC",
+  ],
+  beforeUpload: "Antes de subir",
+  rules: (max, mb, perHour) => [
+    ["Formatos", ".xml y .zip"],
+    ["Facturas por revisión", `hasta ${max}`],
+    ["Tamaño máximo", `${mb} MB`],
+    ["Revisiones", `${perHour} por hora`],
+    ["Resultado", "Excel con 4 hojas"],
+  ],
+  privacy:
+    "Tus archivos se leen en memoria y no se guardan. Al SAT solo se envía lo que trae el código QR de cada factura: folio fiscal, RFC y total.",
+  forBusiness: "¿Lo quieres para tu despacho o empresa?",
+  forBusinessText:
+    "Lo conecto a la descarga masiva del SAT para revisar cada mes en automático, con tus reglas de deducibilidad y avisos por correo.",
 };
 
 // Fechas de la agenda: días y meses abreviados, y formato de hora

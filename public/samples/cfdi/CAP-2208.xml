@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd" Version="4.0" Serie="CAP" Folio="2208" Fecha="2026-09-05T11:00:00" Sello="MZDcNV0WtPvdmvaUTFAbJVPCTjdv4LF5upg8at76VcXLwTiSjzj0XkNBPSWVOv6cYwtg9t7wbgeePR9MBQgcPXOoAclEnmg2lvE83sypaNkDPfuOKjhj8UY4f/1FqZlW9L1x0SXM74WB7lYwfaq0srWyKosBT8CBsvAN+UK+MZcTtdHq2RAKxyB2y6LKkgpbrlFp2paiqtitwgEp6ER2aZPShKzOnSAy2Y+xKU6lv7+ZK9qHb4nChNWVY5CgUYZGPZx9ly+JPCr9OMfLsWcxaNPaV5GNnpSlyrKjFzJmHm4aH3J3vgFPzgJU1jtnj7k+tRrLnw9hQ3w6tNechyTJDGH6" FormaPago="03" NoCertificado="30001000000500003416" Certificado="QWP1ufY8ShPbyH9XsZXDeqC/us8u8rgxGctNre9j02jIhJu7zMlsQpAfMnKxDoFh0JBMXqo/QQnbnfBhE2tHonVspYzTUNRe3cjVsx814KFs//w52EKG4C7VzImu0PTsiAxIg0GpyFs4ckxG2bs90Kdh2bu9lx6GvWNBV5auupqCehT/rxL/Qt7pATyeTOlYT4WF74xiloqWVnemy2XOSHbm4HFWT9Tc2EXPJoaxfPEgs9VF" SubTotal="12000.00" Moneda="MXN" Total="13920.00" TipoDeComprobante="I" Exportacion="01" MetodoPago="PUE" LugarExpedicion="86991">
+  <cfdi:Emisor Rfc="URE180429TM6" Nombre="UNIVERSIDAD ROBOTICA ESPAÑOLA" RegimenFiscal="601" />
+  <cfdi:Receptor Rfc="EKU9003173C9" Nombre="ESCUELA KEMPER URGATE" DomicilioFiscalReceptor="42501" RegimenFiscalReceptor="601" UsoCFDI="G03" />
+  <cfdi:Conceptos>
+    <cfdi:Concepto ClaveProdServ="86101700" Cantidad="1" ClaveUnidad="E48" Descripcion="Curso de capacitación en robótica educativa (20 h)" ValorUnitario="12000.00" Importe="12000.00" ObjetoImp="02">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="12000.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="1920.00" />
+        </cfdi:Traslados>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+  </cfdi:Conceptos>
+  <cfdi:Impuestos TotalImpuestosTrasladados="1920.00">
+    <cfdi:Traslados>
+      <cfdi:Traslado Base="12000.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="1920.00" />
+    </cfdi:Traslados>
+  </cfdi:Impuestos>
+  <cfdi:Complemento>
+    <tfd:TimbreFiscalDigital xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd" Version="1.1" UUID="88F59B5A-4C00-4D85-870E-02C51DB0F9CB" FechaTimbrado="2026-09-05T11:00:59" RfcProvCertif="SPR190613I52" SelloCFD="MZDcNV0WtPvdmvaUTFAbJVPCTjdv4LF5upg8at76VcXLwTiSjzj0XkNBPSWVOv6cYwtg9t7wbgeePR9MBQgcPXOoAclEnmg2lvE83sypaNkDPfuOKjhj8UY4f/1FqZlW9L1x0SXM74WB7lYwfaq0srWyKosBT8CBsvAN+UK+MZcTtdHq2RAKxyB2y6LKkgpbrlFp2paiqtitwgEp6ER2aZPShKzOnSAy2Y+xKU6lv7+ZK9qHb4nChNWVY5CgUYZGPZx9ly+JPCr9OMfLsWcxaNPaV5GNnpSlyrKjFzJmHm4aH3J3vgFPzgJU1jtnj7k+tRrLnw9hQ3w6tNechyTJDGH6" NoCertificadoSAT="30001000000500003456" SelloSAT="NVohwBFvPGVuoMa4An1RJHclVN3RSZhNNYq8P7GTbEnChqqrKehGVGAx5OU9vXSbcv1La49/G15O5XrQnISManyrV8Mlbubf6/Zi3efN9Cdb5sfZqRDNf2K+HN9sPVlLWn67diYUycewsxf3cgRAR1zoFpbXOb5CDlurrk4mCpMNaeazwGqwsYkX6kOSKDH9Hx4R6QfYO9xhNY1wOI78Myo77u9FkFFZsPIJKxTRNxhPuXjtvasoZ1hElgrRROt53lCBzX2Pu2trlnVa1Wg3CJv56Ngj98kJgkkEKgQurQjSUDmPyQZ51dpng9ONoIhB8I8i4S66Il3qw5nZWnv0/buU" />
+  </cfdi:Complemento>
+</cfdi:Comprobante>
