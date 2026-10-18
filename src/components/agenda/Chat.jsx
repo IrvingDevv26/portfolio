@@ -332,14 +332,17 @@ const Chat = ({
           <ArrowUpIcon className="h-5 w-5" />
         </button>
       </form>
-      <p
-        className={`px-4 pb-2 pt-1 text-right text-[11px] ${
-          remaining !== null && remaining <= 5
-            ? "text-[color:var(--warn)]"
-            : "text-[color:var(--muted)]"
-        }`}
-      >
-        {remaining !== null ? words.remaining(remaining) : " "}
+      <p className="flex items-start justify-between gap-3 px-4 pb-2 pt-1 text-[11px] text-[color:var(--muted)]">
+        <span>{words.fakeData}</span>
+        <span
+          className={`shrink-0 text-right ${
+            remaining !== null && remaining <= 5
+              ? "text-[color:var(--warn)]"
+              : ""
+          }`}
+        >
+          {remaining !== null ? words.remaining(remaining) : " "}
+        </span>
       </p>
     </section>
   );

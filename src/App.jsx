@@ -19,6 +19,8 @@ import Landing from "./pages/Landing";
 const DataLab = lazy(() => import("./pages/DataLab"));
 const AgendaLab = lazy(() => import("./pages/AgendaLab"));
 const CfdiLab = lazy(() => import("./pages/CfdiLab"));
+const ClientPage = lazy(() => import("./pages/ClientPage"));
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Mientras llega el código de una página secundaria
@@ -118,6 +120,19 @@ function App() {
                 <Route path="/en/demo/agenda" element={<AgendaLab />} />
                 <Route path="/demo/cfdi" element={<CfdiLab />} />
                 <Route path="/en/demo/cfdi" element={<CfdiLab />} />
+                {/* Páginas para pymes: solo en español */}
+                <Route
+                  path="/contadores"
+                  element={<ClientPage key="contadores" kind="contadores" />}
+                />
+                <Route
+                  path="/consultorios"
+                  element={
+                    <ClientPage key="consultorios" kind="consultorios" />
+                  }
+                />
+                <Route path="/privacidad" element={<PrivacyPage />} />
+                <Route path="/en/privacidad" element={<PrivacyPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

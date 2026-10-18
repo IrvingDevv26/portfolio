@@ -22,11 +22,15 @@ const LOGOS = STACK_LOGOS.map(({ title, d, wordmark }) => ({
   ),
 }));
 
+// Infraestructura que habla a reclutadores, no a una pyme (ver showInfraLogos)
+const INFRA = ["Proxmox", "MikroTik"];
+const PYME_LOGOS = LOGOS.filter((logo) => !INFRA.includes(logo.title));
+
 const TechLogos = () => {
   const { UI } = useContent();
   return (
     <LogoLoop
-      logos={LOGOS}
+      logos={UI.landing.showInfraLogos ? LOGOS : PYME_LOGOS}
       speed={45}
       logoHeight={28}
       gap={56}
