@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import * as en from "../content/en";
+import { SPANISH_ONLY } from "../content/clientes";
 import * as es from "../content/es";
 
 /* Idiomas del sitio. El español vive en la raíz (/, /demo/agenda…) y el
@@ -28,6 +29,9 @@ export const stripLanguage = (pathname) =>
 export const localize = (path, lang) => {
   const [pathname, hash] = path.split("#");
   const bare = stripLanguage(pathname || "/");
+  // Las páginas para pymes (/contadores…) no tienen versión en inglés: su
+  // "versión en inglés" es la portada
+  if (lang === "en" && SPANISH_ONLY.includes(bare)) return "/en";
   const base = lang === "en" ? (bare === "/" ? "/en" : `/en${bare}`) : bare;
   return hash ? `${base}#${hash}` : base;
 };

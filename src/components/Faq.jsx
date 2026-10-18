@@ -81,13 +81,15 @@ const Item = ({ q, a, open, onToggle }) => {
   );
 };
 
-const Faq = () => {
+// `items`: otra lista de preguntas (las páginas para pymes tienen la suya)
+const Faq = ({ items }) => {
   const { FAQ } = useContent();
+  const list = items ?? FAQ;
   const [open, setOpen] = useState(0);
   return (
     <>
       <ul className="border-t border-[color:var(--line)]">
-        {FAQ.map((item, i) => (
+        {list.map((item, i) => (
           <Item
             key={item.q}
             {...item}
@@ -98,7 +100,7 @@ const Faq = () => {
       </ul>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: structured(FAQ) }}
+        dangerouslySetInnerHTML={{ __html: structured(list) }}
       />
     </>
   );

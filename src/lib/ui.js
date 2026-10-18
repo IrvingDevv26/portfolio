@@ -18,6 +18,9 @@ const BTN_VARIANT = {
   // Cristal con borde; al pasar el mouse toma el latón
   secondary:
     "border border-[color:var(--line-strong)] bg-[color:var(--glass)] text-[color:var(--text)] backdrop-blur hover:border-[color:var(--accent-line)] hover:bg-[color:var(--accent-bg)]",
+  // Verde de WhatsApp: se reconoce al instante
+  whatsapp:
+    "bg-[#25D366] text-[#05210f] shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_14px_32px_-14px_rgba(37,211,102,0.6)] hover:bg-[#3ee27d]",
 };
 
 export const btn = (variant = "primary", size = "md") =>

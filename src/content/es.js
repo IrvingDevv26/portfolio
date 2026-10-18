@@ -15,6 +15,7 @@ export const PROFILE = {
 
 export const NAV_LINKS = [
   { href: "#servicios", label: "Servicios" },
+  { href: "#precios", label: "Precios" },
   { href: "#proyecto", label: "Proyectos" },
   { href: "#proceso", label: "Proceso" },
   { href: "#sobre-mi", label: "Sobre mí" },
@@ -30,13 +31,18 @@ export const HERO = {
   highlight: ["trabajan", "solos"],
   rotatingPrefix: "Especializado en",
   rotating: [
+    "agentes de WhatsApp",
+    "revisión de facturas",
     "limpieza de datos",
     "APIs con FastAPI",
     "flujos con IA",
-    "servidores Linux",
-    "redes MikroTik",
   ],
-  lead: "Diseño y desarrollo herramientas B2B que transforman horas de trabajo repetitivo en flujos de datos automatizados: de la API a la interfaz, listas para producción en AWS o en tus propios servidores Linux.",
+  lead: "Hago herramientas para despachos contables, consultorios y pymes que convierten horas de trabajo repetitivo en procesos automáticos: revisión de facturas contra el SAT, citas por WhatsApp y reportes que se arman solos.",
+  // Botones principales: uno por tipo de cliente
+  ctas: [
+    { label: "Soy contador", to: "/contadores" },
+    { label: "Tengo un consultorio", to: "/consultorios" },
+  ],
 };
 
 // Franjas en movimiento debajo del hero
@@ -417,12 +423,143 @@ export const BRIEF = {
   hours: ["Menos de 5 h", "De 5 a 20 h", "Más de 20 h", "No lo sé"],
 };
 
+/* ── Contacto directo ───────────────────────────────────────── */
+
+// Mensaje que llega escrito en WhatsApp según la página desde la que te
+// escriben (el número y la agenda están en src/content/contact.js)
+export const WHATSAPP_MESSAGES = {
+  general: "Hola Irving, vi tu portfolio y quiero platicar de un proyecto.",
+  datarefine: "Hola Irving, vi la demo de DataRefine y quiero limpiar los datos de mi empresa.",
+  agenda: "Hola Irving, vi la demo de AgendaFlow y me interesa el agente de citas por WhatsApp.",
+  cfdi: "Hola Irving, vi la demo de FacturaCheck y me interesa revisar facturas con el SAT.",
+  contadores: "Hola Irving, soy contador y vi FacturaCheck. Me interesa revisar las facturas de mis clientes.",
+  consultorios: "Hola Irving, tengo un consultorio y vi AgendaFlow. Me interesa el agente de citas por WhatsApp.",
+  fastapi: "Hola Irving, vi tu portfolio y necesito ayuda con una API en FastAPI.",
+};
+
+/* ── Precios de entrada ─────────────────────────────────────── */
+
+// "to": página del paquete; "topic": mensaje de WhatsApp (WHATSAPP_MESSAGES)
+export const PRICING = {
+  eyebrow: "Precios",
+  title: "Precios de entrada, sin sorpresas.",
+  intro: "Cada proyecto se cotiza con precio cerrado después de una llamada de 15 minutos. Estos son los puntos de partida.",
+  from: "Desde",
+  note: "Precios en pesos mexicanos. La mensualidad cubre el servidor, la IA de pago cuando aplica y el soporte.",
+  packages: [
+    {
+      name: "Agente de citas por WhatsApp",
+      audience: "Consultorios, clínicas y salones",
+      price: "$7,500 MXN",
+      extra: "de instalación + desde $1,200 MXN al mes",
+      includes: [
+        "Agenda, cambia y cancela citas en tu WhatsApp Business",
+        "Tus servicios, horarios y reglas",
+        "Recordatorios un día antes de cada cita",
+      ],
+      cta: "Ver cómo funciona",
+      to: "/consultorios",
+      topic: "consultorios",
+    },
+    {
+      name: "Revisión de facturas CFDI",
+      audience: "Despachos contables y administración",
+      price: "$5,000 MXN",
+      extra: "de instalación + desde $900 MXN al mes",
+      includes: [
+        "Revisión mensual de tus RFC contra el SAT",
+        "Canceladas, no registradas, lista 69-B y duplicadas",
+        "Excel por cliente listo para el cierre",
+      ],
+      cta: "Ver cómo funciona",
+      to: "/contadores",
+      topic: "contadores",
+    },
+    {
+      name: "Automatización a la medida",
+      audience: "Procesos con Excel, reportes o captura manual",
+      price: "$8,000 MXN",
+      extra: "por proyecto, con precio cerrado",
+      includes: [
+        "Diagnóstico y propuesta antes de empezar",
+        "Limpieza de datos, reportes e integraciones",
+        "Documentación y acompañamiento al entregar",
+      ],
+      cta: "Cuéntame tu proceso",
+      to: "/#contacto",
+      topic: "general",
+    },
+  ],
+};
+
+/* ── Aviso de privacidad (/privacidad) ──────────────────────── */
+
+// Sigue la Ley Federal de Protección de Datos Personales en Posesión de los
+// Particulares. El domicilio está en src/content/contact.js
+export const PRIVACY = {
+  title: "Aviso de privacidad",
+  updated: "Última actualización: 18 de octubre de 2026",
+  intro: (name, address) =>
+    `${name}, con domicilio en ${address}, es responsable del uso y la protección de tus datos personales, conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares. Este aviso explica qué datos recabo en este sitio y en sus demos, para qué los uso y cómo puedes ejercer tus derechos.`,
+  sections: [
+    {
+      title: "Qué datos recabo",
+      items: [
+        "Si me contactas por correo, WhatsApp, el brief o la agenda: tu nombre, correo, teléfono, empresa y lo que me cuentes de tu proyecto.",
+        "Si usas las demos: los archivos y facturas que subes y los mensajes que escribes en el chat. Se procesan en memoria para mostrarte el resultado y no se guardan.",
+        "Datos técnicos: tu dirección IP, solo para limitar el número de pruebas por persona. Se guarda en memoria y se descarta al reiniciar el servidor.",
+        "No recabo datos sensibles. En las demos te pido no escribir ni subir información de salud ni datos reales de pacientes o clientes.",
+      ],
+    },
+    {
+      title: "Para qué los uso",
+      items: [
+        "Responderte, preparar una propuesta y, si me contratas, prestar el servicio y darte soporte.",
+        "Mostrarte el resultado de las demos.",
+        "No uso tus datos para publicidad ni los vendo.",
+      ],
+    },
+    {
+      title: "Con quién se comparten",
+      text: "Solo con los proveedores que hacen posible el sitio y las demos, y únicamente para eso:",
+      items: [
+        "Cloudflare, que aloja el sitio, y Render, que aloja los servidores de las demos.",
+        "Proveedores de IA en su plan gratuito (Google Gemini, Groq y OpenRouter), que procesan los textos de las demos de DataRefine y AgendaFlow. Sus términos les permiten usar esos datos para mejorar sus servicios; por eso las demos piden datos inventados. Con clientes uso planes de pago que no usan los datos para entrenar modelos.",
+        "El SAT, para consultar el estatus de las facturas que subes a FacturaCheck: solo el folio fiscal, los RFC y el total, lo mismo que trae el código QR de la factura.",
+        "WhatsApp (Meta), Cal.com o tu proveedor de correo, si me contactas por esos medios.",
+        "Fuera de esto, no comparto tus datos, salvo que una autoridad lo pida conforme a la ley.",
+      ],
+    },
+    {
+      title: "Tus derechos",
+      text: "Puedes acceder a tus datos, rectificarlos, cancelarlos u oponerte a su uso (derechos ARCO), así como revocar tu consentimiento o limitar su uso.",
+      items: [
+        "Escríbeme a {email} con tu nombre, el derecho que quieres ejercer y los datos a los que se refiere.",
+        "Te respondo en un máximo de 20 días hábiles.",
+      ],
+    },
+    {
+      title: "Cookies y almacenamiento",
+      items: [
+        "El sitio no usa cookies de rastreo ni de publicidad.",
+        "Tu navegador guarda el idioma y la moneda que eliges, solo para recordarlos en tu siguiente visita.",
+      ],
+    },
+    {
+      title: "Cambios a este aviso",
+      items: ["Si este aviso cambia, publicaré la nueva versión en esta página con su fecha."],
+    },
+  ],
+  pending: "Domicilio pendiente",
+};
+
 /* ── Preguntas frecuentes ───────────────────────────────────── */
 
 export const FAQ = [
   {
+    // Si cambias los precios de PRICING, cámbialos también aquí
     q: "¿Cuánto cuesta un proyecto?",
-    a: "Depende del alcance. Después de una primera conversación sin compromiso recibes una propuesta con precio, entregables y tiempos definidos, para que decidas con toda la información.",
+    a: "Hay precios de entrada: el agente de citas por WhatsApp desde $7,500 MXN, la revisión de facturas CFDI desde $5,000 MXN y las automatizaciones a la medida desde $8,000 MXN. Después de una llamada de 15 minutos recibes una propuesta con precio cerrado, entregables y tiempos.",
   },
   {
     q: "¿Cuánto tiempo toma?",
@@ -438,7 +575,7 @@ export const FAQ = [
   },
   {
     q: "¿Qué pasa con mis datos?",
-    a: "Se usan solo para el proyecto. Si una solución envía información a servicios de IA, lo verás explicado en la propuesta antes de implementarlo.",
+    a: "Se usan solo para el proyecto, como explica el aviso de privacidad. Las demos usan el plan gratuito de la IA, por eso piden datos inventados; con clientes uso el plan de pago, cuyos términos no permiten usar tus datos para entrenar modelos, y lo verás por escrito en la propuesta.",
   },
   {
     q: "¿Hay soporte después de la entrega?",
@@ -522,6 +659,11 @@ export const UI = {
     switchTo: "Ver en español",
     dismiss: "Seguir en inglés",
   },
+  contact: {
+    whatsapp: "Escríbeme por WhatsApp",
+    whatsappShort: "WhatsApp",
+    booking: "Agenda 15 min",
+  },
   common: {
     liveDemo: "Demo en vivo",
     backToPortfolio: "Volver al portfolio",
@@ -548,6 +690,8 @@ export const UI = {
   },
   landing: {
     title: "Irving Dávila — Automatización con IA y desarrollo full-stack",
+    // Proxmox y MikroTik en la cinta de logos: útiles para reclutadores, no para una pyme
+    showInfraLogos: false,
     tryDataRefine: "Probar DataRefine",
     talk: "Hablemos de tu proyecto",
     dragHint: "Arrástrala o haz clic para girarla ↗",
@@ -615,6 +759,7 @@ export const UI = {
       email: "Correo",
       rights: "Todos los derechos reservados.",
       top: "Volver arriba",
+      privacy: "Aviso de privacidad",
     },
     knowsAbout: [
       "Automatización de procesos",
@@ -689,6 +834,7 @@ export const UI = {
     ready: "Tu mensaje está listo",
     readyText: (email) => `Ábrelo en tu correo o cópialo y envíalo a ${email}.`,
     open: "Abrir en mi correo",
+    whatsapp: "Enviar por WhatsApp",
     copy: "Copiar mensaje",
     edit: "Editar respuestas",
     needArea: "Elige al menos una opción o descríbelo en una frase.",
@@ -976,6 +1122,7 @@ export const AGENDA_LAB = {
     placeholderOff: "Conectando…",
     send: "Enviar",
     remaining: (n) => `${n} mensajes restantes en esta demo`,
+    fakeData: "Clínica de ejemplo: no escribas datos reales.",
     suggestions: [
       "¿Qué servicios tienen y cuánto cuestan?",
       "Quiero una limpieza el jueves en la tarde",

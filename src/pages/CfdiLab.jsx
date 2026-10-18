@@ -15,6 +15,7 @@ import {
   Stepper,
   SubTitle,
 } from "../components/LabParts";
+import { WhatsAppButton } from "../components/ContactButtons";
 import BlurText from "../components/reactbits/BlurText";
 import LatticeLoader from "../components/reactbits/LatticeLoader";
 import Magnet from "../components/reactbits/Magnet";
@@ -779,7 +780,7 @@ const CfdiLab = () => {
 
   return (
     <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
-      <LabHeader />
+      <LabHeader topic="cfdi" />
 
       <main className="relative isolate overflow-hidden">
         {/* Presentación sobre una cuadrícula animada */}
@@ -1028,6 +1029,7 @@ const CfdiLab = () => {
                 <Link to={to("/#contacto")} className={btn("primary", "sm")}>
                   {UI.common.letsTalk} <ArrowRightIcon className="h-4 w-4" />
                 </Link>
+                <WhatsAppButton topic="cfdi" size="sm" />
                 <VideoButton
                   url={FACTURA_PROJECT.video}
                   label={UI.common.watchVideo}

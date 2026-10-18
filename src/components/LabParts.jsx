@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useContent, useLocalize } from "../lib/i18n";
 import { focusRing } from "../lib/ui";
+import { WhatsAppButton } from "./ContactButtons";
 import { AlertIcon, ArrowLeftIcon, UploadIcon } from "./icons";
 import LanguageSwitch from "./LanguageSwitch";
 import ElectricBorder from "./reactbits/ElectricBorder";
@@ -11,8 +12,9 @@ import StatusMark from "./reactbits/StatusMark";
 /* Piezas que comparten las demos que procesan archivos (DataRefine y
    FacturaCheck): encabezado, pasos, zona para soltar archivos y avisos. */
 
-// Barra superior: volver al portfolio, "Demo en vivo" y el selector de idioma
-export const LabHeader = () => {
+// Barra superior: volver al portfolio, "Demo en vivo", WhatsApp con el mensaje
+// de la página (`topic`) y el selector de idioma
+export const LabHeader = ({ topic, badge = true }) => {
   const { UI } = useContent();
   const to = useLocalize();
   return (
@@ -22,13 +24,19 @@ export const LabHeader = () => {
           to={to("/")}
           className={`inline-flex items-center gap-2 rounded-md text-sm text-[color:var(--muted)] transition-colors hover:text-[color:var(--text)] ${focusRing}`}
         >
-          <ArrowLeftIcon className="h-4 w-4" /> {UI.common.backToPortfolio}
+          <ArrowLeftIcon className="h-4 w-4" />
+          {/* En celular, corto: deja lugar a WhatsApp y al idioma */}
+          <span className="sm:hidden">Portfolio</span>
+          <span className="max-sm:hidden">{UI.common.backToPortfolio}</span>
         </Link>
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium max-[420px]:hidden">
-            <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
-            <ShinyText text={UI.common.liveDemo} />
-          </span>
+          {badge && (
+            <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium max-md:hidden">
+              <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
+              <ShinyText text={UI.common.liveDemo} />
+            </span>
+          )}
+          {topic && <WhatsAppButton topic={topic} size="sm" />}
           <LanguageSwitch />
         </div>
       </div>

@@ -78,6 +78,43 @@ const PAGES = [
       "Upload Mexican e-invoices (CFDI) as XML or the SAT's ZIP: each one is checked with the SAT and you get an Excel file with cancelled and duplicate invoices and tax totals.",
     image: "og-cfdi-en.jpg",
   },
+  // Páginas para pymes: solo en español
+  {
+    path: "contadores",
+    lang: "es",
+    group: "contadores",
+    title: "Revisión de facturas CFDI para despachos contables · Irving Dávila",
+    description:
+      "Consulta en el SAT todas las facturas del mes en minutos: canceladas, no registradas, lista 69-B y duplicadas, en un Excel listo para el cierre.",
+    image: "og-contadores.jpg",
+  },
+  {
+    path: "consultorios",
+    lang: "es",
+    group: "consultorios",
+    title: "Agente de citas por WhatsApp para consultorios · Irving Dávila",
+    description:
+      "Un asistente con IA que agenda, cambia y cancela citas por WhatsApp, sin choques de horario y con recordatorios un día antes.",
+    image: "og-consultorios.jpg",
+  },
+  {
+    path: "privacidad",
+    lang: "es",
+    group: "privacidad",
+    title: "Aviso de privacidad · Irving Dávila",
+    description:
+      "Qué datos personales recaba irvingdevv.dev y sus demos, para qué se usan y cómo ejercer tus derechos ARCO.",
+    image: "og-image.jpg",
+  },
+  {
+    path: "en/privacidad",
+    lang: "en",
+    group: "privacidad",
+    title: "Privacy notice · Irving Dávila",
+    description:
+      "What personal data irvingdevv.dev and its demos collect, what it is used for and how to exercise your rights.",
+    image: "og-image-en.jpg",
+  },
 ];
 
 // Textos fijos de index.html que cambian en inglés (pantalla de carga y aviso

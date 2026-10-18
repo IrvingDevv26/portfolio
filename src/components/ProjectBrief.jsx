@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { hasWhatsApp, whatsappUrl } from "../lib/contact";
 import { useContent } from "../lib/i18n";
 import { useToast } from "../lib/toast";
 import { btn, focusRing } from "../lib/ui";
-import { CheckIcon } from "./icons";
+import { CheckIcon, WhatsappIcon } from "./icons";
 import Stepper, { Step } from "./reactbits/Stepper";
 
 /* Brief de proyecto en 3 pasos (Stepper de React Bits). No necesita backend:
@@ -148,7 +149,21 @@ const ProjectBrief = () => {
               {body}
             </pre>
             <div className="mt-4 flex flex-wrap justify-center gap-2">
-              <a href={mailto} className={btn("primary", "sm")}>
+              {/* En México las pymes contestan por WhatsApp: va primero */}
+              {hasWhatsApp && (
+                <a
+                  href={whatsappUrl(`${subject}\n\n${body}`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={btn("whatsapp", "sm")}
+                >
+                  <WhatsappIcon className="h-4 w-4" /> {words.whatsapp}
+                </a>
+              )}
+              <a
+                href={mailto}
+                className={btn(hasWhatsApp ? "secondary" : "primary", "sm")}
+              >
                 {words.open}
               </a>
               <button
