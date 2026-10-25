@@ -846,11 +846,8 @@ export const DATA_LAB = {
   previewIssues: "Preview of the original file with its problems highlighted",
   previewFile: "File preview",
   noProblems: "We don't see obvious problems; the AI will review the content in depth.",
-  tooManyRows: (rows, max) => [
-    `Your file has ${rows.toLocaleString("en-US")} rows and the demo handles up to ${max}. Try with part of it or `,
-    "get in touch",
-    " and I'll clean the whole thing for your company.",
-  ],
+  tooManyRows: (rows, max) =>
+    `Your file has ${rows.toLocaleString("en-US")} rows and the demo handles up to ${max}. Try with part of the file.`,
   clean: "Clean with AI",
   retry: "Try again",
   willFix: (n) =>
@@ -905,7 +902,7 @@ export const DATA_LAB = {
     "This is a public demo: don't upload sensitive data. The version for your company has none of these limits.",
   forBusiness: "Need it for your business?",
   forBusinessText:
-    "I adapt it to your files: your operation's rules, more columns or a direct connection to your system. On a call I'll tell you how it would work.",
+    "I adapt it to your files: your operation's rules, more columns or a direct connection to your system.",
 };
 
 // Name and explanation of each problem type (colors live in lib/sheet.js)

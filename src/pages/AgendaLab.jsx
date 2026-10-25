@@ -16,7 +16,7 @@ import VideoButton from "../components/VideoButton";
 import LanguageSwitch from "../components/LanguageSwitch";
 import { useDocumentTitle, useMediaQuery } from "../lib/hooks";
 import { useContent, useLang, useLocalize } from "../lib/i18n";
-import { btn, card, focusRing } from "../lib/ui";
+import { card, focusRing } from "../lib/ui";
 
 /* Demo en vivo de AgendaFlow: un agente de IA que agenda, cambia y cancela
    citas de una clínica de ejemplo. El chat (estilo WhatsApp) va junto a la
@@ -437,9 +437,6 @@ const AgendaLab = () => {
                   {words.cards.wantText}
                 </p>
                 <div className="mt-auto flex flex-wrap gap-2 pt-6">
-                  <Link to={to("/#contacto")} className={btn("primary", "sm")}>
-                    {UI.common.letsTalk} <ArrowRightIcon className="h-4 w-4" />
-                  </Link>
                   <VideoButton
                     url={AGENDA_PROJECT.video}
                     label={UI.common.watchVideo}
