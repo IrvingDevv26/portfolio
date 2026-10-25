@@ -1,46 +1,80 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useContent, useLocalize } from "../lib/i18n";
-import { focusRing } from "../lib/ui";
+import { useSalesMode } from "../lib/salesMode";
+import { btn, focusRing } from "../lib/ui";
 import { WhatsAppButton } from "./ContactButtons";
-import { AlertIcon, ArrowLeftIcon, UploadIcon } from "./icons";
+import { AlertIcon, ArrowLeftIcon, ArrowRightIcon, UploadIcon } from "./icons";
 import LanguageSwitch from "./LanguageSwitch";
 import ElectricBorder from "./reactbits/ElectricBorder";
 import ShinyText from "./reactbits/ShinyText";
 import StatusMark from "./reactbits/StatusMark";
 
-/* Piezas que comparten las demos que procesan archivos (DataRefine y
-   FacturaCheck): encabezado, pasos, zona para soltar archivos y avisos. */
+/* Piezas que comparten las demos (DataRefine, AgendaFlow y FacturaCheck):
+   encabezado, pasos, zona para soltar archivos y avisos. */
 
-// Barra superior: volver al portfolio, "Demo en vivo", WhatsApp con el mensaje
-// de la página (`topic`) y el selector de idioma
-export const LabHeader = ({ topic, badge = true }) => {
+const LiveBadge = ({ className = "" }) => {
+  const { UI } = useContent();
+  return (
+    <span
+      className={`inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium ${className}`}
+    >
+      <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
+      <ShinyText text={UI.common.liveDemo} />
+    </span>
+  );
+};
+
+/* Barra superior de las demos y de las páginas del sitio.
+   - Demos abiertas directo desde su link (como llegan desde Workana): solo
+     "Demo en vivo" y el idioma, sin nada que lleve a tus datos de contacto.
+   - Demos en modo venta (ver lib/salesMode.js) y páginas del sitio (`site`):
+     volver al portfolio, WhatsApp con el mensaje de la página (`topic`) y el
+     idioma. `badge`: muestra "Demo en vivo". */
+export const LabHeader = ({ topic, badge = true, site = false }) => {
   const { UI } = useContent();
   const to = useLocalize();
+  const sales = useSalesMode();
+  const contact = site || sales;
   return (
     <header className="relative z-10 border-b border-[color:var(--line)] bg-[color:var(--ink)]/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-10">
-        <Link
-          to={to("/")}
-          className={`inline-flex items-center gap-2 rounded-md text-sm text-[color:var(--muted)] transition-colors hover:text-[color:var(--text)] ${focusRing}`}
-        >
-          <ArrowLeftIcon className="h-4 w-4" />
-          {/* En celular, corto: deja lugar a WhatsApp y al idioma */}
-          <span className="sm:hidden">Portfolio</span>
-          <span className="max-sm:hidden">{UI.common.backToPortfolio}</span>
-        </Link>
+        {contact ? (
+          <Link
+            to={to("/")}
+            className={`inline-flex items-center gap-2 rounded-md text-sm text-[color:var(--muted)] transition-colors hover:text-[color:var(--text)] ${focusRing}`}
+          >
+            <ArrowLeftIcon className="h-4 w-4" />
+            {/* En celular, corto: deja lugar a WhatsApp y al idioma */}
+            <span className="sm:hidden">Portfolio</span>
+            <span className="max-sm:hidden">{UI.common.backToPortfolio}</span>
+          </Link>
+        ) : (
+          badge && <LiveBadge />
+        )}
         <div className="flex items-center gap-2">
-          {badge && (
-            <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium max-md:hidden">
-              <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
-              <ShinyText text={UI.common.liveDemo} />
-            </span>
-          )}
-          {topic && <WhatsAppButton topic={topic} size="sm" />}
+          {contact && badge && <LiveBadge className="max-md:hidden" />}
+          {contact && topic && <WhatsAppButton topic={topic} size="sm" />}
           <LanguageSwitch />
         </div>
       </div>
     </header>
+  );
+};
+
+/** "Platiquemos" (lleva a Contacto) y WhatsApp: solo en modo venta. */
+export const TalkButton = ({ topic }) => {
+  const { UI } = useContent();
+  const to = useLocalize();
+  const sales = useSalesMode();
+  if (!sales) return null;
+  return (
+    <>
+      <Link to={to("/#contacto")} className={btn("primary", "sm")}>
+        {UI.common.letsTalk} <ArrowRightIcon className="h-4 w-4" />
+      </Link>
+      {topic && <WhatsAppButton topic={topic} size="sm" />}
+    </>
   );
 };
 

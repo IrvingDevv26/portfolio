@@ -17,6 +17,7 @@ import { hasWhatsApp } from "../lib/contact";
 import { useDocumentTitle } from "../lib/hooks";
 import { useContent } from "../lib/i18n";
 import { btn, card, focusRing } from "../lib/ui";
+import { useMarkSalesMode } from "../lib/salesMode";
 import { wakeDemos } from "../lib/wake";
 
 /* Página por tipo de cliente (/contadores, /consultorios): el problema, la
@@ -29,6 +30,7 @@ const ClientPage = ({ kind }) => {
   const page = CLIENT_PAGES[kind];
   const { UI } = useContent();
   useDocumentTitle(page.title);
+  useMarkSalesMode();
   const Widget = WIDGETS[page.widget];
 
   // La demo de esta página queda despierta para cuando el visitante la abra
@@ -46,7 +48,7 @@ const ClientPage = ({ kind }) => {
 
   return (
     <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
-      <LabHeader topic={page.topic} badge={false} />
+      <LabHeader topic={page.topic} badge={false} site />
 
       <main>
         {/* Presentación */}

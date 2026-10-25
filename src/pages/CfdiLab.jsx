@@ -12,6 +12,7 @@ import {
   ErrorAlert,
   LabHeader,
   Stepper,
+  TalkButton,
   SubTitle,
 } from "../components/LabParts";
 import BlurText from "../components/reactbits/BlurText";
@@ -777,7 +778,7 @@ const CfdiLab = () => {
 
   return (
     <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
-      <LabHeader />
+      <LabHeader topic="cfdi" />
 
       <main className="relative isolate overflow-hidden">
         {/* Presentación sobre una cuadrícula animada */}
@@ -1023,6 +1024,7 @@ const CfdiLab = () => {
                 {words.forBusinessText}
               </p>
               <div className="mt-auto flex flex-wrap gap-2 pt-6">
+                <TalkButton topic="cfdi" />
                 <VideoButton
                   url={FACTURA_PROJECT.video}
                   label={UI.common.watchVideo}

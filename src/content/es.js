@@ -429,6 +429,8 @@ export const BRIEF = {
 // escriben (el número y la agenda están en src/content/contact.js)
 export const WHATSAPP_MESSAGES = {
   general: "Hola Irving, vi tu portfolio y quiero platicar de un proyecto.",
+  datarefine: "Hola Irving, vi la demo de DataRefine y quiero limpiar los datos de mi empresa.",
+  cfdi: "Hola Irving, vi la demo de FacturaCheck y me interesa revisar facturas con el SAT.",
   agenda: "Hola Irving, vi la demo de AgendaFlow y me interesa el agente de citas por WhatsApp.",
   contadores: "Hola Irving, soy contador y vi FacturaCheck. Me interesa revisar las facturas de mis clientes.",
   consultorios: "Hola Irving, tengo un consultorio y vi AgendaFlow. Me interesa el agente de citas por WhatsApp.",

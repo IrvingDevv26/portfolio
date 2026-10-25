@@ -6,10 +6,10 @@ import { ClinicCard, ClinicDetails } from "../components/agenda/ClinicCard";
 import { daysBetween, minutesOf, timeNow } from "../components/agenda/dates";
 import WeekCalendar, { LAST_WEEK } from "../components/agenda/WeekCalendar";
 import { ArrowRightIcon, CheckIcon } from "../components/icons";
-import { LabHeader } from "../components/LabParts";
 import BlurText from "../components/reactbits/BlurText";
 import SpotlightCard from "../components/reactbits/SpotlightCard";
 import Squares from "../components/reactbits/Squares";
+import { LabHeader, TalkButton } from "../components/LabParts";
 import { Eyebrow } from "../components/shared";
 import VideoButton from "../components/VideoButton";
 import { useDocumentTitle, useMediaQuery } from "../lib/hooks";
@@ -248,7 +248,7 @@ const AgendaLab = () => {
   return (
     <MotionConfig reducedMotion="user">
       <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
-        <LabHeader />
+        <LabHeader topic="agenda" />
 
         {/* overflow-x-clip (y no hidden) para que las pestañas puedan quedarse fijas */}
         <main className="relative isolate overflow-x-clip">
@@ -418,6 +418,7 @@ const AgendaLab = () => {
                   {words.cards.wantText}
                 </p>
                 <div className="mt-auto flex flex-wrap gap-2 pt-6">
+                  <TalkButton topic="agenda" />
                   <VideoButton
                     url={AGENDA_PROJECT.video}
                     label={UI.common.watchVideo}

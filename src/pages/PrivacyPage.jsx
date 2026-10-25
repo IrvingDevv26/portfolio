@@ -2,6 +2,7 @@ import { LabHeader } from "../components/LabParts";
 import PageFooter from "../components/PageFooter";
 import { PRIVACY_ADDRESS } from "../content/contact";
 import { useDocumentTitle } from "../lib/hooks";
+import { useMarkSalesMode } from "../lib/salesMode";
 import { useContent } from "../lib/i18n";
 import { focusRing } from "../lib/ui";
 
@@ -29,10 +30,11 @@ const WithEmail = ({ text, email }) => {
 const PrivacyPage = () => {
   const { PRIVACY, PROFILE } = useContent();
   useDocumentTitle(`${PRIVACY.title} · ${PROFILE.shortName}`);
+  useMarkSalesMode();
 
   return (
     <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
-      <LabHeader badge={false} />
+      <LabHeader badge={false} site />
       <main className="mx-auto max-w-3xl px-6 pb-20 pt-14 md:px-10 md:pt-20">
         <h1 className="font-display text-4xl font-semibold tracking-tight md:text-5xl">
           {PRIVACY.title}

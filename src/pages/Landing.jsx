@@ -59,6 +59,7 @@ import { hasHardwareWebGL } from "../lib/gpu";
 import { useDocumentTitle, useIdle, useMediaQuery } from "../lib/hooks";
 import { useContent, useLocalize } from "../lib/i18n";
 import { useToast } from "../lib/toast";
+import { useMarkSalesMode } from "../lib/salesMode";
 import { btn, card, delay, focusRing, TONE_COLOR } from "../lib/ui";
 import { wakeDemos } from "../lib/wake";
 
@@ -1150,6 +1151,7 @@ const Landing = () => {
   useEffect(() => {
     if (idle) wakeDemos();
   }, [idle]);
+  useMarkSalesMode();
 
   return (
     <div className="grain font-body bg-[color:var(--ink)] text-[color:var(--text)]">
