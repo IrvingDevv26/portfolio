@@ -1,12 +1,10 @@
 import { motion, MotionConfig } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import ActionLog from "../components/agenda/ActionLog";
 import Chat from "../components/agenda/Chat";
 import { ClinicCard, ClinicDetails } from "../components/agenda/ClinicCard";
 import { daysBetween, minutesOf, timeNow } from "../components/agenda/dates";
 import WeekCalendar, { LAST_WEEK } from "../components/agenda/WeekCalendar";
-import { WhatsAppButton } from "../components/ContactButtons";
 import { ArrowRightIcon, CheckIcon } from "../components/icons";
 import { LabHeader } from "../components/LabParts";
 import BlurText from "../components/reactbits/BlurText";
@@ -15,8 +13,8 @@ import Squares from "../components/reactbits/Squares";
 import { Eyebrow } from "../components/shared";
 import VideoButton from "../components/VideoButton";
 import { useDocumentTitle, useMediaQuery } from "../lib/hooks";
-import { useContent, useLang, useLocalize } from "../lib/i18n";
-import { btn, card, focusRing } from "../lib/ui";
+import { useContent, useLang } from "../lib/i18n";
+import { card, focusRing } from "../lib/ui";
 
 /* Demo en vivo de AgendaFlow: un agente de IA que agenda, cambia y cancela
    citas de una clínica de ejemplo. El chat (estilo WhatsApp) va junto a la
@@ -88,7 +86,6 @@ const TABS = [
 const AgendaLab = () => {
   const { AGENDA_LAB: words, AGENDA_PROJECT, DATES, UI } = useContent();
   const lang = useLang();
-  const to = useLocalize();
   const { errors } = words;
   const locale = DATES.locale;
   useDocumentTitle(words.title);
@@ -251,7 +248,7 @@ const AgendaLab = () => {
   return (
     <MotionConfig reducedMotion="user">
       <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
-        <LabHeader topic="agenda" />
+        <LabHeader />
 
         {/* overflow-x-clip (y no hidden) para que las pestañas puedan quedarse fijas */}
         <main className="relative isolate overflow-x-clip">
@@ -421,10 +418,6 @@ const AgendaLab = () => {
                   {words.cards.wantText}
                 </p>
                 <div className="mt-auto flex flex-wrap gap-2 pt-6">
-                  <Link to={to("/#contacto")} className={btn("primary", "sm")}>
-                    {UI.common.letsTalk} <ArrowRightIcon className="h-4 w-4" />
-                  </Link>
-                  <WhatsAppButton topic="agenda" size="sm" />
                   <VideoButton
                     url={AGENDA_PROJECT.video}
                     label={UI.common.watchVideo}

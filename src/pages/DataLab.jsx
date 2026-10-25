@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   ArrowRightIcon,
   CheckIcon,
@@ -15,7 +14,6 @@ import {
   Stepper,
   SubTitle,
 } from "../components/LabParts";
-import { WhatsAppButton } from "../components/ContactButtons";
 import BlurText from "../components/reactbits/BlurText";
 import LatticeLoader from "../components/reactbits/LatticeLoader";
 import Magnet from "../components/reactbits/Magnet";
@@ -28,7 +26,7 @@ import VideoButton from "../components/VideoButton";
 import { formatSize } from "../lib/files";
 import { hasHardwareWebGL } from "../lib/gpu";
 import { useDocumentTitle } from "../lib/hooks";
-import { useContent, useLang, useLocalize } from "../lib/i18n";
+import { useContent, useLang } from "../lib/i18n";
 import { useIssues } from "../lib/issues";
 import { analyze, ISSUE_TYPES, readSheet } from "../lib/sheet";
 import { useToast } from "../lib/toast";
@@ -348,7 +346,6 @@ const DataLab = () => {
     makeSampleFile,
   } = useContent();
   const lang = useLang();
-  const to = useLocalize();
   const issues = useIssues();
   useDocumentTitle(words.title);
   const notify = useToast();
@@ -548,7 +545,7 @@ const DataLab = () => {
 
   return (
     <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
-      <LabHeader topic="datarefine" />
+      <LabHeader />
 
       <main className="relative isolate overflow-hidden">
         {/* Presentación sobre una cuadrícula animada */}
@@ -657,14 +654,7 @@ const DataLab = () => {
                   />
                   {tooManyRows && (
                     <div className="mt-6 rounded-xl border border-[color:var(--accent-line)] bg-[color:var(--accent-bg)] p-4 text-sm leading-relaxed text-[color:var(--text)]">
-                      {words.tooManyRows(original.rows.length, MAX_ROWS)[0]}
-                      <Link
-                        to={to("/#contacto")}
-                        className={`rounded font-medium text-[color:var(--accent)] underline underline-offset-4 ${focusRing}`}
-                      >
-                        {words.tooManyRows(original.rows.length, MAX_ROWS)[1]}
-                      </Link>
-                      {words.tooManyRows(original.rows.length, MAX_ROWS)[2]}
+                      {words.tooManyRows(original.rows.length, MAX_ROWS)}
                     </div>
                   )}
                   <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-[color:var(--line)] pt-6">
@@ -710,7 +700,7 @@ const DataLab = () => {
             </div>
           </section>
 
-          {/* Información y contacto */}
+          {/* Información */}
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             <SpotlightCard className={`${card} p-6`}>
               <h2 className="font-display text-lg font-semibold">
@@ -755,10 +745,6 @@ const DataLab = () => {
                 {words.forBusinessText}
               </p>
               <div className="mt-auto flex flex-wrap gap-2 pt-6">
-                <Link to={to("/#contacto")} className={btn("primary", "sm")}>
-                  {UI.common.letsTalk} <ArrowRightIcon className="h-4 w-4" />
-                </Link>
-                <WhatsAppButton topic="datarefine" size="sm" />
                 <VideoButton
                   url={PROJECT.video}
                   label={UI.common.watchVideo}

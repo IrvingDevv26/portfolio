@@ -429,9 +429,7 @@ export const BRIEF = {
 // (the number and the booking link live in src/content/contact.js)
 export const WHATSAPP_MESSAGES = {
   general: "Hi Irving, I saw your portfolio and I'd like to talk about a project.",
-  datarefine: "Hi Irving, I saw the DataRefine demo and I'd like to clean up my company's data.",
   agenda: "Hi Irving, I saw the AgendaFlow demo and I'm interested in the AI appointment agent.",
-  cfdi: "Hi Irving, I saw the FacturaCheck demo and I'm interested in checking invoices with the SAT.",
   contadores: "Hi Irving, I'm an accountant and I saw FacturaCheck. I'd like to check my clients' invoices.",
   consultorios: "Hi Irving, I run a clinic and I saw AgendaFlow. I'm interested in the WhatsApp appointment agent.",
   fastapi: "Hi Irving, I saw your portfolio and I need help with a FastAPI backend.",
@@ -992,11 +990,8 @@ export const DATA_LAB = {
   previewIssues: "Preview of the original file with its problems highlighted",
   previewFile: "File preview",
   noProblems: "We don't see obvious problems; the AI will review the content in depth.",
-  tooManyRows: (rows, max) => [
-    `Your file has ${rows.toLocaleString("en-US")} rows and the demo handles up to ${max}. Try with part of it or `,
-    "get in touch",
-    " and I'll clean the whole thing for your company.",
-  ],
+  tooManyRows: (rows, max) =>
+    `Your file has ${rows.toLocaleString("en-US")} rows and the demo handles up to ${max}. Try with part of the file.`,
   clean: "Clean with AI",
   retry: "Try again",
   willFix: (n) =>
@@ -1051,7 +1046,7 @@ export const DATA_LAB = {
     "This is a public demo: don't upload sensitive data. The version for your company has none of these limits.",
   forBusiness: "Need it for your business?",
   forBusinessText:
-    "I adapt it to your files: your operation's rules, more columns or a direct connection to your system. On a call I'll tell you how it would work.",
+    "I adapt it to your files: your operation's rules, more columns or a direct connection to your system.",
 };
 
 // Name and explanation of each problem type (colors live in lib/sheet.js)

@@ -429,9 +429,7 @@ export const BRIEF = {
 // escriben (el número y la agenda están en src/content/contact.js)
 export const WHATSAPP_MESSAGES = {
   general: "Hola Irving, vi tu portfolio y quiero platicar de un proyecto.",
-  datarefine: "Hola Irving, vi la demo de DataRefine y quiero limpiar los datos de mi empresa.",
   agenda: "Hola Irving, vi la demo de AgendaFlow y me interesa el agente de citas por WhatsApp.",
-  cfdi: "Hola Irving, vi la demo de FacturaCheck y me interesa revisar facturas con el SAT.",
   contadores: "Hola Irving, soy contador y vi FacturaCheck. Me interesa revisar las facturas de mis clientes.",
   consultorios: "Hola Irving, tengo un consultorio y vi AgendaFlow. Me interesa el agente de citas por WhatsApp.",
   fastapi: "Hola Irving, vi tu portfolio y necesito ayuda con una API en FastAPI.",
@@ -995,11 +993,8 @@ export const DATA_LAB = {
   previewIssues: "Vista previa del archivo original con los problemas resaltados",
   previewFile: "Vista previa del archivo",
   noProblems: "No vemos problemas evidentes; la IA revisará el contenido a fondo.",
-  tooManyRows: (rows, max) => [
-    `Tu archivo tiene ${rows.toLocaleString("es-MX")} filas y la demo procesa hasta ${max}. Prueba con una parte o `,
-    "escríbeme",
-    " y lo limpio completo para tu empresa.",
-  ],
+  tooManyRows: (rows, max) =>
+    `Tu archivo tiene ${rows.toLocaleString("es-MX")} filas y la demo procesa hasta ${max}. Prueba con una parte del archivo.`,
   clean: "Limpiar con IA",
   retry: "Reintentar",
   willFix: (n) =>
@@ -1054,7 +1049,7 @@ export const DATA_LAB = {
     "Es una demo pública: no subas datos sensibles. La versión para tu empresa no tiene estos límites.",
   forBusiness: "¿Lo necesitas para tu negocio?",
   forBusinessText:
-    "Lo adapto a tus archivos: reglas de tu operación, más columnas o conexión directa con tu sistema. En una llamada te digo cómo quedaría.",
+    "Lo adapto a tus archivos: reglas de tu operación, más columnas o conexión directa con tu sistema.",
 };
 
 // Nombre y explicación de cada tipo de problema (los colores están en lib/sheet.js)
