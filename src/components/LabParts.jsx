@@ -1,38 +1,69 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useContent, useLocalize } from "../lib/i18n";
-import { focusRing } from "../lib/ui";
-import { AlertIcon, ArrowLeftIcon, UploadIcon } from "./icons";
+import { useSalesMode } from "../lib/salesMode";
+import { btn, focusRing } from "../lib/ui";
+import { AlertIcon, ArrowLeftIcon, ArrowRightIcon, UploadIcon } from "./icons";
 import LanguageSwitch from "./LanguageSwitch";
 import ElectricBorder from "./reactbits/ElectricBorder";
 import ShinyText from "./reactbits/ShinyText";
 import StatusMark from "./reactbits/StatusMark";
 
-/* Piezas que comparten las demos que procesan archivos (DataRefine y
-   FacturaCheck): encabezado, pasos, zona para soltar archivos y avisos. */
+/* Piezas que comparten las demos (DataRefine, AgendaFlow y FacturaCheck):
+   encabezado, pasos, zona para soltar archivos y avisos. */
 
-// Barra superior: volver al portfolio, "Demo en vivo" y el selector de idioma
+const LiveBadge = ({ className = "" }) => {
+  const { UI } = useContent();
+  return (
+    <span
+      className={`inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium ${className}`}
+    >
+      <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
+      <ShinyText text={UI.common.liveDemo} />
+    </span>
+  );
+};
+
+/* Barra superior de las demos. En modo venta (ver lib/salesMode.js): volver
+   al portfolio, "Demo en vivo" y el idioma. Abierta directo desde su link
+   (como llega desde Workana): solo "Demo en vivo" y el idioma, sin nada que
+   lleve a tus datos de contacto. */
 export const LabHeader = () => {
   const { UI } = useContent();
   const to = useLocalize();
+  const sales = useSalesMode();
   return (
     <header className="relative z-10 border-b border-[color:var(--line)] bg-[color:var(--ink)]/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-10">
-        <Link
-          to={to("/")}
-          className={`inline-flex items-center gap-2 rounded-md text-sm text-[color:var(--muted)] transition-colors hover:text-[color:var(--text)] ${focusRing}`}
-        >
-          <ArrowLeftIcon className="h-4 w-4" /> {UI.common.backToPortfolio}
-        </Link>
+        {sales ? (
+          <Link
+            to={to("/")}
+            className={`inline-flex items-center gap-2 rounded-md text-sm text-[color:var(--muted)] transition-colors hover:text-[color:var(--text)] ${focusRing}`}
+          >
+            <ArrowLeftIcon className="h-4 w-4" /> {UI.common.backToPortfolio}
+          </Link>
+        ) : (
+          <LiveBadge />
+        )}
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium max-[420px]:hidden">
-            <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
-            <ShinyText text={UI.common.liveDemo} />
-          </span>
+          {sales && <LiveBadge className="max-[420px]:hidden" />}
           <LanguageSwitch />
         </div>
       </div>
     </header>
+  );
+};
+
+/** "Platiquemos" (lleva a Contacto): solo en modo venta. */
+export const TalkButton = () => {
+  const { UI } = useContent();
+  const to = useLocalize();
+  const sales = useSalesMode();
+  if (!sales) return null;
+  return (
+    <Link to={to("/#contacto")} className={btn("primary", "sm")}>
+      {UI.common.letsTalk} <ArrowRightIcon className="h-4 w-4" />
+    </Link>
   );
 };
 

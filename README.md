@@ -66,6 +66,12 @@ A bilingual (Spanish and English) portfolio that sells by showing: three live de
   `src/content/es.js` and `src/content/en.js`, which share the same shape;
   `npm run check:content` (also in CI) fails if one of them is missing
   something.
+- **Demos safe for freelance platforms**: Workana penalizes proposals that
+  share contact data, so a demo opened straight from its link shows no path to
+  it (no link to the home page, no contact buttons). Sales mode brings back the
+  "back to portfolio" link and the contact button. It turns on after visiting
+  the site in the same tab, or with `?ref=directo` in the link, for prospects
+  outside Workana (`src/lib/salesMode.js`).
 
 ## Tech stack
 
@@ -216,6 +222,10 @@ repository activity; re-enable it from the Actions tab if that happens.
   demo tiene su propia vista previa al compartir el enlace.
 - **Cómo correrlo:** `npm install`, copia `.env.example` como `.env` y ejecuta
   `npm run dev`.
+- **Demos para Workana:** abiertas directo desde su link, las demos no llevan a
+  tus datos de contacto. Con `?ref=directo` en el link (o si el visitante pasó
+  por la portada en esa pestaña) se activa el modo venta: "Volver al portfolio"
+  y "Platiquemos".
 - **Dónde editar:** todos los textos, enlaces y proyectos están en
   `src/content/es.js` y su versión en inglés en `src/content/en.js` (con la
   misma forma; `npm run check:content` avisa si falta algo); la paleta y las
