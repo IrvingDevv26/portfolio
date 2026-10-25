@@ -49,6 +49,7 @@ const Header = () => {
   useEffect(() => {
     const elements = [
       "servicios",
+      "precios",
       "proyecto",
       "proceso",
       "sobre-mi",

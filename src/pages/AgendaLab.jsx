@@ -248,7 +248,7 @@ const AgendaLab = () => {
   return (
     <MotionConfig reducedMotion="user">
       <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
-        <LabHeader />
+        <LabHeader topic="agenda" />
 
         {/* overflow-x-clip (y no hidden) para que las pestañas puedan quedarse fijas */}
         <main className="relative isolate overflow-x-clip">
@@ -418,7 +418,7 @@ const AgendaLab = () => {
                   {words.cards.wantText}
                 </p>
                 <div className="mt-auto flex flex-wrap gap-2 pt-6">
-                  <TalkButton />
+                  <TalkButton topic="agenda" />
                   <VideoButton
                     url={AGENDA_PROJECT.video}
                     label={UI.common.watchVideo}

@@ -11,10 +11,15 @@ import {
 import { Link } from "react-router-dom";
 import AgentDemo from "../components/AgentDemo";
 import CleaningDemo from "../components/CleaningDemo";
+import ContactButtons, {
+  BookingButton,
+  WhatsAppButton,
+} from "../components/ContactButtons";
 import Deferred from "../components/Deferred";
 import Faq from "../components/Faq";
 import Header from "../components/Header";
 import InvoiceDemo from "../components/InvoiceDemo";
+import Pricing from "../components/Pricing";
 import VideoButton from "../components/VideoButton";
 import StaticBadge from "../components/StaticBadge";
 import AnimatedContent from "../components/reactbits/AnimatedContent";
@@ -49,12 +54,14 @@ import {
   LinkedinIcon,
   MailIcon,
 } from "../components/icons";
+import { hasWhatsApp, whatsappUrl } from "../lib/contact";
 import { hasHardwareWebGL } from "../lib/gpu";
 import { useDocumentTitle, useIdle, useMediaQuery } from "../lib/hooks";
 import { useContent, useLocalize } from "../lib/i18n";
 import { useToast } from "../lib/toast";
 import { useMarkSalesMode } from "../lib/salesMode";
 import { btn, card, delay, focusRing, TONE_COLOR } from "../lib/ui";
+import { wakeDemos } from "../lib/wake";
 
 // three.js pesa: la credencial 3D llega en un archivo aparte, sin frenar el texto
 const Lanyard = lazy(() => import("../components/Lanyard"));
@@ -194,14 +201,14 @@ const Hero = () => {
           style={delay(6)}
         >
           <Magnet>
-            <Link to={to("/demo/datarefine")} className={btn("primary")}>
-              {UI.landing.tryDataRefine} <ArrowRightIcon className="h-4 w-4" />
+            <Link to={to(HERO.ctas[0].to)} className={btn("primary")}>
+              {HERO.ctas[0].label} <ArrowRightIcon className="h-4 w-4" />
             </Link>
           </Magnet>
           <Magnet>
             <StarBorder
-              as="a"
-              href="#contacto"
+              as={Link}
+              to={to(HERO.ctas[1].to)}
               color="#D4B27A"
               backgroundColor="rgba(16,18,23,0.72)"
               textColor="#F1F3F6"
@@ -210,15 +217,17 @@ const Hero = () => {
               cruise={finePointer && idle}
               className={`h-12 px-6 text-[15px] font-semibold backdrop-blur ${focusRing}`}
             >
-              {UI.landing.talk}
+              {HERO.ctas[1].label}
             </StarBorder>
           </Magnet>
         </div>
 
         <div
-          className="rise pointer-events-auto mt-9 flex items-center gap-3"
+          className="rise pointer-events-auto mt-6 flex flex-wrap items-center gap-3"
           style={delay(7)}
         >
+          <WhatsAppButton topic="general" size="sm" />
+          <BookingButton size="sm" />
           <SocialLink href={PROFILE.github} label="GitHub">
             <GithubIcon />
           </SocialLink>
@@ -364,6 +373,24 @@ const HowItWorks = ({ steps }) => {
         ))}
       </ol>
     </>
+  );
+};
+
+/* ── Precios ──────────────────────────────────────────────── */
+
+const Prices = () => {
+  const { PRICING } = useContent();
+  return (
+    <div className="cv cv-m border-t border-[color:var(--line)]">
+      <Section id="precios">
+        <SectionHeading
+          eyebrow={PRICING.eyebrow}
+          title={PRICING.title}
+          intro={PRICING.intro}
+        />
+        <Pricing />
+      </Section>
+    </div>
   );
 };
 
@@ -539,9 +566,11 @@ const AgendaCase = () => {
             </div>
           </div>
 
-          <AnimatedContent blur distance={24}>
-            <AgentDemo />
-          </AnimatedContent>
+          <div className="max-lg:order-first">
+            <AnimatedContent blur distance={24}>
+              <AgentDemo />
+            </AnimatedContent>
+          </div>
         </div>
 
         <Metrics items={AGENDA_PROJECT.metrics} />
@@ -920,7 +949,9 @@ const Contact = () => {
               {CONTACT.text}
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-3">
+            <ContactButtons topic="general" className="mt-10" />
+
+            <div className="mt-4 flex flex-wrap items-center gap-3">
               <Magnet>
                 <a href={`mailto:${PROFILE.email}`} className={btn("primary")}>
                   <MailIcon className="h-[18px] w-[18px]" /> {words.write}
@@ -972,7 +1003,8 @@ const Contact = () => {
 const footerLink = `inline-flex items-center gap-1.5 rounded-md text-[color:var(--soft)] transition-colors hover:text-[color:var(--text)] ${focusRing}`;
 
 const Footer = () => {
-  const { NAV_LINKS, PROFILE, UI } = useContent();
+  const { NAV_LINKS, PROFILE, UI, WHATSAPP_MESSAGES } = useContent();
+  const to = useLocalize();
   const words = UI.landing.footer;
   return (
     <footer className="cv cv-m relative overflow-hidden border-t border-[color:var(--line)]">
@@ -1003,6 +1035,18 @@ const Footer = () => {
           <div>
             <p className={label}>{words.connect}</p>
             <ul className="mt-4 space-y-2.5 text-sm">
+              {hasWhatsApp && (
+                <li>
+                  <a
+                    href={whatsappUrl(WHATSAPP_MESSAGES.general)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={footerLink}
+                  >
+                    WhatsApp <ArrowUpRightIcon className="h-3.5 w-3.5" />
+                  </a>
+                </li>
+              )}
               <li>
                 <a href={`mailto:${PROFILE.email}`} className={footerLink}>
                   {words.email}
@@ -1042,9 +1086,14 @@ const Footer = () => {
           <p>
             © {new Date().getFullYear()} {PROFILE.name}. {words.rights}
           </p>
-          <a href="#inicio" className={footerLink}>
-            <ArrowUpIcon className="h-4 w-4" /> {words.top}
-          </a>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <Link to={to("/privacidad")} className={footerLink}>
+              {words.privacy}
+            </Link>
+            <a href="#inicio" className={footerLink}>
+              <ArrowUpIcon className="h-4 w-4" /> {words.top}
+            </a>
+          </div>
         </div>
       </div>
     </footer>
@@ -1075,6 +1124,7 @@ const BELOW_THE_FOLD = [
   Manifesto,
   CostCalculator,
   Services,
+  Prices,
   Project,
   AgendaCase,
   FacturaCase,
@@ -1097,6 +1147,10 @@ const Landing = () => {
   const { PROFILE, UI } = useContent();
   useDocumentTitle(UI.landing.title);
   const rest = useRestOfPage();
+  const idle = useIdle();
+  useEffect(() => {
+    if (idle) wakeDemos();
+  }, [idle]);
   useMarkSalesMode();
 
   return (

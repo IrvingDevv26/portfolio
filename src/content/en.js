@@ -16,6 +16,7 @@ export const PROFILE = {
 // The section ids stay the same in both languages (/en#contacto works)
 export const NAV_LINKS = [
   { href: "#servicios", label: "Services" },
+  { href: "#precios", label: "Rates" },
   { href: "#proyecto", label: "Projects" },
   { href: "#proceso", label: "Process" },
   { href: "#sobre-mi", label: "About" },
@@ -31,13 +32,18 @@ export const HERO = {
   highlight: ["run", "on", "their", "own"],
   rotatingPrefix: "Specialized in",
   rotating: [
+    "AI appointment agents",
+    "FastAPI backends",
     "data cleaning",
-    "FastAPI APIs",
     "AI workflows",
     "Linux servers",
-    "MikroTik networks",
   ],
   lead: "I design and build B2B tools that turn hours of repetitive work into automated data flows: from the API to the interface, ready for production on AWS or on your own Linux servers.",
+  // Main buttons: the AI agent demo and the FastAPI services with rates
+  ctas: [
+    { label: "See the AI agent", to: "/demo/agenda" },
+    { label: "FastAPI services and rates", to: "/#precios" },
+  ],
 };
 
 // Moving strips below the hero
@@ -417,12 +423,143 @@ export const BRIEF = {
   hours: ["Less than 5 h", "5 to 20 h", "More than 20 h", "Not sure"],
 };
 
+/* ── Direct contact ─────────────────────────────────────────── */
+
+// Message that arrives already written on WhatsApp, by the page it comes from
+// (the number and the booking link live in src/content/contact.js)
+export const WHATSAPP_MESSAGES = {
+  general: "Hi Irving, I saw your portfolio and I'd like to talk about a project.",
+  datarefine: "Hi Irving, I saw the DataRefine demo and I'd like to clean up my company's data.",
+  cfdi: "Hi Irving, I saw the FacturaCheck demo and I'm interested in checking invoices with the SAT.",
+  agenda: "Hi Irving, I saw the AgendaFlow demo and I'm interested in the AI appointment agent.",
+  contadores: "Hi Irving, I'm an accountant and I saw FacturaCheck. I'd like to check my clients' invoices.",
+  consultorios: "Hi Irving, I run a clinic and I saw AgendaFlow. I'm interested in the WhatsApp appointment agent.",
+  fastapi: "Hi Irving, I saw your portfolio and I need help with a FastAPI backend.",
+};
+
+/* ── Starting rates ─────────────────────────────────────────── */
+
+// "to": the package's page; "topic": WhatsApp message (WHATSAPP_MESSAGES)
+export const PRICING = {
+  eyebrow: "Rates",
+  title: "Starting rates, no surprises.",
+  intro: "Every project gets a fixed-price proposal after a 15-minute call. These are the starting points.",
+  from: "From",
+  note: "Prices in US dollars. The monthly fee covers hosting, the paid AI tier when it applies and support.",
+  packages: [
+    {
+      name: "AI appointment agent",
+      audience: "Clinics and service businesses",
+      price: "US$450",
+      extra: "setup + from US$70 a month",
+      includes: [
+        "Books, reschedules and cancels over WhatsApp or web chat",
+        "Your services, hours and rules",
+        "Reminders the day before each appointment",
+      ],
+      cta: "Try the demo",
+      to: "/demo/agenda",
+      topic: "agenda",
+    },
+    {
+      name: "FastAPI backends and integrations",
+      audience: "Teams that need an API or a data pipeline",
+      price: "US$35 / hour",
+      extra: "or fixed-price projects from US$600",
+      includes: [
+        "Typed APIs with tests and documentation",
+        "AI APIs, spreadsheets and third-party integrations",
+        "Deployed on your cloud or your Linux servers",
+      ],
+      cta: "Tell me about your API",
+      to: "/#contacto",
+      topic: "fastapi",
+    },
+    {
+      name: "Custom automation",
+      audience: "Manual work with spreadsheets, reports or data entry",
+      price: "US$500",
+      extra: "per project, at a fixed price",
+      includes: [
+        "Diagnosis and proposal before any work starts",
+        "Data cleaning, reports and integrations",
+        "Documentation and hand-holding at delivery",
+      ],
+      cta: "Tell me about your process",
+      to: "/#contacto",
+      topic: "general",
+    },
+  ],
+};
+
+/* ── Privacy notice (/en/privacidad) ────────────────────────── */
+
+// Follows Mexico's personal data law (LFPDPPP). The address lives in
+// src/content/contact.js
+export const PRIVACY = {
+  title: "Privacy notice",
+  updated: "Last updated: October 18, 2026",
+  intro: (name, address) =>
+    `${name}, with address at ${address}, is responsible for the use and protection of your personal data under Mexico's Federal Law on the Protection of Personal Data Held by Private Parties. This notice explains what data this site and its demos collect, what it is used for and how to exercise your rights. If this English version and the Spanish one differ, the Spanish one prevails.`,
+  sections: [
+    {
+      title: "What data I collect",
+      items: [
+        "If you contact me by email, WhatsApp, the brief or the booking page: your name, email, phone, company and what you tell me about your project.",
+        "If you use the demos: the files and invoices you upload and the messages you type in the chat. They are processed in memory to show you the result and are not stored.",
+        "Technical data: your IP address, only to limit the number of tries per person. It is kept in memory and discarded when the server restarts.",
+        "I don't collect sensitive data. In the demos, please don't type or upload health information or real data about patients or clients.",
+      ],
+    },
+    {
+      title: "What I use it for",
+      items: [
+        "Answering you, preparing a proposal and, if you hire me, providing the service and support.",
+        "Showing you the result of the demos.",
+        "I don't use your data for advertising and I don't sell it.",
+      ],
+    },
+    {
+      title: "Who it is shared with",
+      text: "Only with the providers that make the site and the demos work, and only for that:",
+      items: [
+        "Cloudflare, which hosts the site, and Render, which hosts the demo servers.",
+        "AI providers on their free tier (Google Gemini, Groq and OpenRouter), which process the texts of the DataRefine and AgendaFlow demos. Their terms let them use that data to improve their services, which is why the demos ask for made-up data. With clients I use paid tiers that don't use the data to train models.",
+        "The SAT, Mexico's tax authority, to check the status of the invoices you upload to FacturaCheck: only the fiscal folio, the tax IDs and the total, the same data as the invoice's QR code.",
+        "WhatsApp (Meta), Cal.com or your email provider, if you contact me through them.",
+        "Beyond that, I don't share your data unless an authority requires it by law.",
+      ],
+    },
+    {
+      title: "Your rights",
+      text: "You can access, correct or delete your data or object to its use (ARCO rights), and you can withdraw your consent or limit its use.",
+      items: [
+        "Write to {email} with your name, the right you want to exercise and the data it refers to.",
+        "I'll answer within 20 business days.",
+      ],
+    },
+    {
+      title: "Cookies and storage",
+      items: [
+        "The site doesn't use tracking or advertising cookies.",
+        "Your browser stores the language and currency you pick, only to remember them on your next visit.",
+      ],
+    },
+    {
+      title: "Changes to this notice",
+      items: ["If this notice changes, I'll publish the new version on this page with its date."],
+    },
+  ],
+  pending: "Address pending",
+};
+
 /* ── FAQ ────────────────────────────────────────────────────── */
 
 export const FAQ = [
   {
+    // If you change the prices in PRICING, change them here too
     q: "How much does a project cost?",
-    a: "It depends on the scope. After a first no-commitment conversation you get a proposal with price, deliverables and timeline, so you can decide with all the information.",
+    a: "There are starting rates: AI appointment agents from US$450, FastAPI work from US$35 an hour or fixed-price projects from US$600, and custom automation from US$500. After a 15-minute call you get a fixed-price proposal with deliverables and timeline.",
   },
   {
     q: "How long does it take?",
@@ -438,7 +575,7 @@ export const FAQ = [
   },
   {
     q: "What happens to my data?",
-    a: "It's used only for the project. If a solution sends information to AI services, you'll see it explained in the proposal before it's built.",
+    a: "It's used only for the project, as the privacy notice explains. The demos use the AI's free tier, which is why they ask for made-up data; with clients I use the paid tier, whose terms don't allow your data to be used to train models, and you'll see it in writing in the proposal.",
   },
   {
     q: "Is there support after delivery?",
@@ -522,6 +659,11 @@ export const UI = {
     switchTo: "View in English",
     dismiss: "Stay in Spanish",
   },
+  contact: {
+    whatsapp: "Message me on WhatsApp",
+    whatsappShort: "WhatsApp",
+    booking: "Book a 15-min call",
+  },
   common: {
     liveDemo: "Live demo",
     backToPortfolio: "Back to portfolio",
@@ -548,6 +690,8 @@ export const UI = {
   },
   landing: {
     title: "Irving Dávila — AI automation and full-stack development",
+    // Proxmox and MikroTik in the logo strip: they speak to recruiters
+    showInfraLogos: true,
     tryDataRefine: "Try DataRefine",
     talk: "Tell me about your project",
     dragHint: "Drag it or click to flip it ↗",
@@ -614,6 +758,7 @@ export const UI = {
       email: "Email",
       rights: "All rights reserved.",
       top: "Back to top",
+      privacy: "Privacy notice",
     },
     knowsAbout: [
       "Process automation",
@@ -687,6 +832,7 @@ export const UI = {
     ready: "Your message is ready",
     readyText: (email) => `Open it in your email app, or copy it and send it to ${email}.`,
     open: "Open in my email",
+    whatsapp: "Send on WhatsApp",
     copy: "Copy message",
     edit: "Edit answers",
     needArea: "Pick at least one option or describe it in a sentence.",
@@ -970,6 +1116,7 @@ export const AGENDA_LAB = {
     placeholderOff: "Connecting…",
     send: "Send",
     remaining: (n) => `${n} messages left in this demo`,
+    fakeData: "Sample clinic: don't type real data.",
     suggestions: [
       "What services do you offer and how much are they?",
       "I'd like a cleaning on Thursday afternoon",

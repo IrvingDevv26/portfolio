@@ -66,6 +66,16 @@ A bilingual (Spanish and English) portfolio that sells by showing: three live de
   `src/content/es.js` and `src/content/en.js`, which share the same shape;
   `npm run check:content` (also in CI) fails if one of them is missing
   something.
+- **Made to sell to Mexican SMBs**: the Spanish hero sends accountants to
+  `/contadores` (FacturaCheck) and clinics to `/consultorios` (AgendaFlow),
+  each with the problem, the animated demo, what it includes, a starting
+  price, privacy and contact. Starting prices live in a "Rates" section and
+  the FAQ (MXN in Spanish, USD in English). WhatsApp buttons carry a message
+  that depends on the page, next to a 15-minute Cal.com booking link; both
+  stay hidden until `src/content/contact.js` has a number and a link. There is
+  a privacy notice under Mexican law at `/privacidad`, and the home page
+  pings the demo APIs on load, so they are awake by the time a visitor opens
+  one.
 - **Demos safe for freelance platforms**: Workana penalizes proposals that
   share contact data, so a demo opened straight from its link shows no path to
   it (no link to the home page, no contact buttons). Sales mode brings back the
@@ -230,6 +240,11 @@ repository activity; re-enable it from the Actions tab if that happens.
   `src/content/es.js` y su versión en inglés en `src/content/en.js` (con la
   misma forma; `npm run check:content` avisa si falta algo); la paleta y las
   animaciones globales en `src/styles/GlobalStyles.jsx`.
+- **Contacto y pymes:** tu WhatsApp, tu agenda de Cal.com y el domicilio del
+  aviso de privacidad van en `src/content/contact.js` (mientras estén vacíos,
+  sus botones no aparecen). Las páginas `/contadores` y `/consultorios` toman
+  sus textos de `src/content/clientes.js`; los precios de entrada están en
+  `PRICING` y en las preguntas frecuentes.
 
 ## License
 

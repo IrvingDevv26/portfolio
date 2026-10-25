@@ -546,7 +546,7 @@ const DataLab = () => {
 
   return (
     <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
-      <LabHeader />
+      <LabHeader topic="datarefine" />
 
       <main className="relative isolate overflow-hidden">
         {/* Presentación sobre una cuadrícula animada */}
@@ -746,7 +746,7 @@ const DataLab = () => {
                 {words.forBusinessText}
               </p>
               <div className="mt-auto flex flex-wrap gap-2 pt-6">
-                <TalkButton />
+                <TalkButton topic="datarefine" />
                 <VideoButton
                   url={PROJECT.video}
                   label={UI.common.watchVideo}
