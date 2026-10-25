@@ -1,21 +1,19 @@
 import { motion, MotionConfig } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import ActionLog from "../components/agenda/ActionLog";
 import Chat from "../components/agenda/Chat";
 import { ClinicCard, ClinicDetails } from "../components/agenda/ClinicCard";
 import { daysBetween, minutesOf, timeNow } from "../components/agenda/dates";
 import WeekCalendar, { LAST_WEEK } from "../components/agenda/WeekCalendar";
-import { ArrowLeftIcon, ArrowRightIcon, CheckIcon } from "../components/icons";
+import { ArrowRightIcon, CheckIcon } from "../components/icons";
 import BlurText from "../components/reactbits/BlurText";
-import ShinyText from "../components/reactbits/ShinyText";
 import SpotlightCard from "../components/reactbits/SpotlightCard";
 import Squares from "../components/reactbits/Squares";
+import { LabHeader, TalkButton } from "../components/LabParts";
 import { Eyebrow } from "../components/shared";
 import VideoButton from "../components/VideoButton";
-import LanguageSwitch from "../components/LanguageSwitch";
 import { useDocumentTitle, useMediaQuery } from "../lib/hooks";
-import { useContent, useLang, useLocalize } from "../lib/i18n";
+import { useContent, useLang } from "../lib/i18n";
 import { card, focusRing } from "../lib/ui";
 
 /* Demo en vivo de AgendaFlow: un agente de IA que agenda, cambia y cancela
@@ -88,7 +86,6 @@ const TABS = [
 const AgendaLab = () => {
   const { AGENDA_LAB: words, AGENDA_PROJECT, DATES, UI } = useContent();
   const lang = useLang();
-  const to = useLocalize();
   const { errors } = words;
   const locale = DATES.locale;
   useDocumentTitle(words.title);
@@ -251,23 +248,7 @@ const AgendaLab = () => {
   return (
     <MotionConfig reducedMotion="user">
       <div className="grain font-body min-h-screen bg-[color:var(--ink)] text-[color:var(--text)]">
-        <header className="relative z-10 border-b border-[color:var(--line)] bg-[color:var(--ink)]/80 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-10">
-            <Link
-              to={to("/")}
-              className={`inline-flex items-center gap-2 rounded-md text-sm text-[color:var(--muted)] transition-colors hover:text-[color:var(--text)] ${focusRing}`}
-            >
-              <ArrowLeftIcon className="h-4 w-4" /> {UI.common.backToPortfolio}
-            </Link>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--line)] bg-[color:var(--glass)] px-3 py-1 text-xs font-medium max-[420px]:hidden">
-                <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--clean)]" />
-                <ShinyText text={UI.common.liveDemo} />
-              </span>
-              <LanguageSwitch />
-            </div>
-          </div>
-        </header>
+        <LabHeader />
 
         {/* overflow-x-clip (y no hidden) para que las pestañas puedan quedarse fijas */}
         <main className="relative isolate overflow-x-clip">
@@ -437,6 +418,7 @@ const AgendaLab = () => {
                   {words.cards.wantText}
                 </p>
                 <div className="mt-auto flex flex-wrap gap-2 pt-6">
+                  <TalkButton />
                   <VideoButton
                     url={AGENDA_PROJECT.video}
                     label={UI.common.watchVideo}

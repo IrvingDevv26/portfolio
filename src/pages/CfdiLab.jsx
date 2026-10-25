@@ -12,6 +12,7 @@ import {
   ErrorAlert,
   LabHeader,
   Stepper,
+  TalkButton,
   SubTitle,
 } from "../components/LabParts";
 import BlurText from "../components/reactbits/BlurText";
@@ -1023,6 +1024,7 @@ const CfdiLab = () => {
                 {words.forBusinessText}
               </p>
               <div className="mt-auto flex flex-wrap gap-2 pt-6">
+                <TalkButton />
                 <VideoButton
                   url={FACTURA_PROJECT.video}
                   label={UI.common.watchVideo}
