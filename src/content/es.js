@@ -849,11 +849,8 @@ export const DATA_LAB = {
   previewIssues: "Vista previa del archivo original con los problemas resaltados",
   previewFile: "Vista previa del archivo",
   noProblems: "No vemos problemas evidentes; la IA revisará el contenido a fondo.",
-  tooManyRows: (rows, max) => [
-    `Tu archivo tiene ${rows.toLocaleString("es-MX")} filas y la demo procesa hasta ${max}. Prueba con una parte o `,
-    "escríbeme",
-    " y lo limpio completo para tu empresa.",
-  ],
+  tooManyRows: (rows, max) =>
+    `Tu archivo tiene ${rows.toLocaleString("es-MX")} filas y la demo procesa hasta ${max}. Prueba con una parte del archivo.`,
   clean: "Limpiar con IA",
   retry: "Reintentar",
   willFix: (n) =>
@@ -908,7 +905,7 @@ export const DATA_LAB = {
     "Es una demo pública: no subas datos sensibles. La versión para tu empresa no tiene estos límites.",
   forBusiness: "¿Lo necesitas para tu negocio?",
   forBusinessText:
-    "Lo adapto a tus archivos: reglas de tu operación, más columnas o conexión directa con tu sistema. En una llamada te digo cómo quedaría.",
+    "Lo adapto a tus archivos: reglas de tu operación, más columnas o conexión directa con tu sistema.",
 };
 
 // Nombre y explicación de cada tipo de problema (los colores están en lib/sheet.js)

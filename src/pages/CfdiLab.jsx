@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   AlertIcon,
   ArrowRightIcon,
@@ -27,7 +26,7 @@ import VideoButton from "../components/VideoButton";
 import { formatSize } from "../lib/files";
 import { hasHardwareWebGL } from "../lib/gpu";
 import { useDocumentTitle } from "../lib/hooks";
-import { useContent, useLang, useLocalize } from "../lib/i18n";
+import { useContent, useLang } from "../lib/i18n";
 import { useToast } from "../lib/toast";
 import { btn, card, focusRing, iconBtn, STATE_CHIP } from "../lib/ui";
 
@@ -606,7 +605,6 @@ const Result = ({ result, excelUrl, duration, onReset, words, locale }) => {
 const CfdiLab = () => {
   const { CFDI_LAB: words, DATES, FACTURA_PROJECT, UI } = useContent();
   const lang = useLang();
-  const to = useLocalize();
   const notify = useToast();
   useDocumentTitle(words.title);
 
@@ -980,7 +978,7 @@ const CfdiLab = () => {
             </div>
           </section>
 
-          {/* Información y contacto */}
+          {/* Información */}
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             <SpotlightCard className={`${card} p-6`}>
               <h2 className="font-display text-lg font-semibold">
@@ -1025,9 +1023,6 @@ const CfdiLab = () => {
                 {words.forBusinessText}
               </p>
               <div className="mt-auto flex flex-wrap gap-2 pt-6">
-                <Link to={to("/#contacto")} className={btn("primary", "sm")}>
-                  {UI.common.letsTalk} <ArrowRightIcon className="h-4 w-4" />
-                </Link>
                 <VideoButton
                   url={FACTURA_PROJECT.video}
                   label={UI.common.watchVideo}
